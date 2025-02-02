@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
+    "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.125",
@@ -47,8 +47,8 @@
     "@types/react-router-dom": "^5.3.3",
     "ajv": "^8.17.1",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.31",
+    "postcss": "^8.5.1",
     "postcss-loader": "^7.0.2",
-    "tailwindcss": "^4.0.1"
+    "tailwindcss": "^4.0.3"
   }
 }
