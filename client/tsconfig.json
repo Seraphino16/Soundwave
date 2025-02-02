@@ -1,29 +1,32 @@
 {
-  "compilerOptions": {
-      "target": "esnext",
-      "lib": ["dom", "dom.iterable", "esnext"],
-      "baseUrl": "src",
-      "paths": {
-          "components/*": ["components/*"],
-          "utils/*": ["utils/*"],
-          "types/*": ["types/*"],
-          "assets/*": ["assets/*"],
-          "styles/*": ["styles/*"],
-          "pages/*": ["pages/*"],
-      },
-      "allowJs": true,
-      "skipLibCheck": true,
-      "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "strict": true,
-      "forceConsistentCasingInFileNames": true,
-      "noFallthroughCasesInSwitch": true,
-      "module": "esnext",
-      "moduleResolution": "node",
-      "resolveJsonModule": true,
-      "isolatedModules": true,
-      "noEmit": true,
-      "jsx": "react-jsx"
-  },
-  "include": ["src"]
+    "compilerOptions": {
+        "target": "esnext",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "baseUrl": "src",
+        "paths": {
+            "components/*": ["components/*"],
+            "utils/*": ["utils/*"],
+            "types/*": ["types/*"],
+            "assets/*": ["assets/*"],
+            "styles/*": ["styles/*"],
+            "pages/*": ["pages/*"]
+        },
+        "allowJs": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "exactOptionalPropertyTypes": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "react-jsx"
+    },
+    "include": ["src"]
 }
