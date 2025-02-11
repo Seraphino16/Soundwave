@@ -1,6 +1,6 @@
 // @ts-ignore
 import React from 'react';
-import './styles/App.css';
+import './assets/styles/App.css';
 
 export default function App() {
   return (
