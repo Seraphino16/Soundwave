@@ -22,7 +22,7 @@ const NavbarItem: React.FC<NavbarItemProps> = ({ text, href, onClick, icon }) =>
         <Link
             to={href}
             onClick={onClick}
-            className="flex items-center justify-center px-4 py-2 text-lg rounded-lg text-[#93AFD9] transition-colors duration-200 ease-in-out hover:underline underline-offset-8 dark:bg-transparent dark:text-[#93AFD9]"
+            className="flex items-center justify-center px-4 py-2 text-lg rounded-lg text-primaryBlue transition-colors duration-200 ease-in-out hover:underline underline-offset-8 dark:bg-transparent dark:text-primaryBlue"
         >
             {icon && <span className="mr-2">{icon}</span>}
             {text}
