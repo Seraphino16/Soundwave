@@ -1,13 +1,17 @@
 // @ts-ignore
 import React from 'react';
-import './styles/App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './assets/styles/App.css';
+import Home from './pages/Home';
+import AlertTestPage from './pages/AlertTestPage';
 
 export default function App() {
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold text-red-500">
-        tailwindcss
-      </h1>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/alert" element={<AlertTestPage />} />
+      </Routes>
+    </Router>
   );
 }
