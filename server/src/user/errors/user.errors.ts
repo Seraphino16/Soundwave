@@ -11,6 +11,12 @@ export class UserErrors {
     static readonly PASSWORD_NUMBER = 'Le mot de passe doit contenir au moins un chiffre';
     static readonly PASSWORD_SPECIAL_CHAR = 'Le mot de passe doit contenir au moins un caractère spécial';
 
+    static readonly PSEUDO_REQUIRED = "Le pseudo est requis"
+    static readonly USERNAME_REQUIRED = "Le nom d'utilisateur est requis"
+    static readonly USERNAME_ALREADY_EXISTS = 'Le nom d\'utilisateur existe déjà';
+
+    static readonly BIRTHDATE_INVALID = "La date de naissance doit être une date valide (YYYY-MM-DD)"
+
     static readonly UNKNOW_ERROR = 'Une erreur inconnue est survenue, veuillez réessayer plus tard';
 
 
