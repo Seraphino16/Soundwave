@@ -29,7 +29,7 @@ const AlertTestPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
+    <div className="flex flex-col justify-center items-center h-screen ">
       <h1 className="text-4xl font-bold text-red-500 mb-4">
         tailwindcss
       </h1>
