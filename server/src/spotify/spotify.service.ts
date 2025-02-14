@@ -36,7 +36,6 @@ export class SpotifyService {
         },
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
       const accessToken = authResponse.data.access_token;
 
       // Appeler l'API des nouvelles sorties avec le token d'accès
@@ -53,7 +52,6 @@ export class SpotifyService {
         },
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return response.data; // Retourner les données de la réponse API
     } catch (error) {
       console.error('Erreur lors de la récupération des albums:', error);
