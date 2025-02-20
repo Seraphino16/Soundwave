@@ -11,4 +11,15 @@ export class UserRepository {
         return newUser.save();
     }
 
+    async findByEmail(email: string): Promise<User | null> {
+        return this.userModel.findOne({ email }).exec();
+    }
+    async findByUsername(username: string): Promise<User | null> {
+        return this.userModel.findOne({ username }).exec();
+    }
+
+    async findById(id: number): Promise<User | null> {
+        return this.userModel.findOne({ id }).exec();
+    }
+
 }
