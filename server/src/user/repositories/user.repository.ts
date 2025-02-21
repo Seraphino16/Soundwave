@@ -1,11 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { User } from '../entities/user.entity'
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UserRepository {
     constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+
+    async setId(): Promise<number> {
+        const lastUser = await this.userModel.findOne().sort({ id: -1 }).exec();
+        return lastUser ? lastUser.id + 1 : 1;
+    }
+
     async create(
         id: number,
         email: string,
