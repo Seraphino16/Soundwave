@@ -29,7 +29,7 @@ export class UserRepository {
         is_verified: boolean = false,
         is_active: boolean = true
     ): Promise<User> {
-        const newUser = new this.userModel({
+        const newUser = await this.userModel.create({
             id,
             email,
             password,
@@ -46,9 +46,10 @@ export class UserRepository {
             is_verified,
             is_active,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
         });
-        return newUser.save();
+
+        return newUser;
     }
 
     async findByEmail(email: string): Promise<User | null> {
