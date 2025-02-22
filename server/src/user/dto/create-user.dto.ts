@@ -2,28 +2,34 @@ import { IsEmail, IsString, MinLength, IsOptional, IsNotEmpty, Matches, IsIn, Is
 import { UserErrors } from '../errors/user.errors';
 
 export class CreateUserDto {
-    @IsNotEmpty({ message: UserErrors.EMAIL_REQUIRED })
-    @IsEmail({}, { message: UserErrors.EMAIL_INVALID })
+
+    @IsNotEmpty({ message: UserErrors.emailRequired().message })
+    @IsEmail({}, { message: UserErrors.emailInvalid().message })
     email: string;
 
     @IsString()
-    @IsNotEmpty({ message: UserErrors.PSEUDO_REQUIRED })
+    @IsNotEmpty({ message: UserErrors.pseudoRequired().message })
     pseudo: string;
 
     @IsString()
-    @IsNotEmpty({ message: UserErrors.USERNAME_REQUIRED })
+    @IsNotEmpty({ message: UserErrors.usernameRequired().message })
     username: string;
 
-    @IsDateString({}, { message: UserErrors.BIRTHDATE_INVALID })
+    @IsDateString({}, { message: UserErrors.birthdateInvalid().message })
     birthdate: Date;
 
     @IsString()
-    @MinLength(6, { message: UserErrors.PASSWORD_TOO_SHORT })
-    @Matches(/[A-Z]/, { message: UserErrors.PASSWORD_UPPERCASE })
-    @Matches(/[a-z]/, { message: UserErrors.PASSWORD_LOWERCASE })
-    @Matches(/[0-9]/, { message: UserErrors.PASSWORD_NUMBER })
-    @Matches(/[@$!%*?&]/, { message: UserErrors.PASSWORD_SPECIAL_CHAR })
+    @MinLength(6, { message: UserErrors.passwordTooShort().message })
+    @Matches(/[A-Z]/, { message: UserErrors.passwordUppercase().message })
+    @Matches(/[a-z]/, { message: UserErrors.passwordLowercase().message })
+    @Matches(/[0-9]/, { message: UserErrors.passwordNumber().message })
+    @Matches(/[@$!%*?&]/, { message: UserErrors.passwordSpecialChar().message })
+    @IsOptional()
     password: string;
+
+    @IsString()
+    @IsNotEmpty({ message: UserErrors.passwordsDoNotMatch().message })
+    passwordConfirm: string;
 
     @IsString()
     @IsOptional()
@@ -46,7 +52,7 @@ export class CreateUserDto {
     spotifyId: string;
 
     @IsArray()
-    @IsIn(['USER', 'ADMIN', 'ARTIST', 'BAND'], { each: true })
+    @IsIn(['USER', 'ADMIN', 'ARTIST', 'BAND'], { each: true, message: UserErrors.missingRequiredFields().message })
     roles: string[];
 
     @IsString()
