@@ -66,4 +66,19 @@ export class UserController {
       throw new BadRequestException(UserErrors.unknownError().message);
     }
   }
+
+  @Get('validate')
+  async validateAccount(@Query('token') token: string): Promise<UserSuccess> {
+    try {
+      await this.userService.validateAndActivateAccount(token);
+      return UserSuccess.accountValidated();
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Erreur interne lors de la validation du compte',
+      );
+    }
+  }
 }
