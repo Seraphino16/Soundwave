@@ -39,6 +39,8 @@ export class UserService {
       throw new BadRequestException(UserErrors.passwordsDoNotMatch().message);
     }
 
+    this.validateAge(birthdate);
+
     const existingUserByEmail = await this.userRepository.findByEmail(email);
     if (existingUserByEmail) {
       throw new ConflictException(UserErrors.emailAlreadyExists().message);
