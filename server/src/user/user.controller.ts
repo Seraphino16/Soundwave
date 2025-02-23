@@ -17,7 +17,10 @@ import { firstValueFrom } from 'rxjs';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly httpService: HttpService,
+  ) {}
 
   @Post('create')
   async create(@Body() createUserDto: CreateUserDto): Promise<UserSuccess> {
