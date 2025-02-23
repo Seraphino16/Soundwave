@@ -55,34 +55,28 @@ export const UserSchema = new Schema<User>(
     googleId: {
       type: String,
       required: false,
-      unique: true,
     },
     twitterId: {
       type: String,
       required: false,
-      unique: true,
     },
     facebookId: {
       type: String,
       required: false,
-      unique: true,
     },
     spotifyId: {
       type: String,
       required: false,
-      unique: true,
     },
     deezerId: {
       type: String,
       required: false,
-      unique: true,
     },
     roles: {
       type: [String],
       enum: ['USER', 'ADMIN', 'ARTIST', 'BAND'],
       default: ['USER'],
       required: true,
-      unique: false,
     },
     verification_token: {
       type: String,
@@ -113,4 +107,25 @@ export const UserSchema = new Schema<User>(
   {
     timestamps: true,
   },
+);
+
+UserSchema.index(
+  { googleId: 1 },
+  { unique: true, partialFilterExpression: { googleId: { $ne: null } } },
+);
+UserSchema.index(
+  { facebookId: 1 },
+  { unique: true, partialFilterExpression: { facebookId: { $ne: null } } },
+);
+UserSchema.index(
+  { twitterId: 1 },
+  { unique: true, partialFilterExpression: { twitterId: { $ne: null } } },
+);
+UserSchema.index(
+  { spotifyId: 1 },
+  { unique: true, partialFilterExpression: { spotifyId: { $ne: null } } },
+);
+UserSchema.index(
+  { deezerId: 1 },
+  { unique: true, partialFilterExpression: { deezerId: { $ne: null } } },
 );
