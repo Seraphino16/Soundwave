@@ -75,4 +75,45 @@ export class UserService {
 
     return newUser.id;
   }
+
+  private validateAge(birthdate: Date): void {
+    const birthDate = new Date(birthdate);
+    if (isNaN(birthDate.getTime())) {
+      throw new BadRequestException(UserErrors.birthdateInvalid().message);
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+    const day = today.getDate() - birthDate.getDate();
+
+    if (month < 0 || (month === 0 && day < 0)) {
+      age--;
+    }
+
+    if (age < 13) {
+      throw new BadRequestException(UserErrors.ageTooYoung().message);
+    }
+  }
+
+  async saveValidationToken(userId: number, token: string): Promise<void> {
+    const success = await this.userRepository.setValidationToken(userId, token);
+    if (!success) {
+      throw new BadRequestException(UserErrors.userNotFound().message);
+    }
+  }
+
+  async validateAndActivateAccount(token: string): Promise<void> {
+    const user = await this.userRepository.findByVerificationToken(token);
+
+    if (!user) {
+      throw new BadRequestException(UserErrors.invalidToken().message);
+    }
+
+    const success = await this.userRepository.activateUser(user.id);
+
+    if (!success) {
+      throw new BadRequestException(UserErrors.activationFailed().message);
+    }
+  }
 }
