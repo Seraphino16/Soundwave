@@ -128,6 +128,33 @@ export class UserErrors {
     );
   }
 
+  static ageTooYoung() {
+    return UserErrors.createError(
+      'error',
+      400,
+      "L'utilisateur doit avoir au moins 13 ans",
+    );
+  }
+
+  static invalidToken(): UserErrors {
+    return new UserErrors(
+      'error',
+      400,
+      'Le token est invalide ou déjà utilisé',
+    );
+  }
+
+  static accountAlreadyActivated(): UserErrors {
+    return new UserErrors('error', 400, 'Le compte a déjà été activé');
+  }
+  static activationFailed(): UserErrors {
+    return new UserErrors(
+      'error',
+      400,
+      "L'activation du compte a échoué. Veuillez réessayer.",
+    );
+  }
+
   static internalServerError() {
     return UserErrors.createError('error', 500, 'Erreur interne du serveur');
   }
