@@ -1,5 +1,6 @@
 /**
  * @description Page de test des différentes alertes. 
+ * @author SoundWave
  * */
 
 import React, { useState } from 'react';

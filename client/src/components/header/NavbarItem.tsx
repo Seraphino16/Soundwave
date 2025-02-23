@@ -1,5 +1,6 @@
 /**
  * @description Élément textuel de la barre de navigation
+ * @author SoundWave
  * @param {string} text - Texte à afficher dans l'élément de navigation
  * @param {string} href - URL vers laquelle l'élément de navigation pointe
  * @param {function} [onClick] - Fonction à appeler lors du clic sur l'élément de navigation
