@@ -4,11 +4,17 @@ import {
   Body,
   BadRequestException,
   ConflictException,
+  Get,
+  Query,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
+import { CreateUserDto } from './dto/create-user.dto';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
