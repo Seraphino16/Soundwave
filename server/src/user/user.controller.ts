@@ -27,6 +27,33 @@ export class UserController {
     try {
       const userId = await this.userService.createUser(createUserDto);
 
+      const generateTokenDto = {
+        email: createUserDto.email,
+        username: createUserDto.username,
+        id: userId,
+      };
+
+
+      const tokenResponse = await firstValueFrom(
+        this.httpService.post(
+          'http://localhost:5001/token/generate-email-validation',
+          generateTokenDto,
+        ),
+      );
+
+      const token = tokenResponse.data;
+      await this.userService.saveValidationToken(userId, token);
+
+      await firstValueFrom(
+        this.httpService.post(
+          'http://localhost:5001/mailer/send-validation-email',
+          {
+            email: createUserDto.email,
+            token: token,
+          },
+        ),
+      );
+
       return UserSuccess.userCreated(userId);
     } catch (error) {
       if (
