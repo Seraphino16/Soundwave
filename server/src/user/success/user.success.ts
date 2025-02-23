@@ -29,4 +29,12 @@ export class UserSuccess {
       data,
     );
   }
+
+  static accountValidated() {
+    return UserSuccess.createSuccess(
+      'success',
+      200,
+      'Compte utilisateur validé et activé avec succès',
+    );
+  }
 }
