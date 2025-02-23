@@ -59,4 +59,34 @@ export class UserRepository {
   async findById(id: number): Promise<User | null> {
     return this.userModel.findOne({ id }).exec();
   }
+
+  async setValidationToken(userId: number, token: string): Promise<boolean> {
+    const user = await this.userModel.findOne({ id: userId }).exec();
+
+    if (!user) {
+      return false;
+    }
+
+    user.verification_token = token;
+    await user.save();
+    return true;
+  }
+
+  async findByVerificationToken(token: string): Promise<User | null> {
+    return this.userModel.findOne({ verification_token: token }).exec();
+  }
+
+  async activateUser(userId: number): Promise<boolean> {
+    const user = await this.userModel.findOne({ id: userId }).exec();
+
+    if (!user) {
+      return false;
+    }
+
+    user.is_verified = true;
+    user.is_active = true;
+    user.verification_token = '';
+    await user.save();
+    return true;
+  }
 }
