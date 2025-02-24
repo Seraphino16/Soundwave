@@ -1,5 +1,5 @@
 /**
- * @description Élément textuel de la barre de navigation
+ * @description Liens cliquables de la barre de navigation et du pied de page du site SoundWave
  * @author SoundWave
  * @param {string} text - Texte à afficher dans l'élément de navigation
  * @param {string} href - URL vers laquelle l'élément de navigation pointe
@@ -11,14 +11,14 @@ import { JSX } from 'react';
 import { Link } from 'react-router-dom';
 import "../../assets/styles/Navbar.css";
 
-interface NavbarItemProps {
+interface NavItemProps {
     text: string;
     href: string;
     onClick?: () => void;
     icon?: JSX.Element;
 }
 
-const NavbarItem: React.FC<NavbarItemProps> = ({ text, href, onClick, icon }) => {
+const NavItem: React.FC<NavItemProps> = ({ text, href, onClick, icon }) => {
     return (
         <Link
             to={href}
@@ -31,4 +31,4 @@ const NavbarItem: React.FC<NavbarItemProps> = ({ text, href, onClick, icon }) =>
     );
 }
 
-export default NavbarItem;
+export default NavItem;

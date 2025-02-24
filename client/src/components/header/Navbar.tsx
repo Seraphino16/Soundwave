@@ -3,7 +3,7 @@
  */
 
 import { useState } from "react";
-import NavbarItem from "./NavbarItem";
+import NavbarItem from "../utils/NavItem";
 import "../../assets/styles/Navbar.css";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
