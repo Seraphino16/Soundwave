@@ -10,7 +10,7 @@ import footerWaveRight from "../../assets/images/footerWaveRight.png";
 
 const Footer = () => {
     return (
-        <div className="fixed bottom-0 w-full flex justify-center">
+        <div className="bottom-0 w-full flex justify-center">
             <footer className="w-full md:w-[95%] flex flex-col md:flex-row items-center justify-between bg-white font-inter py-6 md:py-12 md:rounded-t-xl">
                 
                 <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
