@@ -9,9 +9,8 @@ import NavbarItem from "../utils/NavItem";
 import "../../assets/styles/Navbar.css";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
-import MessagesIcon from "../icons/MessagesIcon";
-import ProfileIcon from "../icons/ProfileIcon";
-import SettingsIcon from "../icons/SettingsIcon";
+import SearchBar from "../searchBar/SearchBar";
+import { MessagesIcon, ProfileIcon, SettingsIcon} from "../utils/Icons";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -93,6 +92,7 @@ const Navbar = () => {
                                         <SettingsIcon />
                                     </a>
                                 </div>
+                                <SearchBar />
                             </div>
                         </motion.div>
                     )}
