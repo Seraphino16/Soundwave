@@ -1,4 +1,5 @@
 export class UserErrors {
+
   status: string;
   code: number;
   message: string;
@@ -159,3 +160,4 @@ export class UserErrors {
     return UserErrors.createError('error', 500, 'Erreur interne du serveur');
   }
 }
+
