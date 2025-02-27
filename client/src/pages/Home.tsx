@@ -15,9 +15,11 @@ const Home: React.FC = () => {
                 description="Page d'accueil du site SoundWave"
                 // Rajouter la canonical URL quand il y en aura une (valable pour toutes les pages)
             />
-            <div className="flex flex-col items-center justify-center h-screen">
-                <h1 className="text-4xl font-bold text-center mb-8">Bienvenue sur SoundWave</h1>
-                <SearchBar />
+            
+            <div className="relative mt-28 md:ml-10 lg:ml-12">
+                <div className="hidden md:block w-[20%]">
+                    <SearchBar />
+                </div>
             </div>
         </>
     );
