@@ -1,5 +1,6 @@
 /**
  * @description Pop up apparaîssant en bas à droite de la fenêtre afin d'afficher des messages d'alerte.
+ * @author SoundWave
  * @param {string} type - Types des messages (error, warning, info, success).
  * @param {string} title - Titre du message
  * @param {string} message - Message à afficher
@@ -30,7 +31,7 @@ const Alert: React.FC<AlertProps> = ({ id, type, title, message, onClose }) => {
             : "bg-yellow-100 text-yellow-800";
 
     return (
-        <div className="relative transform transition-transform duration-500 ease-out translate-y-4 opacity-0 animate-slide-up mr-4">
+        <div className="relative z-50 transform transition-transform duration-500 ease-out translate-y-4 opacity-0 animate-slide-up mr-4">
             <div className={`p-4 ${alertClass}`}>
                 <button onClick={() => onClose(id)} className="absolute top-0 right-0 mt-2 mr-2 text-gray-500 hover:text-gray-700">&times;</button>
                 <strong>{title}</strong>

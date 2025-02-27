@@ -4,14 +4,22 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './assets/styles/App.css';
 import Home from './pages/Home';
 import AlertTestPage from './pages/AlertTestPage';
+import Navbar from './components/header/Navbar';
+import Footer from './components/footer/Footer';
 
 export default function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/alert" element={<AlertTestPage />} />
-      </Routes>
+      <div className="flex flex-col min-h-screen bg-light-bg">
+        <Navbar />
+        <div className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/alert" element={<AlertTestPage />} />
+          </Routes>
+        </div>
+        <Footer />
+      </div>
     </Router>
   );
 }
