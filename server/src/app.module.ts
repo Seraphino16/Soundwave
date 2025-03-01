@@ -26,7 +26,12 @@ import { TokenModule } from './token/token.module';
     MailerModule,
     AuthModule,
   ],
-  controllers: [AppController, MailerController, TokenController],
+  controllers: [
+    AppController,
+    MailerController,
+    TokenController,
+    AuthController,
+  ],
   providers: [AppService, MailerService, TokenService],
 
 })
