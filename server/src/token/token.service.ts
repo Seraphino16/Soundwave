@@ -25,7 +25,7 @@ export class TokenService {
 
     const payload = { username, id };
     return jwt.sign(payload, this.jwtSecret, {
-      expiresIn: this.jwtExpiresIn,
+      expiresIn: '24h',
     });
   }
 
