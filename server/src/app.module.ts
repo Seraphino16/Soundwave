@@ -13,6 +13,9 @@ import { TokenModule } from './token/token.module';
 import { ConfigModule } from '@nestjs/config';
 import { SpotifyService } from './spotify/spotify.service';
 import { SpotifyController } from './spotify/spotify.controller';
+import { ConfigModule } from '@nestjs/config';
+import { SpotifyService } from './spotify/spotify.service';
+import { SpotifyController } from './spotify/spotify.controller';
 
 @Module({
   imports: [
@@ -31,6 +34,13 @@ import { SpotifyController } from './spotify/spotify.controller';
   controllers: [AppController, MailerController, TokenController],
   providers: [AppService, MailerService, TokenService],
 
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
+  controllers: [SpotifyController],
+  providers: [SpotifyService],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
