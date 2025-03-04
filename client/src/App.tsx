@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import AlertTestPage from './pages/AlertTestPage';
 import Navbar from './components/header/Navbar';
 import Footer from './components/footer/Footer';
+import Albums from 'pages/Albums';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/albums" element={<Albums />} />
             <Route path="/alert" element={<AlertTestPage />} />
           </Routes>
         </div>
