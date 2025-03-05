@@ -29,7 +29,7 @@ const Navbar = () => {
                     </span>
                 </div>
                 <div className="hidden lg:flex space-x-6">
-                    <NavbarItem text="ALBUMS" href="#" />
+                    <NavbarItem text="ALBUMS" href="/albums" />
                     <NavbarItem text="ARTISTES" href="#" />
                     <NavbarItem text="EVENEMENTS" href="#" />
                 </div>
