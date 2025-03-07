@@ -14,7 +14,6 @@ export class SpotifyService {
     this.clientSecret = <string>this.configService.get<string>('SPOTIFY_CLIENT_SECRET');
   }
 
-  // Récupérer un token d'accès Spotify
   private async getAccessToken(): Promise<string> {
     const authResponse = await axios.post(
         'https://accounts.spotify.com/api/token',
@@ -30,23 +29,37 @@ export class SpotifyService {
     return authResponse.data.access_token;
   }
 
-  // Récupérer les nouvelles sorties d'albums
-  async getNewReleases(limit: number, offset: number) {
+  async getAllNewReleases() {
     try {
       const accessToken = await this.getAccessToken();
+      let allAlbums: { title: string; coverImage: string | null }[] = [];
+      let limit = 50;
+      let offset = 0;
+      let hasMore = true;
 
-      const response = await axios.get(`${this.spotifyApiUrl}/browse/new-releases`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        params: { limit, offset },
-      });
+      while (hasMore) {
+        const response = await axios.get(`${this.spotifyApiUrl}/browse/new-releases`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          params: { limit, offset },
+        });
 
-      // Filtrer pour ne garder que le titre et l'image de couverture
-      const albums = response.data.albums.items.map((album) => ({
-        title: album.name,
-        coverImage: album.images.length > 0 ? album.images[0].url : null,
-      }));
+        const albums = response.data.albums.items.map((album: any) => ({
+          title: album.name,
+          coverImage: album.images.length > 0 ? album.images[0].url : null,
+        }));
 
-      return { total: response.data.albums.total, albums };
+        allAlbums = [...allAlbums, ...albums];
+
+        const totalAlbumsFromSpotify = response.data.albums.total;
+
+        if (offset + limit >= totalAlbumsFromSpotify) {
+          hasMore = false;
+        } else {
+          offset += limit;
+        }
+      }
+
+      return { albums: allAlbums };
     } catch (error) {
       console.error('Erreur lors de la récupération des albums:', error);
       throw new Error('Impossible de récupérer les albums');

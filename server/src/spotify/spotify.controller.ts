@@ -6,7 +6,7 @@ export class SpotifyController {
   constructor(private readonly spotifyService: SpotifyService) {}
 
   @Get()
-  async getNewReleases() {
-    return this.spotifyService.getNewReleases(12, 0);
+  async getAllNewReleases() {
+    return await this.spotifyService.getAllNewReleases();
   }
 }
