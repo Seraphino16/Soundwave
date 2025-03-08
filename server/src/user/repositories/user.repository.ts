@@ -89,4 +89,18 @@ export class UserRepository {
     await user.save();
     return true;
   }
+
+  async checkAccountVerification(userId: number): Promise<boolean> {
+    const user = await this.userModel.findOne({ id: userId }).exec();
+
+    if (!user) {
+      return false;
+    }
+
+    if (!user.is_verified || !user.is_active) {
+      return false;
+    }
+
+    return true;
+  }
 }
