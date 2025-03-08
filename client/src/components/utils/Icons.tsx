@@ -100,12 +100,11 @@ export const SettingsIcon = () => (
 // Icône Google
 export const GoogleIcon = () => (
     <svg
-        class="w-6 h-6 text-gray-800 dark:text-white"
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         width="24"
         height="24"
-        fill="currentColor"
+        fill="black"
         viewBox="0 0 24 24"
     >
         <path
