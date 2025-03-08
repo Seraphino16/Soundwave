@@ -16,7 +16,7 @@ const Home: React.FC = () => {
                 // Rajouter la canonical URL quand il y en aura une (valable pour toutes les pages)
             />
             
-            <div className="relative mt-28 ml-6 md:ml-10 lg:ml-8 xl:ml-10">
+            <div className="relative ml-6 md:ml-10 lg:ml-8 xl:ml-10">
                 <div className="hidden lg:block w-[20%]">
                     <SearchBar />
                 </div>

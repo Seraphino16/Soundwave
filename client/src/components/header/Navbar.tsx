@@ -7,15 +7,35 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavbarItem from "../utils/NavItem";
 import "../../assets/styles/Navbar.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import SearchBar from "../searchBar/SearchBar";
-import { MessagesIcon, ProfileIcon, SettingsIcon, BurgerMenuIcon } from "../utils/Icons";
+import {
+    MessagesIcon,
+    ProfileIcon,
+    SettingsIcon,
+    BurgerMenuIcon,
+} from "../utils/Icons";
+
+interface NavItem {
+    text: string;
+    href: string;
+}
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
+    const location = useLocation();
+    const navItemsByRoute: Record<string, NavItem[]> = {
+        "/": [
+            { text: "ALBUMS", href: "/albums" },
+            { text: "ARTISTES", href: "/artists" },
+            { text: "EVENEMENTS", href: "/events" },
+        ],
+        "/auth": [],
+    };
+    const navItems = navItemsByRoute[location.pathname] || [];
 
     return (
         <div className="fixed top-0 w-full flex justify-center z-50">
@@ -29,9 +49,13 @@ const Navbar = () => {
                     </span>
                 </div>
                 <div className="hidden lg:flex space-x-6">
-                    <NavbarItem text="ALBUMS" href="#" />
-                    <NavbarItem text="ARTISTES" href="#" />
-                    <NavbarItem text="EVENEMENTS" href="#" />
+                    {navItems.map((item) => (
+                        <NavbarItem
+                            key={item.href}
+                            text={item.text}
+                            href={item.href}
+                        />
+                    ))}
                 </div>
                 <div className="block lg:hidden">
                     <button
@@ -52,7 +76,6 @@ const Navbar = () => {
                         <SettingsIcon />
                     </a>
                 </div>
-
                 <AnimatePresence>
                     {isOpen && (
                         <>
@@ -68,21 +91,37 @@ const Navbar = () => {
                                 initial={{ y: "-100%", opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 exit={{ y: "-100%", opacity: 0 }}
-                                transition={{ duration: 0.2, ease: "easeInOut" }}
+                                transition={{
+                                    duration: 0.2,
+                                    ease: "easeInOut",
+                                }}
                                 className="absolute top-24 left-0 w-full bg-white shadow-md lg:hidden transition-all ease-in-out overflow-hidden z-50"
                             >
                                 <div className="flex flex-col items-center w-full py-4 space-y-4">
-                                    <NavbarItem text="ALBUMS" href="#" />
-                                    <NavbarItem text="ARTISTES" href="#" />
-                                    <NavbarItem text="EVENEMENTS" href="#" />
+                                    {navItems.map((item) => (
+                                        <NavbarItem
+                                            key={item.href}
+                                            text={item.text}
+                                            href={item.href}
+                                        />
+                                    ))}
                                     <div className="flex space-x-6 mt-4">
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                        <a
+                                            href="#"
+                                            className="hover:opacity-80 transition-opacity"
+                                        >
                                             <MessagesIcon />
                                         </a>
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                        <a
+                                            href="#"
+                                            className="hover:opacity-80 transition-opacity"
+                                        >
                                             <ProfileIcon />
                                         </a>
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                        <a
+                                            href="#"
+                                            className="hover:opacity-80 transition-opacity"
+                                        >
                                             <SettingsIcon />
                                         </a>
                                     </div>

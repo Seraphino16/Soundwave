@@ -6,16 +6,18 @@ import Home from './pages/Home';
 import AlertTestPage from './pages/AlertTestPage';
 import Navbar from './components/header/Navbar';
 import Footer from './components/footer/Footer';
+import Auth from './pages/Auth';
 
 export default function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-light-bg">
         <Navbar />
-        <div className="flex-grow">
+        <div className="flex-grow pt-32">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/alert" element={<AlertTestPage />} />
+            <Route path="/auth" element={<Auth />} /> 
           </Routes>
         </div>
         <Footer />
