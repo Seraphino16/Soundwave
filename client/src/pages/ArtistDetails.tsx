@@ -13,7 +13,7 @@ interface Artist {
 }
 
 const ArtistDetail: React.FC = () => {
-    const { id } = useParams<{ id: string }>(); // ✅ Récupère l’ID depuis l’URL
+    const { id } = useParams<{ id: string }>();
     const [artist, setArtist] = useState<Artist | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -37,14 +37,11 @@ const ArtistDetail: React.FC = () => {
                         <h1 className="text-4xl font-bold text-primaryBlue mb-4">{artist.name}</h1>
                         <img src={artist.image || "/default-avatar.png"} alt={artist.name} className="w-64 h-64 object-cover rounded-full mx-auto" />
 
-                        {/* ✅ Affichage des nouvelles infos */}
                         <p className="text-lg mt-4"><strong>Followers:</strong> {artist.followers.toLocaleString()}</p>
                         <p className="text-lg mt-2"><strong>Popularité:</strong> {artist.popularity}/100</p>
 
-                        {/* ✅ Affichage des genres musicaux */}
                         <p className="text-lg mt-2"><strong>Genres:</strong> {artist.genres.length > 0 ? artist.genres.join(", ") : "Non spécifié"}</p>
 
-                        {/* ✅ Lien Spotify */}
                         <a href={artist.spotifyUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-700 transition">
                             Écouter sur Spotify
                         </a>

@@ -121,10 +121,10 @@ export class SpotifyService {
         id: artist.id,
         name: artist.name,
         image: artist.images.length > 0 ? artist.images[0].url : null,
-        followers: artist.followers.total, // ✅ Nombre de followers
-        genres: artist.genres, // ✅ Genres musicaux
-        popularity: artist.popularity, // ✅ Popularité de l’artiste
-        spotifyUrl: artist.external_urls.spotify // ✅ Lien vers la page Spotify
+        followers: artist.followers.total,
+        genres: artist.genres,
+        popularity: artist.popularity,
+        spotifyUrl: artist.external_urls.spotify
       };
     } catch (error) {
       console.error("Erreur lors de la récupération de l'artiste:", error);
