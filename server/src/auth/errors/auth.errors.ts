@@ -47,4 +47,13 @@ export class AuthErrors {
       data,
     );
   }
+
+  static accountNotActivated(data?: any): AuthErrors {
+    return AuthErrors.createError(
+      'error',
+      401,
+      "Votre compte n'est pas activé",
+      data,
+    );
+  }
 }
