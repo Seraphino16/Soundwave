@@ -11,15 +11,15 @@ import footerWaveRight from "../../assets/images/footerWaveRight.png";
 const Footer = () => {
     return (
         <div className="bottom-0 w-full flex justify-center">
-            <div className="w-full md:w-[95%] flex flex-col md:flex-row items-center justify-between">
-                <footer className="w-full bg-white font-inter py-6 md:py-12 md:rounded-t-xl flex flex-col md:flex-row items-center justify-between">
-                    <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-2 md:space-y-0">
+            <div className="w-full lg:w-[95%] flex flex-col lg:flex-row items-center justify-between">
+                <footer className="w-full bg-white font-inter py-6 lg:py-12 lg:rounded-t-xl flex flex-col lg:flex-row items-center justify-between">
+                    <div className="flex flex-col lg:flex-row items-center lg:space-x-4 space-y-2 lg:space-y-0">
                         <img
                             src={footerWaveLeft}
                             alt="footerWaveLeft"
-                            className="hidden md:block"
+                            className="hidden lg:block"
                         />
-                        <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-2 md:space-y-0">
+                        <div className="flex flex-col lg:flex-row items-center lg:space-x-4 space-y-2 lg:space-y-0">
                             <NavItem text="À PROPOS" href="#" />
                             <NavItem text="CONTACT" href="#" />
                             <NavItem text="AIDE" href="#" />

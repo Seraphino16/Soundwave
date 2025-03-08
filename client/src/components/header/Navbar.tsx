@@ -19,7 +19,7 @@ const Navbar = () => {
 
     return (
         <div className="fixed top-0 w-full flex justify-center z-50">
-            <nav className="w-full md:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md md:rounded-b-xl z-50">
+            <nav className="w-full lg:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md lg:rounded-b-xl z-50">
                 <div className="flex items-center space-x-2">
                     <Link to="/">
                         <img src={logo} alt="Logo" className="w-16 h-16" />
@@ -41,7 +41,7 @@ const Navbar = () => {
                         <BurgerMenuIcon />
                     </button>
                 </div>
-                <div className="hidden lg:flex space-x-6">
+                <div className="hidden lg:flex space-x-6 mx-2">
                     <a href="#" className="hover:opacity-80 transition-opacity">
                         <MessagesIcon />
                     </a>
