@@ -2,7 +2,7 @@ import {
   IsString,
   IsOptional,
   IsArray,
-  IsNumber,
+  IsInt,
   IsDate,
   IsObject,
   ValidateNested,
@@ -10,10 +10,7 @@ import {
 import { Type } from 'class-transformer';
 
 export class CreateUserInfosDto {
-  @IsNumber()
-  id: number;
-
-  @IsNumber()
+  @IsInt()
   user_id: number;
 
   @IsOptional()
@@ -44,8 +41,8 @@ export class CreateUserInfosDto {
   socialLinks?: { [network: string]: string };
 
   @IsDate()
-  createdAt: Date;
+  createdAt?: Date;
 
   @IsDate()
-  updatedAt: Date;
+  updatedAt?: Date;
 }
