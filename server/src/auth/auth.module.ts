@@ -4,5 +4,10 @@ import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 import { TokenModule } from '../token/token.module';
 
-@Module({})
+@Module({
+  imports: [UserModule, TokenModule],
+  controllers: [AuthController],
+  providers: [AuthService],
+  exports: [AuthService],
+})
 export class AuthModule {}
