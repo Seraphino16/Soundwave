@@ -4,8 +4,7 @@
 
 import React from "react";
 import Meta from "../components/utils/Meta";
-import RegisterCard from "../components/cards/RegisterCard";
-import LoginCard from "../components/cards/LoginCard";
+import { LoginCard, RegisterCard } from "../components/cards/AuthCards";
 
 const Auth: React.FC = () => {
     return (
