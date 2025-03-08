@@ -16,7 +16,7 @@ const Auth: React.FC = () => {
                 // Rajouter la canonical URL quand il y en aura une (valable pour toutes les pages)
             />
 
-            <div className="flex flex-col items-center justify-center min-h-screen">
+            <div className="flex flex-col items-center">
                 <div className="w-full md:w-[80%] bg-white/60 rounded-2xl p-8 shadow-lg py-12 text-primaryBlue text-center space-y-12">
                     <div className="flex flex-col items-center justify-center">
                         <h1 className="text-2xl font-bold mb-4">
