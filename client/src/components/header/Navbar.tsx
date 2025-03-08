@@ -34,8 +34,8 @@ const Navbar = () => {
     const isAuthRoute = location.pathname.startsWith("/auth");
 
     return (
-        <div className="fixed top-0 w-full flex justify-center z-50">
-            <nav className="w-full lg:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md lg:rounded-b-xl z-50">
+        <div className="fixed top-0 w-full flex justify-center z-10">
+            <nav className="w-full lg:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md lg:rounded-b-xl z-10">
                 <div className="flex items-center space-x-2">
                     <Link to="/">
                         <img src={logo} alt="Logo" className="w-16 h-16" />
