@@ -38,4 +38,13 @@ export class AuthErrors {
       data,
     );
   }
+
+  static invalidCredentials(data?: any): AuthErrors {
+    return AuthErrors.createError(
+      'error',
+      401,
+      "Nom d'utilisateur, email ou mot de passe incorrect",
+      data,
+    );
+  }
 }
