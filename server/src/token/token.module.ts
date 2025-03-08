@@ -7,5 +7,6 @@ import { ConfigModule } from '@nestjs/config';
   imports: [ConfigModule],
   providers: [TokenService],
   controllers: [TokenController],
+  exports: [TokenService],
 })
 export class TokenModule {}
