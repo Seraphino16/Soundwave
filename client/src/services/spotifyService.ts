@@ -23,3 +23,16 @@ export const fetchArtists = async () => {
         return { artists: [] };
     }
 };
+
+export const fetchArtistById = async (id: string) => {
+    try {
+        const response = await fetch(`http://localhost:5001/artist/${id}`);
+        if (!response.ok) throw new Error("Erreur lors de la récupération de l'artiste");
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};

@@ -3,6 +3,7 @@ import { fetchArtists } from "../services/spotifyService";
 import ArtistCard from "../components/cards/ArtistCard";
 
 interface Artist {
+    id: string;
     name: string;
     image: string;
 }
@@ -59,8 +60,8 @@ const Artists: React.FC = () => {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 ml-20">
-                            {currentArtists.map((artist, index) => (
-                                <ArtistCard key={index} name={artist.name} image={artist.image} />
+                            {currentArtists.map((artist) => (
+                                <ArtistCard key={artist.id} id={artist.id} name={artist.name} image={artist.image} />
                             ))}
                         </div>
 

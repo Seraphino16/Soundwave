@@ -94,22 +94,41 @@ export class SpotifyService {
 
         allArtists = [...allArtists, ...artists];
 
-        const totalAlbumsFromSpotify = response.data.albums.total;
-
-        if (offset + limit >= totalAlbumsFromSpotify) {
+        if (offset + limit >= response.data.albums.total) {
           hasMore = false;
         } else {
           offset += limit;
         }
       }
 
-      const albumsData = await this.getAllNewReleases();
-      allArtists = allArtists.slice(0, albumsData.albums.length);
-
       return { artists: allArtists };
     } catch (error) {
       console.error('Erreur lors de la récupération des artistes:', error);
       throw new Error('Impossible de récupérer les artistes');
+    }
+  }
+
+  // Récupérer détails d'un artiste
+  async getArtistById(id: string) {
+    try {
+      const accessToken = await this.getAccessToken();
+      const response = await axios.get(`${this.spotifyApiUrl}/artists/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const artist = response.data;
+      return {
+        id: artist.id,
+        name: artist.name,
+        image: artist.images.length > 0 ? artist.images[0].url : null,
+        followers: artist.followers.total, // ✅ Nombre de followers
+        genres: artist.genres, // ✅ Genres musicaux
+        popularity: artist.popularity, // ✅ Popularité de l’artiste
+        spotifyUrl: artist.external_urls.spotify // ✅ Lien vers la page Spotify
+      };
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'artiste:", error);
+      throw new Error("Impossible de récupérer l'artiste");
     }
   }
 }
