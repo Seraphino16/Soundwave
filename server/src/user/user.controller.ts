@@ -1,14 +1,20 @@
 import {
   Controller,
-  Post,
+  Put,
+  Param,
   Body,
+  UseInterceptors,
+  UploadedFile,
+  Post,
+  Query,
   BadRequestException,
   ConflictException,
-  Get,
-  Query,
   InternalServerErrorException,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -32,7 +38,6 @@ export class UserController {
         username: createUserDto.username,
         id: userId,
       };
-
 
       const tokenResponse = await firstValueFrom(
         this.httpService.post(
