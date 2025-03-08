@@ -45,9 +45,6 @@ export class AuthService {
       email: user.email,
     });
 
-    // const socketId = 'dummySocketId';
-    //this.socketService.registerUserSocket(socketId, user.id);
-
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const userWithoutPassword = { ...user.toObject(), password: undefined };
 
