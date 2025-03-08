@@ -11,6 +11,19 @@ export const fetchAlbums = async () => {
     }
 };
 
+export const fetchAlbumById = async (id: string) => {
+    try {
+        const response = await fetch(`http://localhost:5001/album/${id}`);
+        if (!response.ok) throw new Error("Erreur lors de la récupération de l'album");
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
 export const fetchArtists = async () => {
     try {
         const response = await fetch(`http://localhost:5001/artists`);
