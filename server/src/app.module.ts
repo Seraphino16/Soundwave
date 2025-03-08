@@ -28,7 +28,12 @@ import { AuthModule } from './auth/auth.module';
     MailerModule,
     AuthModule,
   ],
-  controllers: [AppController, MailerController, TokenController, SpotifyController, AuthController],
-  providers: [AppService, MailerService, TokenService, SpotifyService],
+  controllers: [
+    AppController,
+    MailerController,
+    SpotifyController,
+    AuthController,
+  ],
+  providers: [AppService, MailerService, SpotifyService],
 })
 export class AppModule {}
