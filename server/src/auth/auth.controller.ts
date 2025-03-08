@@ -3,4 +3,11 @@ import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth-dto';
 
 @Controller('auth')
-export class AuthController {}
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('')
+  async login(@Body() loginDto: AuthDto) {
+    return this.authService.login(loginDto);
+  }
+}
