@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuthForm } from "../../hooks/useAuthForm";
+import { getFirstError } from "../../utils/formValidation";
 
 interface AuthModalsProps {
     isOpen: boolean;
@@ -19,71 +21,22 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
         exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
     };
 
-    const [birthDate, setBirthDate] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
-    const [username, setUsername] = useState<string>("");
-    const [displayName, setDisplayName] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [confirmPassword, setConfirmPassword] = useState<string>("");
-    const [errors, setErrors] = useState<Record<string, string>>({});
-
-    const isUnderage = () => {
-        const now = new Date();
-        const birth = new Date(birthDate);
-        const age = now.getFullYear() - birth.getFullYear();
-        return age < 13;
-    };
-
-    const validateForm = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (type === "register") {
-            if (!/\S+@\S+\.\S+/.test(email))
-                newErrors.email = "Email invalide.";
-            if (username.length < 3)
-                newErrors.username = "Nom d'utilisateur trop court.";
-            if (!displayName) newErrors.displayName = "Pseudo affiché requis.";
-            if (!birthDate) newErrors.birthDate = "Date de naissance requise.";
-            if (isUnderage())
-                newErrors.birthDate = "Vous devez avoir au moins 13 ans.";
-            if (password.length < 6)
-                newErrors.password = "Mot de passe trop court.";
-            if (password !== confirmPassword)
-                newErrors.confirmPassword =
-                    "Les mots de passe ne correspondent pas.";
-        } else {
-            if (!email) newErrors.email = "Email ou Nom d'utilisateur requis.";
-            if (!password) newErrors.password = "Mot de passe requis.";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    useEffect(() => {
-        validateForm();
-    }, [email, username, displayName, birthDate, password, confirmPassword]);
-
-    const isFormValid =
-        Object.keys(errors).length === 0 &&
-        ((type === "register" &&
-            email &&
-            username &&
-            displayName &&
-            birthDate &&
-            password &&
-            confirmPassword) ||
-            (type === "login" && email && password));
-
-    const getFirstError = () => {
-        if (errors.email) return errors.email;
-        if (errors.username) return errors.username;
-        if (errors.displayName) return errors.displayName;
-        if (errors.birthDate) return errors.birthDate;
-        if (errors.password) return errors.password;
-        if (errors.confirmPassword) return errors.confirmPassword;
-        return null;
-    };
+    const {
+        birthDate,
+        setBirthDate,
+        email,
+        setEmail,
+        username,
+        setUsername,
+        displayName,
+        setDisplayName,
+        password,
+        setPassword,
+        confirmPassword,
+        setConfirmPassword,
+        errors,
+        isFormValid,
+    } = useAuthForm(type);
 
     return (
         <AnimatePresence>
@@ -159,9 +112,9 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                                         >
                                             Se connecter
                                         </button>
-                                        {getFirstError() && (
+                                        {getFirstError(errors) && (
                                             <span className="text-red-500 text-sm">
-                                                {getFirstError()}
+                                                {getFirstError(errors)}
                                             </span>
                                         )}
                                     </form>
@@ -262,9 +215,9 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                                         >
                                             S'inscrire
                                         </button>
-                                        {getFirstError() && (
+                                        {getFirstError(errors) && (
                                             <span className="text-red-500 text-sm">
-                                                {getFirstError()}
+                                                {getFirstError(errors)}
                                             </span>
                                         )}
                                     </form>
