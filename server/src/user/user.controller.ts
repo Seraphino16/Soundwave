@@ -76,6 +76,32 @@ export class UserController {
     }
   }
 
+  @Put(':userId/infos')
+  @UseInterceptors(
+    FileInterceptor('profilePicture'),
+    FileInterceptor('bannerPicture'),
+  )
+  async updateUserInfos(
+    @Param('userId') userId: number,
+    @Body() updateUserInfosDto: UpdateUserInfosDto,
+    @UploadedFile('profilePicture') profilePicture?: Express.Multer.File,
+    @UploadedFile('bannerPicture') bannerPicture?: Express.Multer.File,
+  ) {
+    try {
+      const updatedUserInfos = await this.userService.updateInfos(
+        userId,
+        updateUserInfosDto,
+        profilePicture,
+        bannerPicture,
+      );
+      return updatedUserInfos;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Erreur lors de la mise à jour des informations.',
+      );
+    }
+  }
+
   @Get('validate')
   async validateAccount(@Query('token') token: string): Promise<UserSuccess> {
     try {
