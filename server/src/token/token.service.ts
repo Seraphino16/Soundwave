@@ -1,45 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 import { GenerateTokenDto } from './dto/generate-token.dto';
 import { TokenErrors } from './errors/token.errors';
 
 @Injectable()
 export class TokenService {
-  private readonly jwtSecret: string;
-  private readonly jwtExpiresIn = '1h';
-
-  constructor() {
-    this.jwtSecret = process.env.JWT_SECRET_KEY as string;
-  }
+  constructor(private readonly jwtService: JwtService) {}
 
   generateEmailValidationToken(generateTokenDto: GenerateTokenDto): string {
     const { email, id } = generateTokenDto;
     const payload = { email, id };
-    return jwt.sign(payload, this.jwtSecret, {
-      expiresIn: '24h',
-    });
+    return this.jwtService.sign(payload, { expiresIn: '24h' });
   }
 
   generateLoginToken(generateTokenDto: GenerateTokenDto): string {
     const { username, id } = generateTokenDto;
-
     const payload = { username, id };
-    return jwt.sign(payload, this.jwtSecret, {
-      expiresIn: '24h',
-    });
+    return this.jwtService.sign(payload, { expiresIn: '24h' });
   }
 
   validateToken(token: string): any {
     try {
-      return jwt.verify(token, this.jwtSecret);
+      return this.jwtService.verify(token);
     } catch (error: any) {
-      if (error instanceof jwt.JsonWebTokenError) {
+      if (error.name === 'JsonWebTokenError') {
         return TokenErrors.invalidToken(error.message);
-      } else if (error instanceof jwt.TokenExpiredError) {
+      } else if (error.name === 'TokenExpiredError') {
         return TokenErrors.expiredToken(error.message);
-      } else if (error instanceof jwt.NotBeforeError) {
+      } else if (error.name === 'NotBeforeError') {
         return TokenErrors.malformedToken(error.message);
       }
+      return error.message;
     }
   }
 }
