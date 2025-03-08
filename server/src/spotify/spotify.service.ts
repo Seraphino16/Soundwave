@@ -9,9 +9,9 @@ export class SpotifyService {
   private readonly clientSecret: string;
 
   constructor(private configService: ConfigService) {
-    this.spotifyApiUrl = <string>this.configService.get<string>('SPOTIFY_API_URL');
-    this.clientId = <string>this.configService.get<string>('SPOTIFY_CLIENT_ID');
-    this.clientSecret = <string>this.configService.get<string>('SPOTIFY_CLIENT_SECRET');
+    this.spotifyApiUrl = this.configService.get<string>('SPOTIFY_API_URL')!;
+    this.clientId = this.configService.get<string>('SPOTIFY_CLIENT_ID')!;
+    this.clientSecret = this.configService.get<string>('SPOTIFY_CLIENT_SECRET')!;
   }
 
   private async getAccessToken(): Promise<string> {
@@ -29,6 +29,7 @@ export class SpotifyService {
     return authResponse.data.access_token;
   }
 
+  // Récupérer tous les albums récents
   async getAllNewReleases() {
     try {
       const accessToken = await this.getAccessToken();
@@ -63,6 +64,71 @@ export class SpotifyService {
     } catch (error) {
       console.error('Erreur lors de la récupération des albums:', error);
       throw new Error('Impossible de récupérer les albums');
+    }
+  }
+
+  // Récupérer tous les artistes récents
+  async getAllNewArtists() {
+    try {
+      const accessToken = await this.getAccessToken();
+      let allArtists: { id: string; name: string; image: string | null }[] = [];
+      let limit = 50;
+      let offset = 0;
+      let hasMore = true;
+
+      while (hasMore) {
+        const response = await axios.get(`${this.spotifyApiUrl}/browse/new-releases`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          params: { limit, offset },
+        });
+
+        const artists = response.data.albums.items
+            .flatMap((album: any) => album.artists.map((artist: any) => ({
+              id: artist.id,
+              name: artist.name,
+              image: album.images.length > 0 ? album.images[0].url : null,
+            })))
+            .filter((artist, index, self) =>
+                index === self.findIndex((a) => a.id === artist.id)
+            );
+
+        allArtists = [...allArtists, ...artists];
+
+        if (offset + limit >= response.data.albums.total) {
+          hasMore = false;
+        } else {
+          offset += limit;
+        }
+      }
+
+      return { artists: allArtists };
+    } catch (error) {
+      console.error('Erreur lors de la récupération des artistes:', error);
+      throw new Error('Impossible de récupérer les artistes');
+    }
+  }
+
+  // Récupérer détails d'un artiste
+  async getArtistById(id: string) {
+    try {
+      const accessToken = await this.getAccessToken();
+      const response = await axios.get(`${this.spotifyApiUrl}/artists/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const artist = response.data;
+      return {
+        id: artist.id,
+        name: artist.name,
+        image: artist.images.length > 0 ? artist.images[0].url : null,
+        followers: artist.followers.total,
+        genres: artist.genres,
+        popularity: artist.popularity,
+        spotifyUrl: artist.external_urls.spotify
+      };
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'artiste:", error);
+      throw new Error("Impossible de récupérer l'artiste");
     }
   }
 }
