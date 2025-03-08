@@ -10,12 +10,7 @@ import "../../assets/styles/Navbar.css";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import SearchBar from "../searchBar/SearchBar";
-import {
-    MessagesIcon,
-    ProfileIcon,
-    SettingsIcon,
-    BurgerMenuIcon,
-} from "../utils/Icons";
+import { MessagesIcon, ProfileIcon, SettingsIcon, BurgerMenuIcon } from "../utils/Icons";
 
 interface NavItem {
     text: string;
@@ -36,6 +31,7 @@ const Navbar = () => {
         "/auth": [],
     };
     const navItems = navItemsByRoute[location.pathname] || [];
+    const isAuthRoute = location.pathname.startsWith("/auth");
 
     return (
         <div className="fixed top-0 w-full flex justify-center z-50">
@@ -48,6 +44,7 @@ const Navbar = () => {
                         SoundWave
                     </span>
                 </div>
+
                 <div className="hidden lg:flex space-x-6">
                     {navItems.map((item) => (
                         <NavbarItem
@@ -57,25 +54,31 @@ const Navbar = () => {
                         />
                     ))}
                 </div>
-                <div className="block lg:hidden">
-                    <button
-                        onClick={toggleMenu}
-                        className="p-2 border mr-4 rounded text-gray-700 border-gray-700 hover:text-text-200 hover:border-text-200"
-                    >
-                        <BurgerMenuIcon />
-                    </button>
-                </div>
-                <div className="hidden lg:flex space-x-6 mx-2">
-                    <a href="#" className="hover:opacity-80 transition-opacity">
-                        <MessagesIcon />
-                    </a>
-                    <a href="#" className="hover:opacity-80 transition-opacity">
-                        <ProfileIcon />
-                    </a>
-                    <a href="#" className="hover:opacity-80 transition-opacity">
-                        <SettingsIcon />
-                    </a>
-                </div>
+
+                {!isAuthRoute && (
+                    <div className="block lg:hidden">
+                        <button
+                            onClick={toggleMenu}
+                            className="p-2 border mr-4 rounded text-gray-700 border-gray-700 hover:text-text-200 hover:border-text-200"
+                        >
+                            <BurgerMenuIcon />
+                        </button>
+                    </div>
+                )}
+
+                {!isAuthRoute && (
+                    <div className="hidden lg:flex space-x-6 mx-2">
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <MessagesIcon />
+                        </a>
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <ProfileIcon />
+                        </a>
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <SettingsIcon />
+                        </a>
+                    </div>
+                )}
                 <AnimatePresence>
                     {isOpen && (
                         <>
@@ -105,27 +108,31 @@ const Navbar = () => {
                                             href={item.href}
                                         />
                                     ))}
-                                    <div className="flex space-x-6 mt-4">
-                                        <a
-                                            href="#"
-                                            className="hover:opacity-80 transition-opacity"
-                                        >
-                                            <MessagesIcon />
-                                        </a>
-                                        <a
-                                            href="#"
-                                            className="hover:opacity-80 transition-opacity"
-                                        >
-                                            <ProfileIcon />
-                                        </a>
-                                        <a
-                                            href="#"
-                                            className="hover:opacity-80 transition-opacity"
-                                        >
-                                            <SettingsIcon />
-                                        </a>
-                                    </div>
-                                    <SearchBar />
+                                    {!isAuthRoute && (
+                                        <>
+                                            <div className="flex space-x-6 mt-4">
+                                                <a
+                                                    href="#"
+                                                    className="hover:opacity-80 transition-opacity"
+                                                >
+                                                    <MessagesIcon />
+                                                </a>
+                                                <a
+                                                    href="#"
+                                                    className="hover:opacity-80 transition-opacity"
+                                                >
+                                                    <ProfileIcon />
+                                                </a>
+                                                <a
+                                                    href="#"
+                                                    className="hover:opacity-80 transition-opacity"
+                                                >
+                                                    <SettingsIcon />
+                                                </a>
+                                            </div>
+                                            <SearchBar />
+                                        </>
+                                    )}
                                 </div>
                             </motion.div>
                         </>
