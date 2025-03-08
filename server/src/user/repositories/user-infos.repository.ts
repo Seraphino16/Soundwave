@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserInfos } from '../entities/user-infos.entity';
-import { CreateUserInfosDto } from '../dto/create-user-infos.dto';
+import { CreateUserInfosDto } from '../dto/create-user-infos';
 
 @Injectable()
 export class UserInfosRepository {
@@ -16,10 +16,9 @@ export class UserInfosRepository {
     return lastUser ? lastUser.id + 1 : 1;
   }
 
-  async create(createUserInfosDto: CreateUserInfosDto): Promise<UserInfos> {
+  async create(createUserDto: CreateUserInfosDto): Promise<UserInfos> {
     const newUser = new this.userModel({
-      ...createUserInfosDto,
-      user_id: createUserInfosDto.user_id,
+      ...createUserDto,
       createdAt: new Date(),
       updatedAt: new Date(),
       id: await this.setId(),
@@ -30,12 +29,15 @@ export class UserInfosRepository {
 
   async update(
     userId: number,
-    updateUserDto: Partial<UserInfos>,
+    updateUserDto: Partial<CreateUserInfosDto>,
   ): Promise<UserInfos | null> {
-    return this.userModel
+    return await this.userModel
       .findOneAndUpdate(
         { user_id: userId },
-        { ...updateUserDto, updatedAt: new Date() },
+        {
+          ...updateUserDto,
+          updatedAt: new Date(),
+        },
         { new: true },
       )
       .exec();
