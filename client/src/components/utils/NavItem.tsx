@@ -6,7 +6,7 @@
  * @param {JSX.Element} [icon] - Icône à afficher à côté du texte
  */
 
-import { JSX } from 'react';
+import React, { JSX } from 'react';
 import { Link } from 'react-router-dom';
 import "../../assets/styles/Navbar.css";
 
