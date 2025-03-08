@@ -13,7 +13,7 @@ export default function App() {
     <Router>
       <div className="flex flex-col min-h-screen bg-light-bg">
         <Navbar />
-        <div className="flex-grow">
+        <div className="flex-grow pt-32 pb-20">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/albums" element={<Albums />} />

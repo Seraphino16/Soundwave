@@ -50,7 +50,7 @@ const Albums: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen pt-32 pb-20">
+        <div className="flex flex-col items-center justify-center min-h-screen">
             <div className="bg-white shadow-lg rounded-lg w-full max-w-6xl p-10">
                 <h1 className="text-3xl font-bold text-center mb-8 text-primaryBlue">ALBUMS</h1>
 
@@ -58,27 +58,25 @@ const Albums: React.FC = () => {
                     <p className="text-center">Chargement...</p>
                 ) : (
                     <>
-                        {/* ✅ Affichage des albums avec pagination */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 ml-20">
                             {currentAlbums.map((album, index) => (
                                 <AlbumCard key={index} title={album.title} coverImage={album.coverImage} />
                             ))}
                         </div>
 
-                        {/* ✅ Pagination centrée et stylisée */}
                         <nav className="flex justify-center mt-8" aria-label="Pagination">
                             <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg shadow-md">
-                                {/* 🔹 Bouton "Précédent" */}
                                 <button
                                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                     disabled={currentPage === 1}
-                                    className="px-3 py-2 rounded-md text-gray-700 bg-white hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-3 py-2 rounded-md text-gray-700 bg-white hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                                     aria-label="Previous"
                                 >
-                                    ⬅️
+                                    <svg className="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
                                 </button>
 
-                                {/* 🔹 Numéros de page */}
                                 {getPageNumbers().map((page, index) =>
                                     page === "..." ? (
                                         <span key={index} className="text-gray-500 px-3 text-lg">•••</span>
@@ -98,14 +96,15 @@ const Albums: React.FC = () => {
                                     )
                                 )}
 
-                                {/* 🔹 Bouton "Suivant" */}
                                 <button
                                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                                     disabled={currentPage === totalPages}
-                                    className="px-3 py-2 rounded-md text-gray-700 bg-white hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-3 py-2 rounded-md text-gray-700 bg-white hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                                     aria-label="Next"
                                 >
-                                    ➡️
+                                    <svg className="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </button>
                             </div>
                         </nav>
