@@ -12,8 +12,6 @@ import { SpotifyService } from './spotify/spotify.service';
 import { SpotifyController } from './spotify/spotify.controller';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
-import {TokenService} from "./token/token.service";
-import {TokenController} from "./token/token.controller";
 
 @Module({
   imports: [
@@ -30,7 +28,12 @@ import {TokenController} from "./token/token.controller";
     MailerModule,
     AuthModule,
   ],
-  controllers: [AppController, MailerController, TokenController, SpotifyController, AuthController],
-  providers: [AppService, MailerService, TokenService, SpotifyService],
+  controllers: [
+    AppController,
+    MailerController,
+    SpotifyController,
+    AuthController,
+  ],
+  providers: [AppService, MailerService, SpotifyService],
 })
 export class AppModule {}
