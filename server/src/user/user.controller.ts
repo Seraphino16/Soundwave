@@ -13,7 +13,6 @@ import {
   Get,
   Query,
   InternalServerErrorException,
-  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
