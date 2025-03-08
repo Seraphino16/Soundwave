@@ -7,6 +7,7 @@ import AlertTestPage from './pages/AlertTestPage';
 import Navbar from './components/header/Navbar';
 import Footer from './components/footer/Footer';
 import Albums from 'pages/Albums';
+import Artists from "pages/Artists";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/albums" element={<Albums />} />
+            <Route path="/artists" element={<Artists />} />
             <Route path="/alert" element={<AlertTestPage />} />
           </Routes>
         </div>
