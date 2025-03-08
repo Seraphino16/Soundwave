@@ -136,17 +136,18 @@ export const TwitterIcon = () => (
 // Icône Facebook
 export const FacebookIcon = () => (
     <svg
-        width="14"
+        width="24"
         height="24"
-        viewBox="0 0 14 24"
+        viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
     >
         <path
-            d="M13 1H9.72727C8.28064 1 6.89325 1.57946 5.87033 2.61091C4.8474 3.64236 4.27273 5.04131 4.27273 6.5V9.8H1V14.2H4.27273V23H8.63636V14.2H11.9091L13 9.8H8.63636V6.5C8.63636 6.20826 8.7513 5.92847 8.95588 5.72218C9.16047 5.51589 9.43795 5.4 9.72727 5.4H13V1Z"
+            d="M15 1H11.7273C10.2806 1 8.89325 1.57946 7.87033 2.61091C6.8474 3.64236 6.27273 5.04131 6.27273 6.5V9.8H3V14.2H6.27273V23H10.6364V14.2H13.9091L15 9.8H10.6364V6.5C10.6364 6.20826 10.7513 5.92847 10.9559 5.72218C11.1605 5.51589 11.438 5.4 11.7273 5.4H15V1Z"
             stroke="black"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            transform="translate(2 0)"
         />
     </svg>
 );

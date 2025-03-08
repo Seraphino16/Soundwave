@@ -1,6 +1,5 @@
 /**
  * @description Bloc de connexion de SoundWave
- * @author SoundWave
  */
 
 import React from "react";
@@ -19,24 +18,24 @@ const LoginCard: React.FC = () => {
                 Déjà un compte ?
             </h2>
             <div className="flex flex-col items-center space-y-4">
-                <button className="w-[80%] md:w-[60%] bg-[#F5F5F5]/75 py-2 rounded text-primaryBlue">
+                <button className="w-[80%] md:w-[60%] bg-[#F5F5F5]/75 py-2 rounded text-primaryBlue hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer hover:text-[#93D9D6]">
                     CONNEXION
                 </button>
                 <div className="grid grid-cols-3 gap-2 md:flex md:justify-center md:space-x-6">
-                    <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center">
+                    <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
                         <GoogleIcon />
                     </button>
-                    <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center">
+                    <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
                         <TwitterIcon />
                     </button>
-                    <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center">
+                    <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
                         <FacebookIcon />
                     </button>
-                    <div className="col-span-3 flex justify-center space-x-2">
-                        <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center">
+                    <div className="col-span-3 flex justify-center lg:space-x-6 space-x-2">
+                        <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
                             <SpotifyIcon />
                         </button>
-                        <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center">
+                        <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
                             <DeezerIcon />
                         </button>
                     </div>
