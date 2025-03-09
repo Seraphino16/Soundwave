@@ -1,4 +1,6 @@
 import {
+  Injectable,
+  ConflictException,
   BadRequestException,
   ConflictException,
   Injectable, InternalServerErrorException,
@@ -8,6 +10,10 @@ import { UserRepository } from './repositories/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserErrors } from './errors/user.errors';
 import * as bcrypt from 'bcryptjs';
+import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
+import { UploadsService } from '../uploads/uploads.service';
+import { UserInfosRepository } from './repositories/user-infos.repository';
+import { UserSuccess } from './success/user.success';
 import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
 import { UploadsService } from '../uploads/uploads.service';
 import { UserInfosRepository } from './repositories/user-infos.repository';
@@ -74,11 +80,11 @@ export class UserService {
       username,
       birthdate,
       googleId,
-      facebookId,
       twitterId,
+      facebookId,
       spotifyId,
       deezerId,
-      roles as UserRole[],
+      roles,
       verification_token,
       is_verified,
       is_active,
