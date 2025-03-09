@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { UploadsService } from './uploads/uploads.service';
 import { UploadsController } from './uploads/uploads.controller';
 import { UploadsModule } from './uploads/uploads.module';
+import { SpotifyModule } from './spotify/spotify.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UploadsModule } from './uploads/uploads.module';
     MailerModule,
     AuthModule,
     UploadsModule,
+    SpotifyModule,
   ],
   controllers: [
     AppController,
