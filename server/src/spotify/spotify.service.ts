@@ -7,30 +7,39 @@ export class SpotifyService {
   private readonly spotifyApiUrl: string;
   private readonly clientId: string;
   private readonly clientSecret: string;
-  private readonly redirectUri: string;
+  private readonly redirectUriRegister: string;
+  private readonly redirectUriLogin: string;
 
 
   constructor(private configService: ConfigService) {
     this.spotifyApiUrl = this.configService.get<string>('SPOTIFY_API_URL')!;
     this.clientId = this.configService.get<string>('SPOTIFY_CLIENT_ID')!;
     this.clientSecret = this.configService.get<string>('SPOTIFY_CLIENT_SECRET')!;
-    this.redirectUri = this.configService.get<string>('SPOTIFY_REDIRECT_URI')!;
+    this.redirectUriRegister = this.configService.get<string>('SPOTIFY_REDIRECT_URI_REGISTER')!;
+    this.redirectUriLogin = this.configService.get<string>('SPOTIFY_REDIRECT_URI_LOGIN')!;
 
   }
 
-  generateSpotifyAuthUrl(): string {
+  generateSpotifyAuthUrl(isLogin: boolean = false): string {
+    const redirectUri = isLogin
+      ? this.redirectUriLogin
+      : this.redirectUriRegister;
+
     return `https://accounts.spotify.com/authorize?` +
         `client_id=${this.clientId}&` +
         `response_type=code&` +
-        `redirect_uri=${encodeURIComponent(this.redirectUri)}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
         `scope=user-read-email user-read-private`;
   }
 
-  async getAccessTokenFromCode(code: string): Promise<string> {
+  async getAccessTokenFromCode(code: string, isLogin: boolean = false): Promise<string> {
+    const redirectUri = isLogin
+      ? this.redirectUriLogin
+      : this.redirectUriRegister;
     const response = await axios.post('https://accounts.spotify.com/api/token', null, {
       params: {
         code,
-        redirect_uri: this.redirectUri,
+        redirect_uri: redirectUri,
         grant_type: 'authorization_code',
       },
       headers: {
