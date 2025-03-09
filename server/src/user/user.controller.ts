@@ -11,6 +11,7 @@ import {
   ConflictException,
   InternalServerErrorException,
   Get,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
@@ -20,12 +21,14 @@ import { UserSuccess } from './success/user.success';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { SpotifyService } from '../spotify/spotify.service';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly httpService: HttpService,
+    private readonly spotifyService: SpotifyService,
   ) {}
 
   @Post('create')
