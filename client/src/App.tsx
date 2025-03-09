@@ -6,7 +6,6 @@ import AlbumDetail from "./pages/AlbumDetail";
 import Artists from "./pages/Artists";
 import AlertTestPage from "./pages/AlertTestPage";
 import Navbar from "./components/header/Navbar";
-import Footer from "./components/footer/Footer";
 import Auth from './pages/Auth';
 import ArtistDetail from "pages/ArtistDetails";
 import HomeLoggedOff from 'pages/HomeLoggedOff';
@@ -28,6 +27,7 @@ export default function App() {
             <Route path="/auth" element={<Auth />} /> 
           </Routes>
         </div>
-      </Router>
+      </div>
+    </Router>
   );
 }
