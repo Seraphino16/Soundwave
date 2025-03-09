@@ -7,9 +7,15 @@ import { UserModule } from './user/user.module';
 import { MailerService } from './mailer/mailer.service';
 import { MailerController } from './mailer/mailer.controller';
 import { MailerModule } from './mailer/mailer.module';
-import { TokenService } from './token/token.service';
-import { TokenController } from './token/token.controller';
 import { TokenModule } from './token/token.module';
+import { SpotifyService } from './spotify/spotify.service';
+import { SpotifyController } from './spotify/spotify.controller';
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
+import { UploadsService } from './uploads/uploads.service';
+import { UploadsController } from './uploads/uploads.controller';
+import { UploadsModule } from './uploads/uploads.module';
+import { SpotifyModule } from './spotify/spotify.module';
 
 @Module({
   imports: [
@@ -24,9 +30,17 @@ import { TokenModule } from './token/token.module';
     UserModule,
     TokenModule,
     MailerModule,
+    AuthModule,
+    UploadsModule,
+    SpotifyModule,
   ],
-  controllers: [AppController, MailerController, TokenController],
-  providers: [AppService, MailerService, TokenService],
-
+  controllers: [
+    AppController,
+    MailerController,
+    SpotifyController,
+    AuthController,
+    UploadsController,
+  ],
+  providers: [AppService, MailerService, SpotifyService, UploadsService],
 })
 export class AppModule {}

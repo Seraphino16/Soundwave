@@ -1,25 +1,35 @@
 import {
   Controller,
-  Post,
+  Put,
+  Param,
   Body,
+  UseInterceptors,
+  UploadedFile,
+  Post,
+  Patch,
+  Query,
   BadRequestException,
   ConflictException,
   Get,
-  Query,
   InternalServerErrorException,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { SpotifyService } from '../spotify/spotify.service';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly httpService: HttpService,
+    private readonly spotifyService: SpotifyService,
   ) {}
 
   @Post('create')
@@ -67,6 +77,62 @@ export class UserController {
     }
   }
 
+  @Put(':userId/infos')
+  @UseInterceptors(
+    FileInterceptor('profilePicture'),
+    FileInterceptor('bannerPicture'),
+  )
+  async updateUserInfos(
+    @Param('userId') userId: number,
+    @Body() updateUserInfosDto: UpdateUserInfosDto,
+    @UploadedFile('profilePicture') profilePicture?: Express.Multer.File,
+    @UploadedFile('bannerPicture') bannerPicture?: Express.Multer.File,
+  ) {
+    try {
+      const updatedUserInfos = await this.userService.updateInfos(
+        userId,
+        updateUserInfosDto,
+        profilePicture,
+        bannerPicture,
+      );
+      return updatedUserInfos;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Erreur lors de la mise à jour des informations.',
+      );
+    }
+  }
+
+  @Get('create/spotify')
+  redirectToSpotifyAuth(@Query('isLogin') isLogin: string = 'false') {
+    const isLoginBool = isLogin === 'true';
+    const authUrl = this.spotifyService.generateSpotifyAuthUrl();
+    return { url: authUrl };
+  }
+  @Get('create/spotify/callback')
+  async spotifyCallback(
+    @Query('code') code: string,
+    @Query('isLogin') isLogin: string = 'false',
+    @Res() res,
+  ) {
+    try {
+      const isLoginBool = isLogin === 'true';
+      const accessToken = await this.spotifyService.getAccessTokenFromCode(code);
+      const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
+      const newUser = await this.userService.createUserWithSpotify(spotifyUser);
+
+      return res.status(201).json({
+        message: 'Inscription réussie via Spotify',
+        user: newUser,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        message: 'Erreur lors de l\'inscription via Spotify',
+        error: error.message,
+      });
+    }
+  }
+
   @Get('validate')
   async validateAccount(@Query('token') token: string): Promise<UserSuccess> {
     try {
@@ -79,6 +145,24 @@ export class UserController {
       throw new InternalServerErrorException(
         'Erreur interne lors de la validation du compte',
       );
+    }
+  }
+
+  @Patch('request-artist')
+  async requestArtist(
+    @Body('automatic') automatic: string,
+    @Body('id') id: number,
+  ) {
+    try {
+      if (!automatic) {
+        const updatedUser = await this.userService.assignArtistRole(id);
+        return UserSuccess.userRoleUpdated(updatedUser);
+      }
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(UserErrors.unknownError().message);
     }
   }
 }

@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../entities/user.entity';
+import { UserRole } from '../../config/user.config';
+import { UserErrors } from '../errors/user.errors';
 
 @Injectable()
 export class UserRepository {
@@ -18,13 +20,13 @@ export class UserRepository {
     password: string,
     pseudo: string,
     username: string,
-    birthdate: Date,
+    birthdate: Date | null,
     googleId?: string,
     facebookId?: string,
     twitterId?: string,
     deezerId?: string,
     spotifyId?: string,
-    roles: string[] = ['USER'],
+    roles?: string[],
     verification_token?: string,
     is_verified: boolean = false,
     is_active: boolean = true,
@@ -88,5 +90,34 @@ export class UserRepository {
     user.verification_token = '';
     await user.save();
     return true;
+  }
+
+  async checkAccountVerification(userId: number): Promise<boolean> {
+    const user = await this.userModel.findOne({ id: userId }).exec();
+
+    if (!user) {
+      return false;
+    }
+
+    if (!user.is_verified || !user.is_active) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async assignRole(userId: number, role: UserRole): Promise<User> {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new BadRequestException(UserErrors.userNotFound().message);
+    }
+
+    if (user.roles.includes(role)) {
+      throw new BadRequestException(UserErrors.alreadyArtistError().message);
+    }
+
+    user.roles.push(role);
+    user.updatedAt = new Date();
+    return user.save();
   }
 }

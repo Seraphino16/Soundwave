@@ -1,19 +1,33 @@
-import { Schema, Document } from 'mongoose';
+import { Document, Schema } from 'mongoose';
+import { UserRole } from '../../config/user.config';
 
 export interface User extends Document {
   id: number;
   pseudo: string;
   username: string;
   email: string;
-  birthdate: Date;
+  birthdate?: Date;
   password: string;
   googleId?: string;
   facebookId?: string;
   twitterId?: string;
   deezerId?: string;
   spotifyId?: string;
-  roles: string[];
+  roles: UserRole[];
   verification_token?: string;
+  is_verified: boolean;
+  is_active: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserResponse {
+  id: number;
+  pseudo: string;
+  username: string;
+  email: string;
+  birthdate: Date;
+  roles: UserRole[];
   is_verified: boolean;
   is_active: boolean;
   createdAt: Date;
@@ -39,7 +53,7 @@ export const UserSchema = new Schema<User>(
     },
     birthdate: {
       type: Date,
-      required: true,
+      required: false,
       unique: false,
     },
     email: {
@@ -74,13 +88,13 @@ export const UserSchema = new Schema<User>(
     },
     roles: {
       type: [String],
-      enum: ['USER', 'ADMIN', 'ARTIST', 'BAND'],
-      default: ['USER'],
+      enum: [UserRole.USER, UserRole.ADMIN, UserRole.ARTIST, UserRole.BAND],
+      default: [UserRole.USER],
       required: true,
     },
     verification_token: {
       type: String,
-      unique: true,
+      unique: false,
       required: false,
     },
     is_verified: {
@@ -128,4 +142,11 @@ UserSchema.index(
 UserSchema.index(
   { deezerId: 1 },
   { unique: true, partialFilterExpression: { deezerId: { $ne: null } } },
+);
+UserSchema.index(
+  { verification_token: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { verification_token: { $ne: null } },
+  },
 );

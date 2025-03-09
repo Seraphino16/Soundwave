@@ -22,7 +22,7 @@ export class UserSuccess {
   }
 
   static userCreated(data: any) {
-    return UserSuccess.createSuccess(
+    return this.createSuccess(
       'success',
       201,
       'Utilisateur créé avec succès',
@@ -30,11 +30,28 @@ export class UserSuccess {
     );
   }
 
+  static userRoleUpdated(data: any) {
+    return this.createSuccess(
+      'success',
+      200,
+      'Le rôle a été ajouté avec succés',
+      data,
+    );
+  }
+
   static accountValidated() {
-    return UserSuccess.createSuccess(
+    return this.createSuccess(
       'success',
       200,
       'Compte utilisateur validé et activé avec succès',
+    );
+  }
+
+  static userInfosInsert() {
+    return UserSuccess.createSuccess(
+      'success',
+      200,
+      'Informations utilisateur enregistrée avec succès',
     );
   }
 }
