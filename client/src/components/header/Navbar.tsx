@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavbarItem from "../utils/NavItem";
 import "../../assets/styles/Navbar.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import SearchBar from "../searchBar/SearchBar";
 import { MessagesIcon, ProfileIcon, SettingsIcon, BurgerMenuIcon } from "../utils/Icons";
@@ -19,13 +19,32 @@ interface NavItem {
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [user, setUser] = useState<{ pseudo: string; username: string } | null>(null);
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         closeMenu();
     }, [location]);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsedData = JSON.parse(storedUser);
+            const userData = parsedData.user;
+            if (userData && userData.pseudo && userData.username) {
+                setUser({ pseudo: userData.pseudo, username: userData.username });
+            }
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("user");
+        setUser(null);
+        navigate("/auth");
+    };
 
     const navItems: NavItem[] = [
         { text: "ALBUMS", href: "/albums" },
@@ -71,16 +90,30 @@ const Navbar = () => {
                 )}
 
                 {!isAuthRoute && (
-                    <div className="hidden lg:flex space-x-6 mx-2">
+                    <div className="hidden lg:flex space-x-6 mx-2 items-center">
                         <a href="#" className="hover:opacity-80 transition-opacity">
                             <MessagesIcon />
                         </a>
                         <a href="#" className="hover:opacity-80 transition-opacity">
                             <ProfileIcon />
                         </a>
+                        {user && (
+                            <div className="flex flex-col items-end ml-2">
+                                <span className="text-lg font-semibold">{user.pseudo}</span>
+                                <span className="text-sm text-gray-500">@{user.username}</span>
+                            </div>
+                        )}
                         <a href="#" className="hover:opacity-80 transition-opacity">
                             <SettingsIcon />
                         </a>
+                        {user && (
+                            <button
+                                onClick={handleLogout}
+                                className="ml-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                            >
+                                Déconnexion
+                            </button>
+                        )}
                     </div>
                 )}
                 <AnimatePresence>
@@ -125,6 +158,16 @@ const Navbar = () => {
                                         >
                                             <ProfileIcon />
                                         </a>
+                                        {user && (
+                                            <div className="flex flex-col items-end ml-2">
+                                                <span className="text-lg font-semibold">
+                                                    {user.pseudo}
+                                                </span>
+                                                <span className="text-sm text-gray-500">
+                                                    @{user.username}
+                                                </span>
+                                            </div>
+                                        )}
                                         <a
                                             href="#"
                                             className="hover:opacity-80 transition-opacity"
