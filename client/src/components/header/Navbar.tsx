@@ -1,9 +1,9 @@
 /**
- * @description Barre de navigation du site, change selon la href="" route, le rôle et l'état de connexion de l'utilisateur
+ * @description Barre de navigation du site SoundWave
  * @author SoundWave
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavbarItem from "../utils/NavItem";
 import "../../assets/styles/Navbar.css";
@@ -22,15 +22,17 @@ const Navbar = () => {
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
     const location = useLocation();
-    const navItemsByRoute: Record<string, NavItem[]> = {
-        "/": [
-            { text: "ALBUMS", href: "/albums" },
-            { text: "ARTISTES", href: "/artists" },
-            { text: "EVENEMENTS", href: "/events" },
-        ],
-        "/auth": [],
-    };
-    const navItems = navItemsByRoute[location.pathname] || [];
+
+    useEffect(() => {
+        closeMenu();
+    }, [location]);
+
+    const navItems: NavItem[] = [
+        { text: "ALBUMS", href: "/albums" },
+        { text: "ARTISTES", href: "/artists" },
+        { text: "EVENEMENTS", href: "/events" },
+    ];
+
     const isAuthRoute = location.pathname.startsWith("/auth");
 
     return (

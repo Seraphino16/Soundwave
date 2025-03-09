@@ -1,5 +1,6 @@
 /**
  * @description Page d'authentification du site SoundWave
+ * @author SoundWave
  */
 
 import React from "react";
