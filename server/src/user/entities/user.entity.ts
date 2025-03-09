@@ -1,4 +1,5 @@
-import { Schema, Document } from 'mongoose';
+import { Document, Schema } from 'mongoose';
+import { UserRole } from '../../config/user.config';
 
 export interface User extends Document {
   id: number;
@@ -12,8 +13,21 @@ export interface User extends Document {
   twitterId?: string;
   deezerId?: string;
   spotifyId?: string;
-  roles: string[];
+  roles: UserRole[];
   verification_token?: string;
+  is_verified: boolean;
+  is_active: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserResponse {
+  id: number;
+  pseudo: string;
+  username: string;
+  email: string;
+  birthdate: Date;
+  roles: UserRole[];
   is_verified: boolean;
   is_active: boolean;
   createdAt: Date;
@@ -74,8 +88,8 @@ export const UserSchema = new Schema<User>(
     },
     roles: {
       type: [String],
-      enum: ['USER', 'ADMIN', 'ARTIST', 'BAND'],
-      default: ['USER'],
+      enum: [UserRole.USER, UserRole.ADMIN, UserRole.ARTIST, UserRole.BAND],
+      default: [UserRole.USER],
       required: true,
     },
     verification_token: {
