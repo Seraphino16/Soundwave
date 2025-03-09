@@ -7,6 +7,8 @@ export class SpotifyService {
   private readonly spotifyApiUrl: string;
   private readonly clientId: string;
   private readonly clientSecret: string;
+  private readonly redirectUri: string;
+
 
   constructor(private configService: ConfigService) {
     this.spotifyApiUrl = this.configService.get<string>('SPOTIFY_API_URL')!;
