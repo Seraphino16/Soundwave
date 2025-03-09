@@ -16,6 +16,7 @@ import { UserSuccess } from './success/user.success';
 import { UserRole } from '../config/user.config';
 import { User, UserResponse } from './entities/user.entity';
 import axios from 'axios';
+import { SpotifyService } from '../spotify/spotify.service';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly userInfosRepository: UserInfosRepository,
     private readonly uploadsService: UploadsService,
+    private readonly spotifyService: SpotifyService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<number> {

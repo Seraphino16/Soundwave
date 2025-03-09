@@ -10,8 +10,8 @@ import {
   Query,
   BadRequestException,
   ConflictException,
-  InternalServerErrorException,
   Get,
+  InternalServerErrorException,
   Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -42,6 +42,7 @@ export class UserController {
         username: createUserDto.username,
         id: userId,
       };
+
 
       const tokenResponse = await firstValueFrom(
         this.httpService.post(
