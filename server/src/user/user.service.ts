@@ -1,7 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
-  Injectable, InternalServerErrorException,
+  Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UserRepository } from './repositories/user.repository';
@@ -12,6 +13,8 @@ import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
 import { UploadsService } from '../uploads/uploads.service';
 import { UserInfosRepository } from './repositories/user-infos.repository';
 import { UserSuccess } from './success/user.success';
+import { SpotifyService } from '../spotify/spotify.service';
+import axios from 'axios';
 
 @Injectable()
 export class UserService {
@@ -19,6 +22,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly userInfosRepository: UserInfosRepository,
     private readonly uploadsService: UploadsService,
+    private readonly spotifyService: SpotifyService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<number> {
@@ -133,6 +137,69 @@ export class UserService {
     await this.userInfosRepository.update(userId, updateUserInfosDto);
 
     return UserSuccess.userInfosInsert().message;
+  }
+  async createUserWithSpotify(spotifyUser: any): Promise<any> {
+    const existingUserByEmail = await this.userRepository.findByEmail(spotifyUser.email);
+    if (existingUserByEmail) {
+      throw new ConflictException(UserErrors.emailAlreadyExists().message);
+    }
+
+    let displayName = spotifyUser.display_name || '';
+    let existingUserByDisplayName = await this.userRepository.findByUsername(displayName);
+    let count = 1;
+
+    while (existingUserByDisplayName) {
+      displayName = `${spotifyUser.display_name || 'user'}${count}`;
+      count++;
+      existingUserByDisplayName = await this.userRepository.findByUsername(displayName);
+    }
+
+    const id = await this.userRepository.setId();
+    const birthdate = spotifyUser.birthdate ? new Date(spotifyUser.birthdate) : null;
+
+    const newUser = await this.userRepository.create(
+        id,
+        spotifyUser.email,
+        '',
+        displayName,
+        displayName,
+        birthdate,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        spotifyUser.id,
+        ['USER'],
+        undefined,
+        true,
+        true
+    );
+
+    const createUserInfosDto = {
+      user_id: newUser.id,
+      profile_picture: spotifyUser.images[0]?.url || '',
+      banner_picture: '',
+      bio: '',
+      location: '',
+      musicStyle: [],
+      socialLinks: {
+        spotify: `https://open.spotify.com/user/${spotifyUser.id}`,
+      },
+    };
+
+    await this.userInfosRepository.create(createUserInfosDto);
+
+    return newUser;
+  }
+
+  async getSpotifyUserData(accessToken: string): Promise<any> {
+    const response = await axios.get('https://api.spotify.com/v1/me', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data;
   }
 
   private validateAge(birthdate: Date): void {
