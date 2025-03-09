@@ -94,7 +94,7 @@ export const UserSchema = new Schema<User>(
     },
     verification_token: {
       type: String,
-      unique: true,
+      unique: false,
       required: false,
     },
     is_verified: {
@@ -142,4 +142,11 @@ UserSchema.index(
 UserSchema.index(
   { deezerId: 1 },
   { unique: true, partialFilterExpression: { deezerId: { $ne: null } } },
+);
+UserSchema.index(
+  { verification_token: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { verification_token: { $ne: null } },
+  },
 );
