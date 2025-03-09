@@ -6,7 +6,7 @@ export interface User extends Document {
   pseudo: string;
   username: string;
   email: string;
-  birthdate: Date;
+  birthdate?: Date;
   password: string;
   googleId?: string;
   facebookId?: string;
@@ -53,7 +53,7 @@ export const UserSchema = new Schema<User>(
     },
     birthdate: {
       type: Date,
-      required: true,
+      required: false,
       unique: false,
     },
     email: {
