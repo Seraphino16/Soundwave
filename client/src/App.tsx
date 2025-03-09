@@ -7,6 +7,9 @@ import AlertTestPage from './pages/AlertTestPage';
 import Navbar from './components/header/Navbar';
 import Footer from './components/footer/Footer';
 import Auth from './pages/Auth';
+import Albums from 'pages/Albums';
+import Artists from "pages/Artists";
+import ArtistDetail from "pages/ArtistDetails";
 
 export default function App() {
   return (
@@ -16,6 +19,9 @@ export default function App() {
         <div className="flex-grow pt-32 pb-20">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/albums" element={<Albums />} />
+            <Route path="/artists" element={<Artists />} />
+            <Route path="/artists/:id" element={<ArtistDetail />} />
             <Route path="/alert" element={<AlertTestPage />} />
             <Route path="/auth" element={<Auth />} /> 
           </Routes>

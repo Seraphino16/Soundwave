@@ -8,6 +8,8 @@ import { MailerService } from './mailer/mailer.service';
 import { MailerController } from './mailer/mailer.controller';
 import { MailerModule } from './mailer/mailer.module';
 import { TokenModule } from './token/token.module';
+import { SpotifyService } from './spotify/spotify.service';
+import { SpotifyController } from './spotify/spotify.controller';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 
@@ -26,7 +28,12 @@ import { AuthModule } from './auth/auth.module';
     MailerModule,
     AuthModule,
   ],
-  controllers: [AppController, MailerController, AuthController],
-  providers: [AppService, MailerService],
+  controllers: [
+    AppController,
+    MailerController,
+    SpotifyController,
+    AuthController,
+  ],
+  providers: [AppService, MailerService, SpotifyService],
 })
 export class AppModule {}
