@@ -11,6 +11,7 @@ import { TokenModule } from '../token/token.module';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { UserInfosRepository } from './repositories/user-infos.repository';
 import { UploadsModule } from '../uploads/uploads.module';
+import { SpotifyModule } from '../spotify/spotify.module';
 
 @Module({
   imports: [
@@ -22,10 +23,11 @@ import { UploadsModule } from '../uploads/uploads.module';
     HttpModule,
     TokenModule,
     UploadsModule,
+    SpotifyModule,
   ],
   providers: [UserService, UserRepository, UserInfosRepository, JwtAuthGuard],
   controllers: [UserController],
-  exports: [UserRepository, UserInfosRepository],
+  exports: [UserRepository, UserInfosRepository, UserService],
 })
 export class UserModule {}
 
