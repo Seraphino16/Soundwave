@@ -20,7 +20,6 @@ export class MailerService {
   }
   sendValidationEmail(userEmail: string, Token: string): void {
     const validationLink = `http://localhost:5001/users/validate?token=${Token}`;
-    console.log('Validation link:', validationLink);
     const mailOptions = {
       from: process.env.MAIL_FROM,
       to: userEmail,
@@ -36,7 +35,6 @@ export class MailerService {
     this.transporter
       .sendMail(mailOptions)
       .then(() => {
-        console.log(`Email de validation envoyé à ${userEmail}`);
         return MailerSuccess.accountValidationEmailSent({
           email: userEmail,
           token: Token,

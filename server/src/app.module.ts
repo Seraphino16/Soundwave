@@ -12,6 +12,10 @@ import { SpotifyService } from './spotify/spotify.service';
 import { SpotifyController } from './spotify/spotify.controller';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
+import { UploadsService } from './uploads/uploads.service';
+import { UploadsController } from './uploads/uploads.controller';
+import { UploadsModule } from './uploads/uploads.module';
+import { SpotifyModule } from './spotify/spotify.module';
 
 @Module({
   imports: [
@@ -27,13 +31,16 @@ import { AuthModule } from './auth/auth.module';
     TokenModule,
     MailerModule,
     AuthModule,
+    UploadsModule,
+    SpotifyModule,
   ],
   controllers: [
     AppController,
     MailerController,
     SpotifyController,
     AuthController,
+    UploadsController,
   ],
-  providers: [AppService, MailerService, SpotifyService],
+  providers: [AppService, MailerService, SpotifyService, UploadsService],
 })
 export class AppModule {}
