@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import AlertTestPage from './pages/AlertTestPage';
 import Navbar from './components/header/Navbar';
 import Footer from './components/footer/Footer';
+import Auth from './pages/Auth';
 import Albums from 'pages/Albums';
 import Artists from "pages/Artists";
 import ArtistDetail from "pages/ArtistDetails";
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="/artists" element={<Artists />} />
             <Route path="/artists/:id" element={<ArtistDetail />} />
             <Route path="/alert" element={<AlertTestPage />} />
+            <Route path="/auth" element={<Auth />} /> 
           </Routes>
         </div>
         <Footer />
