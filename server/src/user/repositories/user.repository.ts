@@ -20,7 +20,7 @@ export class UserRepository {
     password: string,
     pseudo: string,
     username: string,
-    birthdate: Date,
+    birthdate: Date | null,
     googleId?: string,
     facebookId?: string,
     twitterId?: string,
