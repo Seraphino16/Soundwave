@@ -26,7 +26,7 @@ export class UserRepository {
     twitterId?: string,
     deezerId?: string,
     spotifyId?: string,
-    roles: UserRole[] = [UserRole.USER],
+    roles?: string[],
     verification_token?: string,
     is_verified: boolean = false,
     is_active: boolean = true,

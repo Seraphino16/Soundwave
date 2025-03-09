@@ -1,9 +1,7 @@
 import {
   Injectable,
-  ConflictException,
   BadRequestException,
   ConflictException,
-  Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,13 +13,8 @@ import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
 import { UploadsService } from '../uploads/uploads.service';
 import { UserInfosRepository } from './repositories/user-infos.repository';
 import { UserSuccess } from './success/user.success';
-import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
-import { UploadsService } from '../uploads/uploads.service';
-import { UserInfosRepository } from './repositories/user-infos.repository';
-import { UserSuccess } from './success/user.success';
 import { UserRole } from '../config/user.config';
-import {User, UserResponse} from "./entities/user.entity";
-import { SpotifyService } from '../spotify/spotify.service';
+import { User, UserResponse } from './entities/user.entity';
 import axios from 'axios';
 
 @Injectable()
@@ -51,7 +44,7 @@ export class UserService {
       is_active = false,
     } = createUserDto;
 
-    if (!email || !pseudo || !username || !birthdate || !roles) {
+    if (!email || !pseudo || !username) {
       throw new BadRequestException(UserErrors.missingRequiredFields().message);
     }
 
@@ -165,21 +158,21 @@ export class UserService {
     const birthdate = spotifyUser.birthdate ? new Date(spotifyUser.birthdate) : null;
 
     const newUser = await this.userRepository.create(
-        id,
-        spotifyUser.email,
-        '',
-        displayName,
-        displayName,
-        birthdate,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        spotifyUser.id,
-        ['USER'],
-        undefined,
-        true,
-        true
+      id,
+      spotifyUser.email,
+      '',
+      displayName,
+      displayName,
+      birthdate,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      spotifyUser.id,
+      ['USER'],
+      undefined,
+      true,
+      true,
     );
 
     const createUserInfosDto = {

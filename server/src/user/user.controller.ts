@@ -6,13 +6,12 @@ import {
   UseInterceptors,
   UploadedFile,
   Post,
+  Patch,
   Query,
   BadRequestException,
   ConflictException,
   InternalServerErrorException,
   Get,
-  Query,
-  InternalServerErrorException,
   Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
