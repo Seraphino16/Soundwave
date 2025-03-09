@@ -57,7 +57,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                     password,
                 };
                 await loginUser(loginData);
-                navigate("/");
+                navigate("/home");
             }
             onClose();
         } catch (error) {

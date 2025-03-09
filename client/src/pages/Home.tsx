@@ -1,5 +1,5 @@
 /**
- * @description Page d'accueil du site SoundWave
+ * @description Page d'accueil du site SoundWave pour les utilisateurs connectés
  * @author SoundWave
  */
 

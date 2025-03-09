@@ -1,21 +1,58 @@
+/**
+ * @description Barre de navigation du site SoundWave
+ * @author SoundWave
+ * */
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavbarItem from "../utils/NavItem";
 import "../../assets/styles/Navbar.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
-import { BurgerMenuIcon } from "../utils/Icons";
+import SearchBar from "../searchBar/SearchBar";
+import { MessagesIcon, ProfileIcon, SettingsIcon, BurgerMenuIcon } from "../utils/Icons";
+
+interface NavItem {
+    text: string;
+    href: string;
+}
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [user, setUser] = useState<{ pseudo: string; username: string } | null>(null);
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         closeMenu();
     }, [location]);
 
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsedData = JSON.parse(storedUser);
+            const userData = parsedData.user;
+            if (userData && userData.pseudo && userData.username) {
+                setUser({ pseudo: userData.pseudo, username: userData.username });
+            }
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("user");
+        setUser(null);
+        navigate("/auth");
+    };
+
+    const navItems: NavItem[] = [
+        { text: "ALBUMS", href: "/albums" },
+        { text: "ARTISTES", href: "/artists" },
+        { text: "EVENEMENTS", href: "/events" },
+    ];
+
+    const isAuthRoute = location.pathname.startsWith("/auth");
     const isGuestPage = location.pathname === "/";
 
     return (
@@ -23,7 +60,7 @@ const Navbar = () => {
             <nav className="w-full lg:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md lg:rounded-b-xl z-10">
                 {/* Logo */}
                 <div className="flex items-center space-x-2">
-                    <Link to="/">
+                    <Link to={user ? "/home" : "/"}>
                         <img src={logo} alt="Logo" className="w-16 h-16" />
                     </Link>
                     <span className="text-2xl md:text-3xl lg:text-4xl mt-6 hover:text-text-200 font-site-name text-primaryBlue">
@@ -35,27 +72,55 @@ const Navbar = () => {
                 {isGuestPage ? (
                     <div className="hidden lg:flex space-x-6 items-center">
                         <Link
-                            to="/signup"
+                            to="/auth"
                             className="bg-primaryBlue text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#B0C7E6] transition"
                         >
                             S'inscrire
                         </Link>
                         <Link
-                            to="/login"
+                            to="/auth"
                             className="bg-white text-primaryBlue border border-primaryBlue px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition"
                         >
                             Se connecter
                         </Link>
                     </div>
                 ) : (
-                    <div className="hidden lg:flex space-x-6">
-                        <NavbarItem text="ALBUMS" href="/albums" />
-                        <NavbarItem text="ARTISTES" href="/artists" />
-                        <NavbarItem text="EVENEMENTS" href="/events" />
-                    </div>
+                    !isAuthRoute && (
+                        <div className="hidden lg:flex space-x-6">
+                            {navItems.map((item) => (
+                                <NavbarItem key={item.href} text={item.text} href={item.href} />
+                            ))}
+                        </div>
+                    )
                 )}
 
-                {/* Mobile Menu */}
+                {!isAuthRoute && !isGuestPage && (
+                    <div className="hidden lg:flex space-x-6 mx-2 items-center">
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <MessagesIcon />
+                        </a>
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <ProfileIcon />
+                        </a>
+                        {user && (
+                            <div className="flex items-center space-x-4 ml-4">
+                                <div className="flex flex-col items-end">
+                                    <span className="text-lg font-semibold">{user.pseudo}</span>
+                                    <span className="text-sm text-gray-500">@{user.username}</span>
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                                >
+                                    Déconnexion
+                                </button>
+                            </div>
+                        )}
+                        <a href="#" className="hover:opacity-80 transition-opacity">
+                            <SettingsIcon />
+                        </a>
+                    </div>
+                )}
                 <div className="block lg:hidden">
                     <button
                         onClick={toggleMenu}
@@ -84,26 +149,53 @@ const Navbar = () => {
                                 className="absolute top-24 left-0 w-full bg-white shadow-md lg:hidden transition-all ease-in-out overflow-hidden z-50"
                             >
                                 <div className="flex flex-col items-center w-full py-4 space-y-4">
-                                    {isGuestPage ? (
+                                    {!isAuthRoute && !isGuestPage && (
+                                        <>
+                                            {navItems.map((item) => (
+                                                <NavbarItem key={item.href} text={item.text} href={item.href} />
+                                            ))}
+                                        </>
+                                    )}
+                                    <div className="flex space-x-6 mt-4">
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                            <MessagesIcon />
+                                        </a>
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                            <ProfileIcon />
+                                        </a>
+                                        {user && (
+                                            <div className="flex items-center space-x-4 ml-4">
+                                                <div className="flex flex-col items-end">
+                                                    <span className="text-lg font-semibold">{user.pseudo}</span>
+                                                    <span className="text-sm text-gray-500">@{user.username}</span>
+                                                </div>
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                                                >
+                                                    Déconnexion
+                                                </button>
+                                            </div>
+                                        )}
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                            <SettingsIcon />
+                                        </a>
+                                    </div>
+                                    <SearchBar />
+                                    {isGuestPage && (
                                         <>
                                             <Link
-                                                to="/signup"
+                                                to="/auth"
                                                 className="bg-primaryBlue text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#B0C7E6] transition text-center"
                                             >
                                                 S'inscrire
                                             </Link>
                                             <Link
-                                                to="/login"
+                                                to="/auth"
                                                 className="bg-white text-primaryBlue border border-primaryBlue px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition text-center"
                                             >
                                                 Se connecter
                                             </Link>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <NavbarItem text="ALBUMS" href="/albums" />
-                                            <NavbarItem text="ARTISTES" href="/artists" />
-                                            <NavbarItem text="EVENEMENTS" href="/events" />
                                         </>
                                     )}
                                 </div>

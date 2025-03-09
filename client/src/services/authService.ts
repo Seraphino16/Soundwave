@@ -7,6 +7,7 @@ const API_URL = "http://localhost:5001";
 
 export const registerUser = async (userData: any) => {
     try {
+        console.log("Registering user with data:", userData);
         const response = await fetch(`${API_URL}/users/create`, {
             method: "POST",
             headers: {
@@ -16,7 +17,9 @@ export const registerUser = async (userData: any) => {
         });
 
         if (!response.ok) {
-            throw new Error("Échec de l'enregistrement de l'utilisateur");
+            const errorData = await response.json();
+            console.error("Register Error Response:", errorData);
+            throw new Error(errorData.message || "Échec de l'enregistrement de l'utilisateur");
         }
 
         return response.json();
@@ -28,6 +31,7 @@ export const registerUser = async (userData: any) => {
 
 export const loginUser = async (loginData: any) => {
     try {
+        console.log("Logging in user with data:", loginData);
         const response = await fetch(`${API_URL}/auth`, {
             method: "POST",
             headers: {
@@ -37,7 +41,9 @@ export const loginUser = async (loginData: any) => {
         });
 
         if (!response.ok) {
-            throw new Error("Échec de la connexion de l'utilisateur");
+            const errorData = await response.json();
+            console.error("Login Error Response:", errorData);
+            throw new Error(errorData.message || "Échec de la connexion de l'utilisateur");
         }
 
         const userData = await response.json();
