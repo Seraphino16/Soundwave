@@ -166,4 +166,12 @@ export class UserErrors {
       'Ce compte est déja enregistré comme artiste',
     );
   }
+
+  static mustBeArtist(): UserErrors {
+    return new UserErrors(
+      'error',
+      400,
+      "Le compte doit d'abord être enregisté comme artiste",
+    );
+  }
 }
