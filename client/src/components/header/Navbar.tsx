@@ -47,15 +47,17 @@ const Navbar = () => {
                     </span>
                 </div>
 
-                <div className="hidden lg:flex space-x-6">
-                    {navItems.map((item) => (
-                        <NavbarItem
-                            key={item.href}
-                            text={item.text}
-                            href={item.href}
-                        />
-                    ))}
-                </div>
+                {!isAuthRoute && (
+                    <div className="hidden lg:flex space-x-6">
+                        {navItems.map((item) => (
+                            <NavbarItem
+                                key={item.href}
+                                text={item.text}
+                                href={item.href}
+                            />
+                        ))}
+                    </div>
+                )}
 
                 {!isAuthRoute && (
                     <div className="block lg:hidden">
@@ -82,7 +84,7 @@ const Navbar = () => {
                     </div>
                 )}
                 <AnimatePresence>
-                    {isOpen && (
+                    {isOpen && !isAuthRoute && (
                         <>
                             <motion.div
                                 initial={{ opacity: 0 }}
@@ -110,31 +112,27 @@ const Navbar = () => {
                                             href={item.href}
                                         />
                                     ))}
-                                    {!isAuthRoute && (
-                                        <>
-                                            <div className="flex space-x-6 mt-4">
-                                                <a
-                                                    href="#"
-                                                    className="hover:opacity-80 transition-opacity"
-                                                >
-                                                    <MessagesIcon />
-                                                </a>
-                                                <a
-                                                    href="#"
-                                                    className="hover:opacity-80 transition-opacity"
-                                                >
-                                                    <ProfileIcon />
-                                                </a>
-                                                <a
-                                                    href="#"
-                                                    className="hover:opacity-80 transition-opacity"
-                                                >
-                                                    <SettingsIcon />
-                                                </a>
-                                            </div>
-                                            <SearchBar />
-                                        </>
-                                    )}
+                                    <div className="flex space-x-6 mt-4">
+                                        <a
+                                            href="#"
+                                            className="hover:opacity-80 transition-opacity"
+                                        >
+                                            <MessagesIcon />
+                                        </a>
+                                        <a
+                                            href="#"
+                                            className="hover:opacity-80 transition-opacity"
+                                        >
+                                            <ProfileIcon />
+                                        </a>
+                                        <a
+                                            href="#"
+                                            className="hover:opacity-80 transition-opacity"
+                                        >
+                                            <SettingsIcon />
+                                        </a>
+                                    </div>
+                                    <SearchBar />
                                 </div>
                             </motion.div>
                         </>
