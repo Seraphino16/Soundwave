@@ -1,7 +1,14 @@
-import React from "react";
+/**
+ * @description Blocs de connexion et d'inscription de SoundWave avec modales de connexion et d'inscription incluses
+ * @author SoundWave
+ */
+
+import React, { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthForm } from "../../hooks/useAuthForm";
 import { getFirstError } from "../../utils/formValidation";
+import { registerUser, loginUser } from "../../services/authService";
 
 interface AuthModalsProps {
     isOpen: boolean;
@@ -10,17 +17,7 @@ interface AuthModalsProps {
 }
 
 const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
-    const backdropVariants = {
-        hidden: { opacity: 0 },
-        visible: { opacity: 0.5 },
-    };
-
-    const modalVariants = {
-        hidden: { opacity: 0, scale: 0.8 },
-        visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
-        exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
-    };
-
+    const navigate = useNavigate();
     const {
         birthDate,
         setBirthDate,
@@ -37,6 +34,51 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
         errors,
         isFormValid,
     } = useAuthForm(type);
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+
+        try {
+            if (type === "register") {
+                const userData = {
+                    email,
+                    username,
+                    displayName,
+                    birthDate,
+                    password,
+                    passwordConfirm: confirmPassword,
+                };
+                await registerUser(userData);
+                alert("L'utilisateur a été enregistré avec succès");
+            } else {
+                const loginData = {
+                    email: /\S+@\S+\.\S+/.test(email) ? email : "",
+                    username: /\S+@\S+\.\S+/.test(email) ? "" : email,
+                    password,
+                };
+                await loginUser(loginData);
+                navigate("/");
+            }
+            onClose();
+        } catch (error) {
+            if (error instanceof Error) {
+                alert(error.message);
+            } else {
+                alert("Une erreur inconnue s'est produite");
+            }
+        }
+    };
+
+    const backdropVariants = {
+        hidden: { opacity: 0 },
+        visible: { opacity: 0.5 },
+    };
+
+    const modalVariants = {
+        hidden: { opacity: 0, scale: 0.8 },
+        visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+        exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
+    };
 
     return (
         <AnimatePresence>
@@ -74,9 +116,12 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                                     <h2 className="text-2xl text-[#93D9D6] mb-6 mt-2 text-center">
                                         Déjà un compte ? Connectez-vous !
                                     </h2>
-                                    <form className="flex flex-col space-y-4">
+                                    <form
+                                        className="flex flex-col space-y-4"
+                                        onSubmit={handleSubmit}
+                                    >
                                         <input
-                                            type="email"
+                                            type="text"
                                             placeholder="Email ou Nom d'utilisateur"
                                             value={email}
                                             onChange={(e) =>
@@ -124,7 +169,10 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                                     <h2 className="text-2xl text-[#93D9D6] mb-6 mt-2 text-center">
                                         Pas de compte ? Inscrivez-vous !
                                     </h2>
-                                    <form className="flex flex-col space-y-4">
+                                    <form
+                                        className="flex flex-col space-y-4"
+                                        onSubmit={handleSubmit}
+                                    >
                                         <input
                                             type="email"
                                             placeholder="Email"
