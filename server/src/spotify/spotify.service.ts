@@ -45,6 +45,7 @@ export class SpotifyService {
         });
 
         const albums = response.data.albums.items.map((album: any) => ({
+          id: album.id,
           title: album.name,
           coverImage: album.images.length > 0 ? album.images[0].url : null,
         }));
@@ -66,6 +67,44 @@ export class SpotifyService {
       throw new Error('Impossible de récupérer les albums');
     }
   }
+
+  // Récupère détails d'un album
+  async getAlbumById(id: string) {
+    try {
+      const accessToken = await this.getAccessToken();
+      const response = await axios.get(`${this.spotifyApiUrl}/albums/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const album = response.data;
+      return {
+        id: album.id,
+        title: album.name,
+        coverImage: album.images.length > 0 ? album.images[0].url : null,
+        releaseDate: album.release_date,
+        totalTracks: album.total_tracks,
+        spotifyUrl: album.external_urls.spotify,
+        label: album.label,
+        popularity: album.popularity,
+        artists: album.artists.map((artist: any) => ({
+          id: artist.id,
+          name: artist.name,
+          spotifyUrl: artist.external_urls.spotify,
+        })),
+        tracks: album.tracks.items.map((track: any) => ({
+          id: track.id,
+          title: track.name,
+          durationMs: track.duration_ms,
+          spotifyUrl: track.external_urls.spotify,
+          previewUrl: track.preview_url,
+        })),
+      };
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'album:", error);
+      throw new Error("Impossible de récupérer l'album");
+    }
+  }
+
 
   // Récupérer tous les artistes récents
   async getAllNewArtists() {
@@ -131,4 +170,6 @@ export class SpotifyService {
       throw new Error("Impossible de récupérer l'artiste");
     }
   }
+
+
 }

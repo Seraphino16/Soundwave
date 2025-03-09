@@ -3,6 +3,7 @@ import { fetchAlbums } from "../services/spotifyService";
 import AlbumCard from "../components/cards/AlbumCard";
 
 interface Album {
+    id: string;
     title: string;
     coverImage: string;
 }
@@ -59,8 +60,8 @@ const Albums: React.FC = () => {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 ml-20">
-                            {currentAlbums.map((album, index) => (
-                                <AlbumCard key={index} title={album.title} coverImage={album.coverImage} />
+                            {currentAlbums.map((album) => (
+                                <AlbumCard key={album.id} id={album.id} title={album.title} coverImage={album.coverImage} />
                             ))}
                         </div>
 
