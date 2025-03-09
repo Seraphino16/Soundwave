@@ -141,7 +141,9 @@ export class UserService {
     return UserSuccess.userInfosInsert().message;
   }
   async createUserWithSpotify(spotifyUser: any): Promise<any> {
-    const existingUserByEmail = await this.userRepository.findByEmail(spotifyUser.email);
+    const existingUserByEmail = await this.userRepository.findByEmail(
+      spotifyUser.email,
+    );
     if (existingUserByEmail) {
       throw new ConflictException(UserErrors.emailAlreadyExists().message);
     }
@@ -249,6 +251,14 @@ export class UserService {
     const user: User = await this.userRepository.assignRole(
       userId,
       UserRole.ARTIST,
+    );
+    return this.mapUserForResponse(user);
+  }
+
+  async assignBandRole(userId: number): Promise<UserResponse> {
+    const user: User = await this.userRepository.assignRole(
+      userId,
+      UserRole.BAND,
     );
     return this.mapUserForResponse(user);
   }

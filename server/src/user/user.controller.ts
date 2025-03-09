@@ -165,4 +165,17 @@ export class UserController {
       throw new BadRequestException(UserErrors.unknownError().message);
     }
   }
+
+  @Patch('request-band')
+  async requestBand(@Body('id') id: number): Promise<UserSuccess> {
+    try {
+      const updatedUser = await this.userService.assignBandRole(id);
+      return UserSuccess.userRoleUpdated(updatedUser);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(UserErrors.unknownError().message);
+    }
+  }
 }

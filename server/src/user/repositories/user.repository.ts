@@ -116,6 +116,10 @@ export class UserRepository {
       throw new BadRequestException(UserErrors.alreadyArtistError().message);
     }
 
+    if (role === UserRole.BAND && !user.roles.includes(UserRole.ARTIST)) {
+      throw new BadRequestException(UserErrors.mustBeArtist().message);
+    }
+
     user.roles.push(role);
     user.updatedAt = new Date();
     return user.save();
