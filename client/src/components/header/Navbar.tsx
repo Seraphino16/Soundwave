@@ -1,3 +1,8 @@
+/**
+ * @description Barre de navigation du site SoundWave
+ * @author SoundWave
+ * */
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavbarItem from "../utils/NavItem";
@@ -55,7 +60,7 @@ const Navbar = () => {
             <nav className="w-full lg:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md lg:rounded-b-xl z-10">
                 {/* Logo */}
                 <div className="flex items-center space-x-2">
-                    <Link to="/">
+                    <Link to={user ? "/home" : "/"}>
                         <img src={logo} alt="Logo" className="w-16 h-16" />
                     </Link>
                     <span className="text-2xl md:text-3xl lg:text-4xl mt-6 hover:text-text-200 font-site-name text-primaryBlue">
@@ -80,14 +85,16 @@ const Navbar = () => {
                         </Link>
                     </div>
                 ) : (
-                    <div className="hidden lg:flex space-x-6">
-                        <NavbarItem text="ALBUMS" href="/albums" />
-                        <NavbarItem text="ARTISTES" href="/artists" />
-                        <NavbarItem text="EVENEMENTS" href="/events" />
-                    </div>
+                    !isAuthRoute && (
+                        <div className="hidden lg:flex space-x-6">
+                            {navItems.map((item) => (
+                                <NavbarItem key={item.href} text={item.text} href={item.href} />
+                            ))}
+                        </div>
+                    )
                 )}
 
-                {!isAuthRoute && (
+                {!isAuthRoute && !isGuestPage && (
                     <div className="hidden lg:flex space-x-6 mx-2 items-center">
                         <a href="#" className="hover:opacity-80 transition-opacity">
                             <MessagesIcon />
@@ -114,7 +121,6 @@ const Navbar = () => {
                         </a>
                     </div>
                 )}
-                {/* Mobile Menu */}
                 <div className="block lg:hidden">
                     <button
                         onClick={toggleMenu}
@@ -143,35 +149,25 @@ const Navbar = () => {
                                 className="absolute top-24 left-0 w-full bg-white shadow-md lg:hidden transition-all ease-in-out overflow-hidden z-50"
                             >
                                 <div className="flex flex-col items-center w-full py-4 space-y-4">
-                                    {navItems.map((item) => (
-                                        <NavbarItem
-                                            key={item.href}
-                                            text={item.text}
-                                            href={item.href}
-                                        />
-                                    ))}
+                                    {!isAuthRoute && !isGuestPage && (
+                                        <>
+                                            {navItems.map((item) => (
+                                                <NavbarItem key={item.href} text={item.text} href={item.href} />
+                                            ))}
+                                        </>
+                                    )}
                                     <div className="flex space-x-6 mt-4">
-                                        <a
-                                            href="#"
-                                            className="hover:opacity-80 transition-opacity"
-                                        >
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
                                             <MessagesIcon />
                                         </a>
-                                        <a
-                                            href="#"
-                                            className="hover:opacity-80 transition-opacity"
-                                        >
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
                                             <ProfileIcon />
                                         </a>
                                         {user && (
                                             <div className="flex items-center space-x-4 ml-4">
                                                 <div className="flex flex-col items-end">
-                                                    <span className="text-lg font-semibold">
-                                                        {user.pseudo}
-                                                    </span>
-                                                    <span className="text-sm text-gray-500">
-                                                        @{user.username}
-                                                    </span>
+                                                    <span className="text-lg font-semibold">{user.pseudo}</span>
+                                                    <span className="text-sm text-gray-500">@{user.username}</span>
                                                 </div>
                                                 <button
                                                     onClick={handleLogout}
@@ -181,15 +177,12 @@ const Navbar = () => {
                                                 </button>
                                             </div>
                                         )}
-                                        <a
-                                            href="#"
-                                            className="hover:opacity-80 transition-opacity"
-                                        >
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
                                             <SettingsIcon />
                                         </a>
                                     </div>
                                     <SearchBar />
-                                    {isGuestPage ? (
+                                    {isGuestPage && (
                                         <>
                                             <Link
                                                 to="/auth"
@@ -203,12 +196,6 @@ const Navbar = () => {
                                             >
                                                 Se connecter
                                             </Link>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <NavbarItem text="ALBUMS" href="/albums" />
-                                            <NavbarItem text="ARTISTES" href="/artists" />
-                                            <NavbarItem text="EVENEMENTS" href="/events" />
                                         </>
                                     )}
                                 </div>
