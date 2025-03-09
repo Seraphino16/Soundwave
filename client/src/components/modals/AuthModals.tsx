@@ -19,14 +19,14 @@ interface AuthModalsProps {
 const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
     const navigate = useNavigate();
     const {
-        birthDate,
+        birthdate,
         setBirthDate,
         email,
         setEmail,
         username,
         setUsername,
-        displayName,
-        setDisplayName,
+        pseudo,
+        setPseudo,
         password,
         setPassword,
         confirmPassword,
@@ -43,13 +43,13 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                 const userData = {
                     email,
                     username,
-                    displayName,
-                    birthDate,
+                    pseudo,
+                    birthdate,
                     password,
                     passwordConfirm: confirmPassword,
+                    roles: ["USER"],
                 };
                 await registerUser(userData);
-                alert("L'utilisateur a été enregistré avec succès");
             } else {
                 const loginData = {
                     email: /\S+@\S+\.\S+/.test(email) ? email : "",
@@ -202,24 +202,24 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                                         <input
                                             type="text"
                                             placeholder="Pseudo affiché"
-                                            value={displayName}
+                                            value={pseudo}
                                             onChange={(e) =>
-                                                setDisplayName(e.target.value)
+                                                setPseudo(e.target.value)
                                             }
                                             className={`border rounded-md p-2 ${
-                                                errors.displayName
+                                                errors.pseudo
                                                     ? "border-red-500"
                                                     : ""
                                             }`}
                                         />
                                         <input
                                             type="date"
-                                            value={birthDate}
+                                            value={birthdate}
                                             onChange={(e) =>
                                                 setBirthDate(e.target.value)
                                             }
                                             className={`border rounded-md p-2 ${
-                                                errors.birthDate
+                                                errors.birthdate
                                                     ? "border-red-500"
                                                     : ""
                                             }`}
