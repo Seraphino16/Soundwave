@@ -1,5 +1,4 @@
 export class UserErrors {
-
   status: string;
   code: number;
   message: string;
@@ -159,5 +158,12 @@ export class UserErrors {
   static internalServerError() {
     return UserErrors.createError('error', 500, 'Erreur interne du serveur');
   }
-}
 
+  static alreadyArtistError(): UserErrors {
+    return new UserErrors(
+      'error',
+      409,
+      'Ce compte est déja enregistré comme artiste',
+    );
+  }
+}

@@ -7,6 +7,7 @@ import {
   Get,
   Query,
   InternalServerErrorException,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserErrors } from './errors/user.errors';
@@ -79,6 +80,24 @@ export class UserController {
       throw new InternalServerErrorException(
         'Erreur interne lors de la validation du compte',
       );
+    }
+  }
+
+  @Patch('request-artist')
+  async requestArtist(
+    @Body('automatic') automatic: string,
+    @Body('id') id: number,
+  ) {
+    try {
+      if (!automatic) {
+        const updatedUser = await this.userService.assignArtistRole(id);
+        return UserSuccess.userRoleUpdated(updatedUser);
+      }
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(UserErrors.unknownError().message);
     }
   }
 }

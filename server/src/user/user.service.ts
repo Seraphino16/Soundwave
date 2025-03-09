@@ -7,6 +7,8 @@ import { UserRepository } from './repositories/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserErrors } from './errors/user.errors';
 import * as bcrypt from 'bcryptjs';
+import { UserRole } from '../config/user.config';
+import {User, UserResponse} from "./entities/user.entity";
 
 @Injectable()
 export class UserService {
@@ -63,11 +65,11 @@ export class UserService {
       username,
       birthdate,
       googleId,
-      twitterId,
       facebookId,
+      twitterId,
       spotifyId,
       deezerId,
-      roles,
+      roles as UserRole[],
       verification_token,
       is_verified,
       is_active,
@@ -115,5 +117,27 @@ export class UserService {
     if (!success) {
       throw new BadRequestException(UserErrors.activationFailed().message);
     }
+  }
+
+  async assignArtistRole(userId: number): Promise<UserResponse> {
+    const user: User = await this.userRepository.assignRole(
+      userId,
+      UserRole.ARTIST,
+    );
+    return this.mapUserForResponse(user);
+  }
+
+  private mapUserForResponse(user: User): UserResponse {
+    return {
+      id: user.id,
+      pseudo: user.pseudo,
+      username: user.username,
+      birthdate: user.birthdate,
+      roles: user.roles,
+      is_verified: user.is_verified,
+      is_active: user.is_active,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    } as UserResponse;
   }
 }
