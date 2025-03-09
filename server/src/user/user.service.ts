@@ -1,18 +1,27 @@
 import {
-  Injectable,
-  ConflictException,
   BadRequestException,
+  ConflictException,
+  Injectable, InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserErrors } from './errors/user.errors';
 import * as bcrypt from 'bcryptjs';
+import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
+import { UploadsService } from '../uploads/uploads.service';
+import { UserInfosRepository } from './repositories/user-infos.repository';
+import { UserSuccess } from './success/user.success';
 import { UserRole } from '../config/user.config';
 import {User, UserResponse} from "./entities/user.entity";
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly userInfosRepository: UserInfosRepository,
+    private readonly uploadsService: UploadsService,
+  ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<number> {
     const {
@@ -75,7 +84,57 @@ export class UserService {
       is_active,
     );
 
+    const createUserInfosDto = {
+      user_id: newUser.id,
+      profile_picture: '',
+      banner_picture: '',
+      bio: '',
+      location: '',
+      musicStyle: [],
+      socialLinks: {},
+    };
+
+    await this.userInfosRepository.create(createUserInfosDto);
+
     return newUser.id;
+  }
+
+  async updateInfos(
+    userId: number,
+    updateUserInfosDto: UpdateUserInfosDto,
+    profilePicture?: Express.Multer.File,
+    bannerPicture?: Express.Multer.File,
+  ) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(UserErrors.userNotFound().message);
+    }
+
+    if (profilePicture) {
+      const uploadedProfilePicture =
+        this.uploadsService.handleFileUpload(profilePicture);
+      if (uploadedProfilePicture) {
+        updateUserInfosDto.profile_picture = uploadedProfilePicture.filePath;
+      } else {
+        throw new InternalServerErrorException(
+          'Erreur lors du téléchargement de la photo de profile',
+        );
+      }
+    }
+
+    if (bannerPicture) {
+      const uploadedBannerPicture =
+        this.uploadsService.handleFileUpload(bannerPicture);
+      if (uploadedBannerPicture) {
+        updateUserInfosDto.banner_picture = uploadedBannerPicture.filePath;
+      } else {
+        throw new InternalServerErrorException('Banner picture upload failed');
+      }
+    }
+
+    await this.userInfosRepository.update(userId, updateUserInfosDto);
+
+    return UserSuccess.userInfosInsert().message;
   }
 
   private validateAge(birthdate: Date): void {
