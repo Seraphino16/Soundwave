@@ -102,13 +102,19 @@ export class UserController {
   }
 
   @Get('create/spotify')
-  redirectToSpotifyAuth() {
+  redirectToSpotifyAuth(@Query('isLogin') isLogin: string = 'false') {
+    const isLoginBool = isLogin === 'true';
     const authUrl = this.spotifyService.generateSpotifyAuthUrl();
     return { url: authUrl };
   }
   @Get('create/spotify/callback')
-  async spotifyCallback(@Query('code') code: string, @Res() res) {
+  async spotifyCallback(
+    @Query('code') code: string,
+    @Query('isLogin') isLogin: string = 'false',
+    @Res() res,
+  ) {
     try {
+      const isLoginBool = isLogin === 'true';
       const accessToken = await this.spotifyService.getAccessTokenFromCode(code);
       const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
       const newUser = await this.userService.createUserWithSpotify(spotifyUser);
