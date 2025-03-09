@@ -101,6 +101,30 @@ export class UserController {
     }
   }
 
+  @Get('create/spotify')
+  redirectToSpotifyAuth() {
+    const authUrl = this.spotifyService.generateSpotifyAuthUrl();
+    return { url: authUrl };
+  }
+  @Get('create/spotify/callback')
+  async spotifyCallback(@Query('code') code: string, @Res() res) {
+    try {
+      const accessToken = await this.spotifyService.getAccessTokenFromCode(code);
+      const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
+      const newUser = await this.userService.createUserWithSpotify(spotifyUser);
+
+      return res.status(201).json({
+        message: 'Inscription réussie via Spotify',
+        user: newUser,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        message: 'Erreur lors de l\'inscription via Spotify',
+        error: error.message,
+      });
+    }
+  }
+
   @Get('validate')
   async validateAccount(@Query('token') token: string): Promise<UserSuccess> {
     try {
