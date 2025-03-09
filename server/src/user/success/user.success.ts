@@ -37,4 +37,12 @@ export class UserSuccess {
       'Compte utilisateur validé et activé avec succès',
     );
   }
+
+  static userInfosInsert() {
+    return UserSuccess.createSuccess(
+      'success',
+      200,
+      'Informations utilisateur enregistrée avec succès',
+    );
+  }
 }
