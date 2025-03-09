@@ -19,20 +19,20 @@ export class AuthService {
       throw new UnauthorizedException(AuthErrors.missingLogin().message);
     }
 
-    if (!password) {
-      throw new UnauthorizedException(AuthErrors.missingPassword().message);
-    }
-
     const user = await this.getUserByUsernameOrEmail(username, email);
 
     if (!user) {
       throw new UnauthorizedException(AuthErrors.invalidCredentials().message);
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (password) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) {
-      throw new UnauthorizedException(AuthErrors.invalidCredentials().message);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException(
+          AuthErrors.invalidCredentials().message,
+        );
+      }
     }
 
     if (!user.is_verified || !user.is_active) {
