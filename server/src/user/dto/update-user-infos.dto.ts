@@ -1,14 +1,13 @@
-// src/user/dto/update-user-infos.dto.ts
 import { IsOptional, IsString, IsArray, IsDateString } from 'class-validator';
 
 export class UpdateUserInfosDto {
   @IsOptional()
   @IsString()
-  profile_picture?: { message: string; filePath: string };
+  profile_picture?: string;
 
   @IsOptional()
   @IsString()
-  banner_picture?: { message: string; filePath: string };
+  banner_picture?: string;
 
   @IsOptional()
   @IsString()
