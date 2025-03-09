@@ -20,9 +20,7 @@ export class TokenController {
     @Body() generateTokenDto: GenerateTokenDto,
   ): string {
     try {
-      return this.tokenService.generateEmailValidationToken(
-          generateTokenDto,
-      );
+      return this.tokenService.generateEmailValidationToken(generateTokenDto);
     } catch (error) {
       if (error instanceof TokenErrors) {
         throw new BadRequestException(error.message);
@@ -34,9 +32,7 @@ export class TokenController {
   }
 
   @Post('generate-login')
-  generateLoginToken(
-    @Body() generateTokenDto: GenerateTokenDto,
-  ): string {
+  generateLoginToken(@Body() generateTokenDto: GenerateTokenDto): string {
     try {
       return this.tokenService.generateLoginToken(generateTokenDto);
     } catch (error) {

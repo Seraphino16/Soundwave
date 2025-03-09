@@ -29,8 +29,8 @@ const Navbar = () => {
                     </span>
                 </div>
                 <div className="hidden lg:flex space-x-6">
-                    <NavbarItem text="ALBUMS" href="#" />
-                    <NavbarItem text="ARTISTES" href="#" />
+                    <NavbarItem text="ALBUMS" href="/albums" />
+                    <NavbarItem text="ARTISTES" href="/artists" />
                     <NavbarItem text="EVENEMENTS" href="#" />
                 </div>
                 <div className="block lg:hidden">
@@ -72,8 +72,8 @@ const Navbar = () => {
                                 className="absolute top-24 left-0 w-full bg-white shadow-md lg:hidden transition-all ease-in-out overflow-hidden z-50"
                             >
                                 <div className="flex flex-col items-center w-full py-4 space-y-4">
-                                    <NavbarItem text="ALBUMS" href="#" />
-                                    <NavbarItem text="ARTISTES" href="#" />
+                                    <NavbarItem text="ALBUMS" href="/albums" />
+                                    <NavbarItem text="ARTISTES" href="/artists" />
                                     <NavbarItem text="EVENEMENTS" href="#" />
                                     <div className="flex space-x-6 mt-4">
                                         <a href="#" className="hover:opacity-80 transition-opacity">

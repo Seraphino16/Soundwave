@@ -14,11 +14,11 @@ const Home: React.FC = () => {
             <Meta
                 title="Accueil"
                 description="Page d'accueil du site SoundWave"
-                // Rajouter la canonical URL quand il y en aura une (valable pour toutes les pages)
             />
 
-            <div className="relative mt-28 md:ml-10 lg:ml-12 flex flex-col md:flex-row">
-                {/* Search Bar (Left Side) */}
+            <div className="relative md:ml-10 lg:ml-12">
+                {/* Barre de recherche */}
+
                 <div className="hidden md:block w-[20%]">
                     <SearchBar />
                 </div>
