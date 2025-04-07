@@ -1,0 +1,28 @@
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../fonts/Outfit/Outfit-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Jaini';
+  src: url('../fonts/Jaini/Jaini-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
