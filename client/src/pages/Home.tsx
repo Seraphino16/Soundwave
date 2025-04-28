@@ -6,7 +6,7 @@
 import React from "react";
 import Meta from "../components/utils/Meta";
 import SearchBar from "../components/searchBar/SearchBar";
-import Waves from "../components/waves/Waves"; // Import the Waves component
+import Waves from "../components/waves/Waves";
 
 const Home: React.FC = () => {
     return (
@@ -21,7 +21,6 @@ const Home: React.FC = () => {
                     <SearchBar />
                 </div>
 
-                {/* Waves Section (Center) */}
                 <div className="flex-1 max-w-2xl mx-auto p-4">
                     <Waves />
                 </div>

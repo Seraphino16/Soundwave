@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuthForm } from "../../hooks/useAuthForm";
 import { getFirstError } from "../../utils/formValidation";
 import { registerUser, loginUser } from "../../services/authService";
+import { useUserContext } from "../../context/UserContext"; 
 
 interface AuthModalsProps {
     isOpen: boolean;
@@ -18,6 +19,7 @@ interface AuthModalsProps {
 
 const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
     const navigate = useNavigate();
+    const { setUser } = useUserContext();
     const {
         birthdate,
         setBirthDate,
@@ -56,7 +58,8 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                     username: /\S+@\S+\.\S+/.test(email) ? "" : email,
                     password,
                 };
-                await loginUser(loginData);
+                const response = await loginUser(loginData);
+                setUser(response.user, response.token);
                 navigate("/home");
             }
             onClose();
