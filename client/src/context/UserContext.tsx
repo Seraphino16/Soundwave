@@ -1,3 +1,20 @@
+/**
+ * @description
+ * Contexte global de l'application SoundWave pour la gestion de l'état utilisateur et du token d'authentification.
+ * Ce contexte permet de :
+ * - Stocker et récupérer les informations de l'utilisateur connecté.
+ * - Mettre à jour l'utilisateur et son token.
+ * - Gérer la déconnexion en nettoyant l'état local et le localStorage.
+ * - Assurer la persistance des données utilisateur entre les sessions via localStorage.
+ *
+ * @property {User | null} user - L'utilisateur actuellement connecté, ou `null` si non connecté.
+ * @property {string | null} token - Le token d'authentification associé à l'utilisateur, ou `null` si non connecté.
+ * @property {function} setUser - Fonction pour définir ou mettre à jour l'utilisateur et son token.
+ * @property {function} logout - Fonction pour déconnecter l'utilisateur et réinitialiser les données stockées.
+ * @author SoundWave
+ */
+
+
 import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
 
 interface User {
