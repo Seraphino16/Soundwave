@@ -30,6 +30,7 @@ import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -72,6 +73,10 @@ export class UserController {
   })
   @ApiInternalServerErrorResponse({
     description: 'Erreur inconnue',
+    type: UserErrors,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erreur inconnue du serveur',
     type: UserErrors,
   })
   @ApiBody({ type: [CreateUserDto] })
@@ -117,6 +122,32 @@ export class UserController {
     }
   }
 
+  @ApiOperation({ summary: 'Mettre à jour les informations utilisateurs' })
+  @ApiBody({ type: [UpdateUserInfosDto] })
+  @ApiOkResponse({
+    description: 'Informations utilisateur enregistrée avec succès',
+    type: UserSuccess,
+  })
+  @ApiBadRequestResponse({
+    description: `Erreurs possibles :
+    - Champs requis manquants
+    - Email invalide`,
+    type: UserErrors,
+  })
+  @ApiConflictResponse({
+    description: `Erreurs de conflit :
+    - L'email existe déjà
+    - Le nom d'utilisateur existe déjà`,
+    type: UserErrors,
+  })
+  @ApiNotFoundResponse({
+    description: 'Utilisateur non trouvé',
+    type: UserErrors,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erreur inconnue du serveur',
+    type: UserErrors,
+  })
   @Put(':userId/infos')
   @UseInterceptors(
     FileInterceptor('profilePicture'),
