@@ -23,7 +23,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { SpotifyService } from '../spotify/spotify.service';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(
@@ -33,6 +44,37 @@ export class UserController {
   ) {}
 
   @Post('create')
+  @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
+  @ApiCreatedResponse({
+    description: 'Utilisateur créé avec succès',
+    type: UserSuccess,
+  })
+  @ApiBadRequestResponse({
+    description: `Erreurs de validation :
+    - L'email est requis
+    - Format de l’email invalide
+    - Mot de passe trop court
+    - Mot de passe sans majuscule / minuscule / chiffre / caractère spécial
+    - Pseudo ou nom d'utilisateur manquant
+    - Les mots de passe ne correspondent pas
+    - Date de naissance invalide ou âge < 13 ans`,
+    type: UserErrors,
+  })
+  @ApiConflictResponse({
+    description: `Conflit de données :
+    - L'email existe déjà
+    - Le nom d'utilisateur existe déjà`,
+    type: UserErrors,
+  })
+  @ApiNotFoundResponse({
+    description: 'Utilisateur non trouvé',
+    type: UserErrors,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erreur inconnue',
+    type: UserErrors,
+  })
+  @ApiBody({ type: [CreateUserDto] })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserSuccess> {
     try {
       const userId = await this.userService.createUser(createUserDto);
@@ -42,8 +84,6 @@ export class UserController {
         username: createUserDto.username,
         id: userId,
       };
-
-
       const tokenResponse = await firstValueFrom(
         this.httpService.post(
           'http://localhost:5001/token/generate-email-validation',
@@ -117,8 +157,10 @@ export class UserController {
   ) {
     try {
       const isLoginBool = isLogin === 'true';
-      const accessToken = await this.spotifyService.getAccessTokenFromCode(code);
-      const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
+      const accessToken =
+        await this.spotifyService.getAccessTokenFromCode(code);
+      const spotifyUser =
+        await this.spotifyService.getSpotifyUserData(accessToken);
       const newUser = await this.userService.createUserWithSpotify(spotifyUser);
 
       return res.status(201).json({
@@ -127,7 +169,7 @@ export class UserController {
       });
     } catch (error) {
       return res.status(400).json({
-        message: 'Erreur lors de l\'inscription via Spotify',
+        message: "Erreur lors de l'inscription via Spotify",
         error: error.message,
       });
     }
