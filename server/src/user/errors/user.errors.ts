@@ -1,15 +1,17 @@
-export class UserErrors {
+export class UserErrors extends Error {
   status: string;
   code: number;
   message: string;
   data: any;
 
   constructor(status: string, code: number, message: string, data: any = null) {
+    super(message);
     this.status = status;
     this.code = code;
     this.message = message;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.data = data;
+    Object.setPrototypeOf(this, UserErrors.prototype);
   }
 
   static createError(
