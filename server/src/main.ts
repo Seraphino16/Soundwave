@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const swaggerConfig = new DocumentBuilder()
       .setTitle('SoundWave api')
-      .setDescription('The SoudWave api documentation')
+      .setDescription('The SoundWave api documentation')
       .setVersion('1.0')
       .build();
   const documentFactory = () => SwaggerModule.createDocument(app, swaggerConfig);
