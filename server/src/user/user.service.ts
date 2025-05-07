@@ -46,7 +46,7 @@ export class UserService {
       is_active = false,
     } = createUserDto;
 
-    if (!email || !pseudo || !username) {
+    if (!email || !pseudo || !username || !birthdate) {
       throw new BadRequestException(UserErrors.missingRequiredFields().message);
     }
 
