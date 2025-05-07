@@ -9,26 +9,28 @@ import {
   Patch,
   Query,
   BadRequestException,
-  ConflictException,
   Get,
   InternalServerErrorException,
   Res,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
+import { MailerErrors } from '../mailer/errors/mailer.errors';
+import { TokenErrors } from '../token/errors/token.errors';
 import { CreateUserDto } from './dto/create-user.dto';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import { UserService } from './user.service';
+import { MailerService } from '../mailer/mailer.service';
+import { TokenService } from '../token/token.service';
 import { SpotifyService } from '../spotify/spotify.service';
+import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly httpService: HttpService,
+    private readonly mailerService: MailerService,
+    private readonly tokenService: TokenService,
     private readonly spotifyService: SpotifyService,
   ) {}
 
