@@ -121,7 +121,13 @@ export class UserController {
       const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
       const newUser = await this.userService.createUserWithSpotify(spotifyUser);
 
-      return res.redirect('http://localhost:3000/home');
+      // return res.redirect('http://localhost:3000/home');
+
+      return res.status(201).json({
+        message: 'Inscription réussie via Spotify',
+        user: newUser,
+      });
+      
     } catch (error) {
       return res.status(400).json({
         message: 'Erreur lors de l\'inscription via Spotify',
