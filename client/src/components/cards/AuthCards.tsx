@@ -40,7 +40,7 @@ export const LoginCard: React.FC = () => {
     const handleSpotifyLogin = async () => {
         try {
             const authUrl = await getSpotifyAuthUrl(true);
-            window.open(authUrl, "_blank", "noopener,noreferrer");
+            window.location.href = authUrl;
         } catch (error) {
             console.error("Erreur lors de la redirection vers Spotify:", error);
         }
@@ -106,7 +106,7 @@ export const RegisterCard: React.FC = () => {
     const handleSpotifyRegister = async () => {
         try {
             const authUrl = await getSpotifyAuthUrl(false);
-            window.open(authUrl, "_blank", "noopener,noreferrer");
+            window.location.href = authUrl;
         } catch (error) {
             console.error("Erreur lors de la redirection vers Spotify:", error);
         }

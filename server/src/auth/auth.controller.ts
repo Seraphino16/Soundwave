@@ -30,11 +30,7 @@ export class AuthController {
       const loginDto = { email: spotifyUser.email } as AuthDto;
       const loginResponse = await this.authService.login(loginDto);
 
-      return res.status(200).json({
-        message: 'Connexion réussie via Spotify',
-        token: loginResponse.token,
-        user: loginResponse.user,
-      });
+      return res.redirect('http://localhost:3000/home');
     } catch (error) {
       return res.status(400).json({
         message: 'Erreur lors de la connexion via Spotify',

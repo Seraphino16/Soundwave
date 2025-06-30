@@ -15,7 +15,13 @@
  */
 
 
-import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
 
 interface User {
   _id: string;
@@ -35,6 +41,7 @@ interface User {
 interface UserContextProps {
   user: User | null;
   token: string | null;
+  loading: boolean;
   setUser: (user: User | null, token: string | null) => void;
   logout: () => void;
 }
@@ -44,13 +51,21 @@ const UserContext = createContext<UserContextProps | undefined>(undefined);
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUserState] = useState<User | null>(null);
   const [token, setTokenState] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const storedData = localStorage.getItem("user");
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      setUserState(parsedData.user || null);
-      setTokenState(parsedData.token || null);
+    try {
+      const storedData = localStorage.getItem("user");
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        setUserState(parsedData.user || null);
+        setTokenState(parsedData.token || null);
+      }
+    } catch (err) {
+      console.error("Erreur lors du chargement de l'utilisateur:", err);
+      localStorage.removeItem("user");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -70,7 +85,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <UserContext.Provider value={{ user, token, setUser, logout }}>
+    <UserContext.Provider value={{ user, token, loading, setUser, logout }}>
       {children}
     </UserContext.Provider>
   );
