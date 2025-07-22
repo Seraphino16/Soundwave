@@ -14,69 +14,133 @@ import {
   InternalServerErrorException,
   Res,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
+import { MailerErrors } from '../mailer/errors/mailer.errors';
+import { TokenErrors } from '../token/errors/token.errors';
 import { CreateUserDto } from './dto/create-user.dto';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import { UserService } from './user.service';
 import { SpotifyService } from '../spotify/spotify.service';
+import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { TokenService } from '../token/token.service';
+import { MailerService } from '../mailer/mailer.service';
 
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly httpService: HttpService,
+    private readonly mailerService: MailerService,
+    private readonly tokenService: TokenService,
     private readonly spotifyService: SpotifyService,
   ) {}
 
   @Post('create')
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserSuccess> {
+  @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
+  @ApiCreatedResponse({
+    description: 'Utilisateur créé avec succès',
+    type: UserSuccess,
+  })
+  @ApiBadRequestResponse({
+    description: `Erreurs de validation :
+    - L'email est requis
+    - Format de l’email invalide
+    - Mot de passe trop court
+    - Mot de passe sans majuscule / minuscule / chiffre / caractère spécial
+    - Pseudo ou nom d'utilisateur manquant
+    - Les mots de passe ne correspondent pas
+    - Date de naissance invalide ou âge < 13 ans`,
+    type: UserErrors,
+  })
+  @ApiConflictResponse({
+    description: `Conflit de données :
+    - L'email existe déjà
+    - Le nom d'utilisateur existe déjà`,
+    type: UserErrors,
+  })
+  @ApiNotFoundResponse({
+    description: 'Utilisateur non trouvé',
+    type: UserErrors,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erreur inconnue',
+    type: UserErrors,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erreur inconnue du serveur',
+    type: UserErrors,
+  })
+  @ApiBody({ type: [CreateUserDto] })
+  async create(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<UserSuccess | UserErrors> {
     try {
       const userId = await this.userService.createUser(createUserDto);
 
-      const generateTokenDto = {
+      const activationToken = this.tokenService.generateEmailValidationToken({
         email: createUserDto.email,
         username: createUserDto.username,
         id: userId,
-      };
+      });
 
-
-      const tokenResponse = await firstValueFrom(
-        this.httpService.post(
-          'http://localhost:5001/token/generate-email-validation',
-          generateTokenDto,
-        ),
-      );
-
-      const token = tokenResponse.data;
-      await this.userService.saveValidationToken(userId, token);
-
-      await firstValueFrom(
-        this.httpService.post(
-          'http://localhost:5001/mailer/send-validation-email',
-          {
-            email: createUserDto.email,
-            token: token,
-          },
-        ),
-      );
+      await this.mailerService.sendValidationEmail({
+        to: createUserDto.email,
+        username: createUserDto.username,
+        token: activationToken,
+      });
 
       return UserSuccess.userCreated(userId);
     } catch (error) {
       if (
-        error instanceof BadRequestException ||
-        error instanceof ConflictException
+        error instanceof UserErrors ||
+        error instanceof MailerErrors ||
+        error instanceof TokenErrors
       ) {
         throw error;
       }
 
-      throw new BadRequestException(UserErrors.unknownError().message);
+      throw UserErrors.unknownError();
     }
   }
 
+  @ApiOperation({ summary: 'Mettre à jour les informations utilisateurs' })
+  @ApiBody({ type: [UpdateUserInfosDto] })
+  @ApiOkResponse({
+    description: 'Informations utilisateur enregistrée avec succès',
+    type: UserSuccess,
+  })
+  @ApiBadRequestResponse({
+    description: `Erreurs possibles :
+    - Champs requis manquants
+    - Email invalide`,
+    type: UserErrors,
+  })
+  @ApiConflictResponse({
+    description: `Erreurs de conflit :
+    - L'email existe déjà
+    - Le nom d'utilisateur existe déjà`,
+    type: UserErrors,
+  })
+  @ApiNotFoundResponse({
+    description: 'Utilisateur non trouvé',
+    type: UserErrors,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erreur inconnue du serveur',
+    type: UserErrors,
+  })
   @Put(':userId/infos')
   @UseInterceptors(
     FileInterceptor('profilePicture'),
@@ -117,8 +181,10 @@ export class UserController {
   ) {
     try {
       const isLoginBool = isLogin === 'true';
-      const accessToken = await this.spotifyService.getAccessTokenFromCode(code);
-      const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
+      const accessToken =
+        await this.spotifyService.getAccessTokenFromCode(code);
+      const spotifyUser =
+        await this.spotifyService.getSpotifyUserData(accessToken);
       const newUser = await this.userService.createUserWithSpotify(spotifyUser);
 
       // return res.redirect('http://localhost:3000/home');
@@ -130,7 +196,7 @@ export class UserController {
       
     } catch (error) {
       return res.status(400).json({
-        message: 'Erreur lors de l\'inscription via Spotify',
+        message: "Erreur lors de l'inscription via Spotify",
         error: error.message,
       });
     }

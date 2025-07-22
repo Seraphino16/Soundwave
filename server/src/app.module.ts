@@ -5,7 +5,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { MailerService } from './mailer/mailer.service';
-import { MailerController } from './mailer/mailer.controller';
 import { MailerModule } from './mailer/mailer.module';
 import { TokenModule } from './token/token.module';
 import { SpotifyService } from './spotify/spotify.service';
@@ -36,7 +35,6 @@ import { SpotifyModule } from './spotify/spotify.module';
   ],
   controllers: [
     AppController,
-    MailerController,
     SpotifyController,
     AuthController,
     UploadsController,
