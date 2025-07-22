@@ -82,7 +82,7 @@ export class UserController {
     description: 'Erreur inconnue du serveur',
     type: UserErrors,
   })
-  @ApiBody({ type: [CreateUserDto] })
+  @ApiBody({ type: CreateUserDto })
   async create(
     @Body() createUserDto: CreateUserDto,
   ): Promise<UserSuccess | UserErrors> {
@@ -116,7 +116,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour les informations utilisateurs' })
-  @ApiBody({ type: [UpdateUserInfosDto] })
+  @ApiBody({ type: UpdateUserInfosDto })
   @ApiOkResponse({
     description: 'Informations utilisateur enregistrée avec succès',
     type: UserSuccess,
@@ -169,10 +169,10 @@ export class UserController {
 
   @Get('create/spotify')
   redirectToSpotifyAuth(@Query('isLogin') isLogin: string = 'false') {
-    const isLoginBool = isLogin === 'true';
     const authUrl = this.spotifyService.generateSpotifyAuthUrl();
     return { url: authUrl };
   }
+
   @Get('create/spotify/callback')
   async spotifyCallback(
     @Query('code') code: string,
@@ -185,20 +185,23 @@ export class UserController {
         await this.spotifyService.getAccessTokenFromCode(code);
       const spotifyUser =
         await this.spotifyService.getSpotifyUserData(accessToken);
-      const newUser = await this.userService.createUserWithSpotify(spotifyUser);
 
-      // return res.redirect('http://localhost:3000/home');
+      try {
+        const newUser = await this.userService.createUserWithSpotify(spotifyUser);
 
-      return res.status(201).json({
-        message: 'Inscription réussie via Spotify',
-        user: newUser,
-      });
-      
+        return res.redirect('http://localhost:3000/welcome');
+      } catch (error) {
+        if (
+          error instanceof ConflictException ||
+          error?.message?.includes("email existe déjà") ||
+          error?.message?.includes("L'email existe déjà")
+        ) {
+          return res.redirect('http://localhost:3000/error-email-already-exists');
+        }
+        return res.redirect('http://localhost:3000/erreur-inconnue');
+      }
     } catch (error) {
-      return res.status(400).json({
-        message: "Erreur lors de l'inscription via Spotify",
-        error: error.message,
-      });
+      return res.redirect('http://localhost:3000/erreur-inconnue');
     }
   }
 
