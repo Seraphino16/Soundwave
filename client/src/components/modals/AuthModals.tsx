@@ -59,7 +59,7 @@ const AuthModals: React.FC<AuthModalsProps> = ({ isOpen, onClose, type }) => {
                     password,
                 };
                 const response = await loginUser(loginData);
-                setUser(response.user, response.token);
+                setUser(response.user);
                 navigate("/home");
             }
             onClose();

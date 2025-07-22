@@ -13,6 +13,8 @@ import {
   Get,
   InternalServerErrorException,
   Res,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
@@ -36,6 +38,7 @@ import {
 } from '@nestjs/swagger';
 import { TokenService } from '../token/token.service';
 import { MailerService } from '../mailer/mailer.service';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -198,10 +201,10 @@ export class UserController {
         ) {
           return res.redirect('http://localhost:3000/error-email-already-exists');
         }
-        return res.redirect('http://localhost:3000/erreur-inconnue');
+        return res.redirect('http://localhost:3000/error');
       }
     } catch (error) {
-      return res.redirect('http://localhost:3000/erreur-inconnue');
+      return res.redirect('http://localhost:3000/error');
     }
   }
 
@@ -219,6 +222,12 @@ export class UserController {
       );
     }
   }
+
+  @Get('me')
+@UseGuards(JwtAuthGuard)
+getMe(@Req() req) {
+  return req.user;
+}
 
   @Patch('request-artist')
   async requestArtist(

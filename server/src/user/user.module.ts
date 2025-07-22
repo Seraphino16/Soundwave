@@ -8,7 +8,6 @@ import { UserRepository } from './repositories/user.repository';
 import { UserSchema } from './entities/user.entity';
 import { UserInfosSchema } from './entities/user-infos.entity';
 import { TokenModule } from '../token/token.module';
-import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { UserInfosRepository } from './repositories/user-infos.repository';
 import { UploadsModule } from '../uploads/uploads.module';
 import { SpotifyModule } from '../spotify/spotify.module';
@@ -25,7 +24,7 @@ import { SpotifyModule } from '../spotify/spotify.module';
     UploadsModule,
     SpotifyModule,
   ],
-  providers: [UserService, UserRepository, UserInfosRepository, JwtAuthGuard],
+  providers: [UserService, UserRepository, UserInfosRepository],
   controllers: [UserController],
   exports: [UserRepository, UserInfosRepository, UserService],
 })

@@ -1,20 +1,3 @@
-/**
- * @description
- * Contexte global de l'application SoundWave pour la gestion de l'état utilisateur et du token d'authentification.
- * Ce contexte permet de :
- * - Stocker et récupérer les informations de l'utilisateur connecté.
- * - Mettre à jour l'utilisateur et son token.
- * - Gérer la déconnexion en nettoyant l'état local et le localStorage.
- * - Assurer la persistance des données utilisateur entre les sessions via localStorage.
- *
- * @property {User | null} user - L'utilisateur actuellement connecté, ou `null` si non connecté.
- * @property {string | null} token - Le token d'authentification associé à l'utilisateur, ou `null` si non connecté.
- * @property {function} setUser - Fonction pour définir ou mettre à jour l'utilisateur et son token.
- * @property {function} logout - Fonction pour déconnecter l'utilisateur et réinitialiser les données stockées.
- * @author SoundWave
- */
-
-
 import React, {
   createContext,
   useState,
@@ -40,52 +23,58 @@ interface User {
 
 interface UserContextProps {
   user: User | null;
-  token: string | null;
   loading: boolean;
-  setUser: (user: User | null, token: string | null) => void;
+  setUser: (user: User | null) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUserState] = useState<User | null>(null);
-  const [token, setTokenState] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
+  const fetchUser = async () => {
+    setLoading(true);
     try {
-      const storedData = localStorage.getItem("user");
-      if (storedData) {
-        const parsedData = JSON.parse(storedData);
-        setUserState(parsedData.user || null);
-        setTokenState(parsedData.token || null);
-      }
-    } catch (err) {
-      console.error("Erreur lors du chargement de l'utilisateur:", err);
-      localStorage.removeItem("user");
+      const res = await fetch("http://localhost:5001/users/me", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error();
+      const user = await res.json();
+      setUserState(user);
+    } catch {
+      setUserState(null);
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  const setUser = (user: User | null, token: string | null) => {
-    setUserState(user);
-    setTokenState(token);
-
-    if (user && token) {
-      localStorage.setItem("user", JSON.stringify({ user, token }));
-    } else {
-      localStorage.removeItem("user");
-    }
   };
 
-  const logout = () => {
-    setUser(null, null);
+  useEffect(() => {
+    fetchUser();
+    // eslint-disable-next-line
+  }, []);
+
+  const refreshUser = async () => {
+    await fetchUser();
+  };
+
+  const setUser = (user: User | null) => {
+    setUserState(user);
+  };
+
+  const logout = async () => {
+    try {
+      await fetch("http://localhost:5001/auth/logout", {
+        credentials: "include",
+      });
+    } catch {}
+    setUserState(null);
   };
 
   return (
-    <UserContext.Provider value={{ user, token, loading, setUser, logout }}>
+    <UserContext.Provider value={{ user, loading, setUser, logout, refreshUser }}>
       {children}
     </UserContext.Provider>
   );

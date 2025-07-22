@@ -2,6 +2,7 @@ import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth-dto';
 import { SpotifyService } from '../spotify/spotify.service';
+import * as cookie from 'cookie';
 
 @Controller('auth')
 export class AuthController {
@@ -22,28 +23,28 @@ export class AuthController {
   }
 
   @Get('spotify/callback')
-  async spotifyLoginCallback(@Query('code') code: string, @Res() res) {
-    try {
+async spotifyLoginCallback(@Query('code') code: string, @Res() res) {
+  try {
+    const accessToken = await this.spotifyService.getAccessTokenFromCode(code, true);
+    const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
+    const loginDto = { email: spotifyUser.email } as AuthDto;
+    const loginResponse = await this.authService.login(loginDto);
 
-      const accessToken = await this.spotifyService.getAccessTokenFromCode(code, true);
-      const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
-      const loginDto = { email: spotifyUser.email } as AuthDto;
-      const loginResponse = await this.authService.login(loginDto);
+    res.setHeader(
+      'Set-Cookie',
+      cookie.serialize('token', loginResponse.token, {
+        httpOnly: true,
+        secure: false, // A mettre à true en production
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      }),
+    );
 
-      // return res.redirect('http://localhost:3000/home');
-
-      return res.status(200).json({
-        message: 'Connexion réussie via Spotify',
-        token: loginResponse.token,
-        user: loginResponse.user,
-      });
-      
-    } catch (error) {
-      return res.status(400).json({
-        message: 'Erreur lors de la connexion via Spotify',
-        error: error.message,
-      });
-    }
+    return res.redirect('http://localhost:3000/home');
+  } catch (error) {
+    return res.redirect('http://localhost:3000/error');
   }
+}
 
 }
