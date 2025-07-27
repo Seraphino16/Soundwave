@@ -70,10 +70,10 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const id = await this.userRepository.setId();
 
-    const newUser = await this.userRepository.create(
+    const newUser = await this.userRepository.create({
       id,
       email,
-      hashedPassword,
+      password: hashedPassword,
       pseudo,
       username,
       birthdate,
@@ -86,7 +86,8 @@ export class UserService {
       verification_token,
       is_verified,
       is_active,
-    );
+    });
+
 
     const createUserInfosDto = {
       user_id: newUser.id,
@@ -149,35 +150,38 @@ export class UserService {
     }
 
     let displayName = spotifyUser.display_name || '';
-    let existingUserByDisplayName = await this.userRepository.findByUsername(displayName);
+    let existingUserByDisplayName =
+      await this.userRepository.findByUsername(displayName);
     let count = 1;
 
     while (existingUserByDisplayName) {
       displayName = `${spotifyUser.display_name || 'user'}${count}`;
       count++;
-      existingUserByDisplayName = await this.userRepository.findByUsername(displayName);
+      existingUserByDisplayName =
+        await this.userRepository.findByUsername(displayName);
     }
 
     const id = await this.userRepository.setId();
-    const birthdate = spotifyUser.birthdate ? new Date(spotifyUser.birthdate) : null;
+    const birthdate = spotifyUser.birthdate ? new Date(spotifyUser.birthdate) : undefined;
 
-    const newUser = await this.userRepository.create(
+    const newUser = await this.userRepository.create({
       id,
-      spotifyUser.email,
-      '',
-      displayName,
-      displayName,
+      email: spotifyUser.email,
+      password: '',
+      pseudo: displayName,
+      username: displayName,
       birthdate,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      spotifyUser.id,
-      ['USER'],
-      undefined,
-      true,
-      true,
-    );
+      googleId: undefined,
+      twitterId: undefined,
+      facebookId: undefined,
+      spotifyId: spotifyUser.id,
+      deezerId: undefined,
+      roles: ['USER'],
+      verification_token: undefined,
+      is_verified: true,
+      is_active: true,
+    });
+
 
     const createUserInfosDto = {
       user_id: newUser.id,
@@ -275,5 +279,33 @@ export class UserService {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     } as UserResponse;
+  }
+
+  async createUserWithGoogleProfile(profile: any) {
+    const existingUser = await this.userRepository.findByEmail(profile.email);
+
+    if (existingUser) {
+      throw UserErrors.emailAlreadyExists();
+    }
+
+    const id = await this.userRepository.setId();
+
+    const pseudo = profile.name ?? profile.email.split('@')[0];
+    const username =
+      `${profile.given_name}${profile.family_name}`.toLowerCase();
+
+    const newUser = await this.userRepository.create({
+      id: id,
+      pseudo,
+      username,
+      email: profile.email,
+      googleId: profile.sub,
+      is_verified: true,
+      is_active: true,
+      roles: ['USER'],
+      password: '',
+    });
+
+    return newUser;
   }
 }
