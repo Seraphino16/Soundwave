@@ -13,6 +13,8 @@ import { UserErrors } from '../errors/user.errors';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
+  id?: number;
+
   @IsNotEmpty({ message: UserErrors.emailRequired().message })
   @IsEmail({}, { message: UserErrors.emailInvalid().message })
   email: string;

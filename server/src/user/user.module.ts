@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HttpModule } from '@nestjs/axios';
 import { MailerModule } from '../mailer/mailer.module';
@@ -12,6 +12,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { UserInfosRepository } from './repositories/user-infos.repository';
 import { UploadsModule } from '../uploads/uploads.module';
 import { SpotifyModule } from '../spotify/spotify.module';
+import { GoogleModule } from '../google/google.module';
 
 @Module({
   imports: [
@@ -24,10 +25,10 @@ import { SpotifyModule } from '../spotify/spotify.module';
     TokenModule,
     UploadsModule,
     SpotifyModule,
+    forwardRef(() => GoogleModule),
   ],
   providers: [UserService, UserRepository, UserInfosRepository, JwtAuthGuard],
   controllers: [UserController],
   exports: [UserRepository, UserInfosRepository, UserService],
 })
 export class UserModule {}
-

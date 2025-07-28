@@ -23,6 +23,7 @@ import { UserService } from './user.service';
 import { SpotifyService } from '../spotify/spotify.service';
 import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { GoogleService } from '../google/google.service';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -45,6 +46,7 @@ export class UserController {
     private readonly mailerService: MailerService,
     private readonly tokenService: TokenService,
     private readonly spotifyService: SpotifyService,
+    private readonly googleService: GoogleService
   ) {}
 
   @Post('create')
@@ -244,4 +246,44 @@ export class UserController {
       throw new BadRequestException(UserErrors.unknownError().message);
     }
   }
+
+  @Get('create/google')
+  redirectToGoogleAuth() {
+    const baseUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      throw new InternalServerErrorException('Google client ID non défini');
+    }
+
+    const params = new URLSearchParams();
+    params.set('client_id', process.env.GOOGLE_CLIENT_ID);
+    params.set(
+      'redirect_uri',
+      'http://localhost:5001/users/create/google/callback',
+    );
+    params.set('response_type', 'code');
+    params.set('scope', 'openid email profile');
+    params.set('access_type', 'offline');
+    params.set('prompt', 'consent');
+
+    return { url: `${baseUrl}?${params.toString()}` };
+  }
+
+  @Get('create/google/callback')
+  async googleCallback(@Query('code') code: string, @Res() res) {
+    try {
+      const user = await this.googleService.registerWithGoogle(code);
+      return res.status(201).json(
+          UserSuccess.userCreated(user.id),
+      );
+    } catch (error) {
+      if (error instanceof UserErrors) {
+        return res.status(400).json(error);
+      }
+
+
+      return res.status(500).json(UserErrors.unknownError());
+    }
+  }
+
 }
