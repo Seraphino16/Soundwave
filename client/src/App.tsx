@@ -10,6 +10,7 @@ import Auth from './pages/Auth';
 import ArtistDetail from "pages/ArtistDetails";
 import HomeLoggedOff from 'pages/HomeLoggedOff';
 import AdminPanel from './pages/AdminPanel';
+import UserManagement from './pages/UserManagement';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/alert" element={<AlertTestPage />} />
             <Route path="/auth" element={<Auth />} /> 
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/admin/users" element={<UserManagement />} />
           </Routes>
         </div>
       </div>

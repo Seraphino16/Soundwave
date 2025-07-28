@@ -70,7 +70,9 @@ const AdminPanel: React.FC = () => {
                         <p className="text-gray-600 mb-4">
                             Gérer les comptes utilisateurs, rôles et permissions.
                         </p>
-                        <button className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">
+                        <button 
+                            onClick={() => navigate("/admin/users")}
+                            className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">
                             Accéder
                         </button>
                     </div>
