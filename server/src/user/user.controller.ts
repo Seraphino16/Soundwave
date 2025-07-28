@@ -1,3 +1,9 @@
+/**
+ * @description Controller pour la gestion des utilisateurs
+ * @author SoundWave
+ */
+
+
 import {
   Controller,
   Put,
@@ -13,7 +19,6 @@ import {
   Get,
   InternalServerErrorException,
   Res,
-  UseGuards,
   Req,
 } from '@nestjs/common';
 import { UserErrors } from './errors/user.errors';
@@ -38,7 +43,6 @@ import {
 } from '@nestjs/swagger';
 import { TokenService } from '../token/token.service';
 import { MailerService } from '../mailer/mailer.service';
-import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -190,16 +194,19 @@ export class UserController {
         await this.spotifyService.getSpotifyUserData(accessToken);
 
       try {
-        const newUser = await this.userService.createUserWithSpotify(spotifyUser);
+        const newUser =
+          await this.userService.createUserWithSpotify(spotifyUser);
 
-        return res.redirect('http://localhost:3000/welcome');
+        return res.redirect('http://localhost:3000/home');
       } catch (error) {
         if (
           error instanceof ConflictException ||
-          error?.message?.includes("email existe déjà") ||
+          error?.message?.includes('email existe déjà') ||
           error?.message?.includes("L'email existe déjà")
         ) {
-          return res.redirect('http://localhost:3000/error-email-already-exists');
+          return res.redirect(
+            'http://localhost:3000/error-email-already-exists',
+          );
         }
         return res.redirect('http://localhost:3000/error');
       }
@@ -224,10 +231,51 @@ export class UserController {
   }
 
   @Get('me')
-@UseGuards(JwtAuthGuard)
-getMe(@Req() req) {
-  return req.user;
-}
+  async getMe(@Req() req) {
+    try {
+      console.log('Cookies reçus:', req.cookies);
+      const token = req.cookies?.token;
+
+      if (!token) {
+        console.log('Aucun token trouvé dans les cookies');
+        throw new BadRequestException("Token d'authentification manquant");
+      }
+
+      console.log('Token trouvé:', token);
+
+      let decoded: any;
+      try {
+        decoded = this.tokenService.verifyToken(token);
+        console.log('Token décodé:', decoded);
+      } catch (tokenError) {
+        console.error('Erreur de vérification du token:', tokenError);
+        throw new BadRequestException('Token invalide');
+      }
+
+      if (!decoded || typeof decoded !== 'object' || !decoded.id) {
+        console.log('Structure du token invalide:', decoded);
+        throw new BadRequestException('Token invalide');
+      }
+
+      console.log('Recherche utilisateur avec ID:', decoded.id);
+      const user = await this.userService.findUserById(decoded.id);
+
+      if (!user) {
+        console.log('Utilisateur non trouvé pour ID:', decoded.id);
+        throw new BadRequestException('Utilisateur non trouvé');
+      }
+
+      console.log('Utilisateur trouvé:', {
+        id: user.id,
+        pseudo: user.pseudo,
+        username: user.username,
+      });
+      return user;
+    } catch (error) {
+      console.error('Erreur complète dans getMe:', error);
+      throw new BadRequestException('Accès non autorisé');
+    }
+  }
 
   @Patch('request-artist')
   async requestArtist(

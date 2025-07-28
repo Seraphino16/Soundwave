@@ -3,12 +3,47 @@
  * @author SoundWave
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useUserContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 import Meta from "../components/utils/Meta";
 import SearchBar from "../components/searchBar/SearchBar";
 import Waves from "../components/waves/Waves";
 
 const Home: React.FC = () => {
+    const { user, loading, checkAuth } = useUserContext();
+    const navigate = useNavigate();
+    const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
+
+    useEffect(() => {
+        const verifyAuth = async () => {
+            if (!hasCheckedAuth) {
+                await checkAuth();
+                setHasCheckedAuth(true);
+            }
+        };
+        
+        verifyAuth();
+    }, [checkAuth, hasCheckedAuth]);
+
+    useEffect(() => {
+        if (hasCheckedAuth && !loading && !user) {
+            navigate("/auth");
+        }
+    }, [user, loading, navigate, hasCheckedAuth]);
+
+    if (loading || !hasCheckedAuth) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-xl">Chargement...</div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return null;
+    }
+
     return (
         <>
             <Meta

@@ -1,3 +1,8 @@
+/**
+ * @description Service pour la gestion des utilisateurs
+ * @author SoundWave
+ */
+
 import {
   Injectable,
   BadRequestException,
@@ -150,17 +155,21 @@ export class UserService {
     }
 
     let displayName = spotifyUser.display_name || '';
-    let existingUserByDisplayName = await this.userRepository.findByUsername(displayName);
+    let existingUserByDisplayName =
+      await this.userRepository.findByUsername(displayName);
     let count = 1;
 
     while (existingUserByDisplayName) {
       displayName = `${spotifyUser.display_name || 'user'}${count}`;
       count++;
-      existingUserByDisplayName = await this.userRepository.findByUsername(displayName);
+      existingUserByDisplayName =
+        await this.userRepository.findByUsername(displayName);
     }
 
     const id = await this.userRepository.setId();
-    const birthdate = spotifyUser.birthdate ? new Date(spotifyUser.birthdate) : null;
+    const birthdate = spotifyUser.birthdate
+      ? new Date(spotifyUser.birthdate)
+      : null;
 
     const newUser = await this.userRepository.create(
       id,
@@ -199,13 +208,19 @@ export class UserService {
 
   async loginWithSpotify(spotifyUser: any): Promise<any> {
     const user =
-      (spotifyUser.id && (await this.userRepository.findBySpotifyId(spotifyUser.id))) ||
-      (spotifyUser.email && (await this.userRepository.findByEmail(spotifyUser.email)));
+      (spotifyUser.id &&
+        (await this.userRepository.findBySpotifyId(spotifyUser.id))) ||
+      (spotifyUser.email &&
+        (await this.userRepository.findByEmail(spotifyUser.email)));
 
     if (!user) {
-      throw new NotFoundException("Aucun compte associé à ce compte Spotify.");
+      throw new NotFoundException('Aucun compte associé à ce compte Spotify.');
     }
     return user;
+  }
+
+  async findUserById(id: number): Promise<User | null> {
+    return await this.userRepository.findById(id);
   }
 
   async getSpotifyUserData(accessToken: string): Promise<any> {

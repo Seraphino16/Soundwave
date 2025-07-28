@@ -20,7 +20,7 @@ interface NavItem {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout } = useUserContext();
+  const { user, loading, logout } = useUserContext();
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
   const location = useLocation();
@@ -30,9 +30,14 @@ const Navbar = () => {
     closeMenu();
   }, [location]);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/auth");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/auth");
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+      navigate("/auth");
+    }
   };
 
   const navItems: NavItem[] = [
@@ -43,6 +48,8 @@ const Navbar = () => {
 
   const isAuthRoute = location.pathname.startsWith("/auth");
   const isGuestPage = location.pathname === "/";
+
+  const shouldShowUserInfo = !loading && user;
 
   return (
     <div className="fixed top-0 w-full flex justify-center z-10">
@@ -84,7 +91,7 @@ const Navbar = () => {
             <a href="#" className="hover:opacity-80 transition-opacity">
               <ProfileIcon />
             </a>
-            {user && (
+            {shouldShowUserInfo && (
               <div className="flex items-center space-x-4 ml-4">
                 <div className="flex flex-col items-end">
                   <span className="text-lg font-semibold">{user.pseudo}</span>
@@ -139,7 +146,7 @@ const Navbar = () => {
                     <a href="#" className="hover:opacity-80 transition-opacity">
                       <ProfileIcon />
                     </a>
-                    {user && (
+                    {shouldShowUserInfo && (
                       <div className="flex items-center space-x-4 ml-4">
                         <div className="flex flex-col items-end">
                           <span className="text-lg font-semibold">{user.pseudo}</span>
