@@ -11,6 +11,7 @@ import ArtistDetail from "pages/ArtistDetails";
 import HomeLoggedOff from 'pages/HomeLoggedOff';
 import AdminPanel from './pages/AdminPanel';
 import UserManagement from './pages/UserManagement';
+import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/auth" element={<Auth />} /> 
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
           </Routes>
         </div>
       </div>

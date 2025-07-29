@@ -1,8 +1,4 @@
-/**
- * @description Service d'administration pour la gestion des utilisateurs (Frontend Mock)
- * @author SoundWave
- */
-
+// Interfaces for admin service
 export interface User {
     id: number;
     pseudo: string;
@@ -27,19 +23,76 @@ export interface UserListResponse {
     };
 }
 
-export interface AdminStats {
-    totalUsers: number;
-    activeUsers: number;
-    verifiedUsers: number;
-    inactiveUsers: number;
-    unverifiedUsers: number;
-    recentRegistrations: number;
-    usersByRole: {
-        users: number;
-        artists: number;
-        admins: number;
-        bands: number;
+// Dashboard interfaces
+export interface DashboardStats {
+    users: {
+        total: number;
+        active: number;
+        newToday: number;
+        newThisWeek: number;
+        newThisMonth: number;
+        growthRate: number;
     };
+    content: {
+        totalWaves: number;
+        newWavesToday: number;
+        wavesThisWeek: number;
+        wavesThisMonth: number;
+        albums: number;
+        artists: number;
+        totalPlaylists: number;
+        collaborativePlaylists: number;
+        sharedPlaylists: number;
+    };
+    interactions: {
+        totalLikes: number;
+        likesToday: number;
+        totalComments: number;
+        commentsToday: number;
+        totalShares: number;
+        sharesToday: number;
+        engagementRate: number;
+    };
+    authentication: {
+        native: number;
+        google: number;
+        spotify: number;
+    };
+    moderation: {
+        reports: number;
+        totalReports: number;
+        resolvedReports: number;
+        pendingReports: number;
+        moderationActions: number;
+        resolutionRate: number;
+    };
+    recentActivity: Array<{
+        user: string;
+        action: string;
+        timestamp: string;
+    }>;
+    topAlbums: Array<{
+        name: string;
+        artist: string;
+        plays: number;
+    }>;
+    topContent: {
+        albums: Array<{ name: string; artist: string; views: number }>;
+        artists: Array<{ name: string; followers: number; streams: number }>;
+        genres: Array<{ name: string; popularity: number; streams: number }>;
+        playlists: Array<{ name: string; creator: string; followers: number; isCollaborative: boolean }>;
+    };
+}
+
+export interface ChartData {
+    labels: string[];
+    datasets: Array<{
+        label: string;
+        data: number[];
+        backgroundColor?: string | string[];
+        borderColor?: string;
+        borderWidth?: number;
+    }>;
 }
 
 // Mock data for development
@@ -129,6 +182,95 @@ const mockUsers: User[] = [
         birthdate: "1998-01-10T00:00:00Z",
     },
 ];
+
+// Mock dashboard data
+const mockDashboardStats: DashboardStats = {
+    users: {
+        total: 403,
+        active: 387,
+        newToday: 12,
+        newThisWeek: 89,
+        newThisMonth: 283,
+        growthRate: 15.7,
+    },
+    content: {
+        totalWaves: 2847,
+        newWavesToday: 142,
+        wavesThisWeek: 956,
+        wavesThisMonth: 2847,
+        albums: 1234,
+        artists: 456,
+        totalPlaylists: 1234,
+        collaborativePlaylists: 456,
+        sharedPlaylists: 789,
+    },
+    interactions: {
+        totalLikes: 12034,
+        likesToday: 567,
+        totalComments: 2345,
+        commentsToday: 123,
+        totalShares: 678,
+        sharesToday: 34,
+        engagementRate: 4.5,
+    },
+    authentication: {
+        native: 267,
+        google: 98,
+        spotify: 38,
+    },
+    moderation: {
+        reports: 23,
+        totalReports: 23,
+        resolvedReports: 19,
+        pendingReports: 4,
+        moderationActions: 12,
+        resolutionRate: 82.6,
+    },
+    topContent: {
+        albums: [
+            { name: "Thriller", artist: "Michael Jackson", views: 15234 },
+            { name: "Back in Black", artist: "AC/DC", views: 12456 },
+            { name: "The Dark Side of the Moon", artist: "Pink Floyd", views: 11789 },
+            { name: "Led Zeppelin IV", artist: "Led Zeppelin", views: 10923 },
+            { name: "Abbey Road", artist: "The Beatles", views: 9876 },
+        ],
+        artists: [
+            { name: "The Beatles", followers: 45234, streams: 156789 },
+            { name: "Michael Jackson", followers: 38912, streams: 134567 },
+            { name: "Queen", followers: 34567, streams: 123456 },
+            { name: "Led Zeppelin", followers: 29876, streams: 112345 },
+            { name: "Pink Floyd", followers: 27654, streams: 98765 },
+        ],
+        genres: [
+            { name: "Rock", popularity: 78, streams: 245890 },
+            { name: "Pop", popularity: 65, streams: 198765 },
+            { name: "Hip-Hop", popularity: 58, streams: 167432 },
+            { name: "Electronic", popularity: 42, streams: 123456 },
+            { name: "Jazz", popularity: 35, streams: 89012 },
+        ],
+        playlists: [
+            { name: "Hits 2024", creator: "SoundWave Team", followers: 25000, isCollaborative: false },
+            { name: "Trucs aléatoires", creator: "MusicLover69", followers: 18500, isCollaborative: true },
+            { name: "Jesaispas", creator: "Stéphane Vaillant", followers: 15200, isCollaborative: false },
+            { name: "Chill Vibes", creator: "DJ ChillVibes", followers: 12800, isCollaborative: true },
+            { name: "Gros rap", creator: "K2A", followers: 9600, isCollaborative: false },
+        ],
+    },
+    recentActivity: [
+        { user: "admin", action: "a approuvé un album", timestamp: "il y a 5 minutes" },
+        { user: "moderator1", action: "a résolu un signalement", timestamp: "il y a 12 minutes" },
+        { user: "user123", action: "s'est inscrit", timestamp: "il y a 15 minutes" },
+        { user: "artist_pro", action: "a publié une wave", timestamp: "il y a 20 minutes" },
+        { user: "admin", action: "a modifié les permissions", timestamp: "il y a 1 heure" },
+    ],
+    topAlbums: [
+        { name: "Thriller", artist: "Michael Jackson", plays: 15234 },
+        { name: "Back in Black", artist: "AC/DC", plays: 12456 },
+        { name: "The Dark Side of the Moon", artist: "Pink Floyd", plays: 11789 },
+        { name: "Led Zeppelin IV", artist: "Led Zeppelin", plays: 10923 },
+        { name: "Abbey Road", artist: "The Beatles", plays: 9876 },
+    ],
+};
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -262,36 +404,163 @@ export const adminService = {
         };
     },
 
-    // Get admin statistics
-    getStats: async (): Promise<AdminStats> => {
-        await delay(600);
+    // Dashboard methods
+    getDashboardStats: async (period: 'day' | 'week' | 'month' | 'year' = 'month'): Promise<DashboardStats> => {
+        await delay(800);
         
-        // Calculate real stats from mock data
-        const totalUsers = mockUsers.length;
-        const activeUsers = mockUsers.filter(u => u.is_active).length;
-        const verifiedUsers = mockUsers.filter(u => u.is_verified).length;
+        // Simulate different stats based on period
+        const multiplier = period === 'day' ? 0.1 : period === 'week' ? 0.7 : period === 'month' ? 1 : 12;
         
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const recentRegistrations = mockUsers.filter(u => 
-            new Date(u.createdAt) >= thirtyDaysAgo
-        ).length;
+        const stats = { ...mockDashboardStats };
+        
+        // Adjust stats based on period
+        stats.users.newToday = Math.floor(stats.users.newToday * multiplier);
+        stats.users.newThisWeek = Math.floor(stats.users.newThisWeek * multiplier);
+        stats.users.newThisMonth = Math.floor(stats.users.newThisMonth * multiplier);
+        stats.content.newWavesToday = Math.floor(stats.content.newWavesToday * multiplier);
+        stats.content.wavesThisWeek = Math.floor(stats.content.wavesThisWeek * multiplier);
+        
+        return stats;
+    },
 
-        const usersByRole = {
-            users: mockUsers.filter(u => u.roles.includes('USER')).length,
-            artists: mockUsers.filter(u => u.roles.includes('ARTIST')).length,
-            admins: mockUsers.filter(u => u.roles.includes('ADMIN')).length,
-            bands: mockUsers.filter(u => u.roles.includes('BAND')).length,
+    getUserGrowthChart: async (period: 'day' | 'week' | 'month' | 'year' = 'month'): Promise<ChartData> => {
+        await delay(1100); // Combined delay for both operations
+        
+        // Generate mock time series data inline
+        const generateTimeSeriesData = (period: string) => {
+            const baseData = [
+                { date: '2024-07-01', users: 120 },
+                { date: '2024-07-02', users: 135 },
+                { date: '2024-07-03', users: 142 },
+                { date: '2024-07-04', users: 158 },
+                { date: '2024-07-05', users: 167 },
+                { date: '2024-07-06', users: 173 },
+                { date: '2024-07-07', users: 189 },
+                { date: '2024-07-08', users: 195 },
+                { date: '2024-07-09', users: 208 },
+                { date: '2024-07-10', users: 215 },
+                { date: '2024-07-11', users: 223 },
+                { date: '2024-07-12', users: 234 },
+                { date: '2024-07-13', users: 247 },
+                { date: '2024-07-14', users: 256 },
+                { date: '2024-07-15', users: 268 },
+                { date: '2024-07-16', users: 275 },
+                { date: '2024-07-17', users: 289 },
+                { date: '2024-07-18', users: 297 },
+                { date: '2024-07-19', users: 308 },
+                { date: '2024-07-20', users: 315 },
+                { date: '2024-07-21', users: 327 },
+                { date: '2024-07-22', users: 334 },
+                { date: '2024-07-23', users: 346 },
+                { date: '2024-07-24', users: 353 },
+                { date: '2024-07-25', users: 365 },
+                { date: '2024-07-26', users: 372 },
+                { date: '2024-07-27', users: 384 },
+                { date: '2024-07-28', users: 391 },
+                { date: '2024-07-29', users: 403 },
+            ];
+
+            if (period === 'day') {
+                return baseData.slice(-6); // Last 6 data points
+            } else if (period === 'week') {
+                return baseData.slice(-7); // Last 7 days
+            } else if (period === 'month') {
+                return baseData; // All data
+            } else {
+                return baseData.filter((_, index) => index % 3 === 0).slice(-12); // Every 3rd for year
+            }
         };
 
+        const timeSeriesData = generateTimeSeriesData(period);
+        
         return {
-            totalUsers,
-            activeUsers,
-            verifiedUsers,
-            inactiveUsers: totalUsers - activeUsers,
-            unverifiedUsers: totalUsers - verifiedUsers,
-            recentRegistrations,
-            usersByRole,
+            labels: timeSeriesData.map(data => {
+                const date = new Date(data.date);
+                return period === 'day' ? 
+                    date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) :
+                    date.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
+            }),
+            datasets: [
+                {
+                    label: 'New users',
+                    data: timeSeriesData.map(data => data.users),
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                },
+            ],
+        };
+    },
+
+    getContentChart: async (period: 'day' | 'week' | 'month' | 'year' = 'month'): Promise<ChartData> => {
+        await delay(500);
+        
+        // Create a more suitable dataset for bar chart visualization
+        let labels: string[];
+        let data: number[];
+        let colors: string[];
+        
+        if (period === 'day') {
+            // Show hourly data for today
+            const hours = ['06h', '09h', '12h', '15h', '18h', '21h'];
+            labels = hours;
+            data = hours.map(() => Math.floor(Math.random() * 15) + 5);
+            colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
+        } else if (period === 'week') {
+            // Show daily data for this week
+            const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            labels = weekDays;
+            data = weekDays.map(() => Math.floor(Math.random() * 50) + 20);
+            colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16'];
+        } else if (period === 'month') {
+            // Show weekly data for this month
+            const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
+            labels = weeks;
+            data = weeks.map(() => Math.floor(Math.random() * 200) + 100);
+            colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
+        } else {
+            // Show monthly data for this year
+            const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+            labels = months;
+            data = months.map(() => Math.floor(Math.random() * 500) + 200);
+            colors = [
+                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4',
+                '#84CC16', '#F97316', '#EC4899', '#6366F1', '#14B8A6', '#F43F5E'
+            ];
+        }
+        
+        return {
+            labels,
+            datasets: [
+                {
+                    label: 'Contenu publié',
+                    data,
+                    backgroundColor: colors,
+                    borderWidth: 1,
+                },
+            ],
+        };
+    },
+
+    getAuthMethodsChart: async (): Promise<ChartData> => {
+        await delay(400);
+        
+        const stats = mockDashboardStats.authentication;
+        
+        return {
+            labels: ['Native', 'Google', 'Spotify'],
+            datasets: [
+                {
+                    label: 'Connection methods',
+                    data: [stats.native, stats.google, stats.spotify],
+                    backgroundColor: [
+                        '#3B82F6',
+                        '#EF4444',
+                        '#10B981',
+                    ],
+                    borderWidth: 1,
+                },
+            ],
         };
     },
 };

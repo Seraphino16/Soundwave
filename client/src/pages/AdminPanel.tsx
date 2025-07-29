@@ -93,12 +93,14 @@ const AdminPanel: React.FC = () => {
                     <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center mb-4">
                             <span className="text-2xl mr-3">📊</span>
-                            <h3 className="text-xl font-semibold text-gray-800">Statistiques</h3>
+                            <h3 className="text-xl font-semibold text-gray-800">Tableau de Bord</h3>
                         </div>
                         <p className="text-gray-600 mb-4">
-                            Voir les statistiques d'utilisation de la plateforme.
+                            Voir les statistiques et performances de la plateforme.
                         </p>
-                        <button className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">
+                        <button 
+                            onClick={() => navigate("/admin/dashboard")}
+                            className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">
                             Accéder
                         </button>
                     </div>
