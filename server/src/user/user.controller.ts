@@ -41,6 +41,7 @@ import { TokenService } from '../token/token.service';
 import { MailerService } from '../mailer/mailer.service';
 import { CreateUserInfosDto } from './dto/create-user-infos.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { ChangePasswordDto } from './dto/change-password-dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -210,14 +211,16 @@ export class UserController {
   }
   @Get('create/spotify/callback')
   async spotifyCallback(
-      @Query('code') code: string,
-      @Query('isLogin') isLogin: string = 'false',
-      @Res() res,
+    @Query('code') code: string,
+    @Query('isLogin') isLogin: string = 'false',
+    @Res() res,
   ) {
     try {
       const isLoginBool = isLogin === 'true';
-      const accessToken = await this.spotifyService.getAccessTokenFromCode(code);
-      const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
+      const accessToken =
+        await this.spotifyService.getAccessTokenFromCode(code);
+      const spotifyUser =
+        await this.spotifyService.getSpotifyUserData(accessToken);
       const newUser = await this.userService.createUserWithSpotify(spotifyUser);
 
       return res.status(201).json({
@@ -226,7 +229,7 @@ export class UserController {
       });
     } catch (error) {
       return res.status(400).json({
-        message: 'Erreur lors de l\'inscription via Spotify',
+        message: "Erreur lors de l'inscription via Spotify",
         error: error.message,
       });
     }
@@ -327,5 +330,13 @@ export class UserController {
         'Erreur lors de la récupération du profil',
       );
     }
+  }
+
+  @Patch('/:id/password')
+  async changePassword(
+    @Param('id') id: number,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.userService.changePassword(id, dto);
   }
 }

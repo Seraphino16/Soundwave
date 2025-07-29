@@ -13,6 +13,7 @@ import { UserInfosRepository } from './repositories/user-infos.repository';
 import { UploadsModule } from '../uploads/uploads.module';
 import { SpotifyModule } from '../spotify/spotify.module';
 import { GoogleModule } from '../google/google.module';
+import { UtilsModule } from '../utils/utils.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { GoogleModule } from '../google/google.module';
     UploadsModule,
     SpotifyModule,
     forwardRef(() => GoogleModule),
+    UtilsModule,
   ],
   providers: [UserService, UserRepository, UserInfosRepository, JwtAuthGuard],
   controllers: [UserController],

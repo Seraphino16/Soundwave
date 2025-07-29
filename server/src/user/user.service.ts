@@ -4,6 +4,7 @@ import {
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,6 +19,8 @@ import { User, UserResponse } from './entities/user.entity';
 import axios from 'axios';
 import { SpotifyService } from '../spotify/spotify.service';
 import { CreateUserInfosDto } from './dto/create-user-infos.dto';
+import { PasswordUtil } from '../utils/password';
+import { ChangePasswordDto } from './dto/change-password-dto';
 
 @Injectable()
 export class UserService {
@@ -26,6 +29,7 @@ export class UserService {
     private readonly userInfosRepository: UserInfosRepository,
     private readonly uploadsService: UploadsService,
     private readonly spotifyService: SpotifyService,
+    private readonly passwordUtil: PasswordUtil,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<number> {
@@ -369,6 +373,42 @@ export class UserService {
         musicStyle: userInfos.musicStyle,
         socialLinks: userInfos.socialLinks,
       }),
+    };
+  }
+
+
+
+  async changePassword(userId: number, dto: ChangePasswordDto) {
+    if (dto.newPassword !== dto.confirmPassword) {
+      throw new BadRequestException('Les mots de passe ne correspondent pas.');
+    }
+
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable.');
+    }
+
+    if (!user.password || user.password.trim() === '') {
+      user.password = await this.passwordUtil.hashPassword(dto.newPassword);
+      await this.userRepository.save(user);
+
+      return {message: 'Mot de passe défini avec succès.'};
+    }
+
+    if (!dto.oldPassword) {
+      throw new BadRequestException('L’ancien mot de passe est requis pour le changement.');
+    }
+
+    const isValid = await this.passwordUtil.comparePasswords(dto.oldPassword, user.password);
+    if (!isValid) {
+      throw new UnauthorizedException('Ancien mot de passe incorrect.');
+    }
+
+    user.password = await this.passwordUtil.hashPassword(dto.newPassword);
+    await this.userRepository.save(user);
+
+    return {
+      message: 'Mot de passe modifié avec succès.'
     };
   }
 }
