@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEdit2, FiTrash2, FiToggleLeft, FiToggleRight, FiSearch, FiUsers, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { adminService, User, UserListResponse } from "../services/adminService";
+import { FiEdit2, FiTrash2, FiToggleLeft, FiToggleRight, FiSearch, FiUsers, FiChevronLeft, FiChevronRight, FiPlus, FiUserX } from "react-icons/fi";
+import { adminService, User, UserListResponse, CreateUserData } from "../services/adminService";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import Alert from "../components/utils/Alert";
 
@@ -18,9 +18,22 @@ const UserManagement: React.FC = () => {
     const [showRoleModal, setShowRoleModal] = useState(false);
     const [newRole, setNewRole] = useState("");
     
+    // Create user modal state
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [createUserData, setCreateUserData] = useState<CreateUserData>({
+        username: '',
+        email: '',
+        pseudo: '',
+        password: '',
+        role: 'USER',
+        birthdate: ''
+    });
+    
     // Confirmation modal and alert states
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [userToBan, setUserToBan] = useState<User | null>(null);
+    const [confirmAction, setConfirmAction] = useState<'delete' | 'ban'>('delete');
     const [alerts, setAlerts] = useState<{
         id: number;
         type: 'success' | 'error' | 'info' | 'warning';
@@ -111,6 +124,7 @@ const UserManagement: React.FC = () => {
 
     const handleDeleteUser = (user: User) => {
         setUserToDelete(user);
+        setConfirmAction('delete');
         setShowConfirmModal(true);
     };
 
@@ -129,9 +143,76 @@ const UserManagement: React.FC = () => {
         }
     };
 
-    const cancelDeleteUser = () => {
+    const cancelAction = () => {
         setShowConfirmModal(false);
         setUserToDelete(null);
+        setUserToBan(null);
+    };
+
+    const handleConfirmAction = () => {
+        if (confirmAction === 'delete') {
+            confirmDeleteUser();
+        } else if (confirmAction === 'ban') {
+            confirmBanUser();
+        }
+    };
+
+    const handleCreateUser = async () => {
+        try {
+            // Basic validation
+            if (!createUserData.username || !createUserData.email || !createUserData.pseudo || !createUserData.password) {
+                showAlert("error", "Erreur", "Tous les champs obligatoires doivent être remplis");
+                return;
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(createUserData.email)) {
+                showAlert("error", "Erreur", "Format d'email invalide");
+                return;
+            }
+
+            await adminService.createUser(createUserData);
+            setShowCreateModal(false);
+            resetCreateUserForm();
+            fetchUsers();
+            showAlert("success", "Succès", "Utilisateur créé avec succès");
+        } catch (error) {
+            console.error("Error creating user:", error);
+            showAlert("error", "Erreur", error instanceof Error ? error.message : "Erreur lors de la création de l'utilisateur");
+        }
+    };
+
+    const resetCreateUserForm = () => {
+        setCreateUserData({
+            username: '',
+            email: '',
+            pseudo: '',
+            password: '',
+            role: 'USER',
+            birthdate: ''
+        });
+    };
+
+    const handleBanUser = (user: User) => {
+        setUserToBan(user);
+        setConfirmAction('ban');
+        setShowConfirmModal(true);
+    };
+
+    const confirmBanUser = async () => {
+        if (!userToBan) return;
+
+        try {
+            await adminService.banUser(userToBan.id);
+            setShowConfirmModal(false);
+            setUserToBan(null);
+            fetchUsers();
+            showAlert("success", "Succès", `Utilisateur ${userToBan.is_active ? 'banni' : 'débanni'} avec succès`);
+        } catch (error) {
+            console.error("Error banning user:", error);
+            showAlert("error", "Erreur", error instanceof Error ? error.message : "Erreur lors du bannissement");
+        }
     };
 
     const getRoleBadgeColor = (roles: string[]) => {
@@ -169,12 +250,21 @@ const UserManagement: React.FC = () => {
                                 <p className="text-gray-600">{totalUsers} utilisateur(s) au total</p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => navigate("/admin")}
-                            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                        >
-                            Retour au panel
-                        </button>
+                <div className="flex items-center space-x-3">
+                    <button
+                        onClick={() => setShowCreateModal(true)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600 transition"
+                    >
+                        <FiPlus className="h-4 w-4" />
+                        <span>Créer un utilisateur</span>
+                    </button>
+                    <button
+                        onClick={() => navigate("/admin")}
+                        className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                    >
+                        Retour au panel
+                    </button>
+                </div>
                     </div>
                 </div>
 
@@ -306,13 +396,22 @@ const UserManagement: React.FC = () => {
                                                     {user.is_active ? <FiToggleLeft /> : <FiToggleRight />}
                                                 </button>
                                                 {!user.roles.includes('ADMIN') && (
-                                                    <button
-                                                        onClick={() => handleDeleteUser(user)}
-                                                        className="text-red-600 hover:text-red-700"
-                                                        title="Supprimer"
-                                                    >
-                                                        <FiTrash2 />
-                                                    </button>
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleBanUser(user)}
+                                                            className="text-yellow-600 hover:text-yellow-700"
+                                                            title={user.is_active ? 'Bannir' : 'Débannir'}
+                                                        >
+                                                            <FiUserX />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteUser(user)}
+                                                            className="text-red-600 hover:text-red-700"
+                                                            title="Supprimer"
+                                                        >
+                                                            <FiTrash2 />
+                                                        </button>
+                                                    </>
                                                 )}
                                             </div>
                                         </td>
@@ -424,16 +523,120 @@ const UserManagement: React.FC = () => {
                 </div>
             )}
 
+            {/* Create User Modal */}
+            {showCreateModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            Créer un nouvel utilisateur
+                        </h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Nom d'utilisateur *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={createUserData.username}
+                                    onChange={(e) => setCreateUserData(prev => ({ ...prev, username: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
+                                    placeholder="johndoe"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Email *
+                                </label>
+                                <input
+                                    type="email"
+                                    value={createUserData.email}
+                                    onChange={(e) => setCreateUserData(prev => ({ ...prev, email: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
+                                    placeholder="john@example.com"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Pseudo *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={createUserData.pseudo}
+                                    onChange={(e) => setCreateUserData(prev => ({ ...prev, pseudo: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
+                                    placeholder="John Doe"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Mot de passe *
+                                </label>
+                                <input
+                                    type="password"
+                                    value={createUserData.password}
+                                    onChange={(e) => setCreateUserData(prev => ({ ...prev, password: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
+                                    placeholder="••••••••"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Rôle
+                                </label>
+                                <select
+                                    value={createUserData.role}
+                                    onChange={(e) => setCreateUserData(prev => ({ ...prev, role: e.target.value as any }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
+                                >
+                                    <option value="USER">Utilisateur</option>
+                                    <option value="ARTIST">Artiste</option>
+                                    <option value="BAND">Groupe</option>
+                                    <option value="ADMIN">Administrateur</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Date de naissance
+                                </label>
+                                <input
+                                    type="date"
+                                    value={createUserData.birthdate}
+                                    onChange={(e) => setCreateUserData(prev => ({ ...prev, birthdate: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex justify-end space-x-3 mt-6">
+                            <button
+                                onClick={() => {
+                                    setShowCreateModal(false);
+                                    resetCreateUserForm();
+                                }}
+                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={handleCreateUser}
+                                className="px-4 py-2 bg-primaryBlue text-white rounded-md hover:bg-blue-600"
+                            >
+                                Créer l'utilisateur
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Confirmation Modal */}
             <ConfirmModal
                 isOpen={showConfirmModal}
-                title="Confirmer la suppression"
-                message={`Êtes-vous sûr de vouloir supprimer l'utilisateur ${userToDelete?.username} ?`}
-                confirmText="Supprimer"
+                title={confirmAction === 'delete' ? "Confirmer la suppression" : "Confirmer le bannissement"}
+                message={confirmAction === 'delete' ? `Êtes-vous sûr de vouloir supprimer l'utilisateur ${userToDelete?.username} ?` : `Êtes-vous sûr de vouloir ${userToBan?.is_active ? 'bannir' : 'débannir'} l'utilisateur ${userToBan?.username} ?`}
+                confirmText={confirmAction === 'delete' ? "Supprimer" : (userToBan?.is_active ? "Bannir" : "Débannir")}
                 cancelText="Annuler"
                 variant="danger"
-                onConfirm={confirmDeleteUser}
-                onCancel={cancelDeleteUser}
+                onConfirm={handleConfirmAction}
+                onCancel={cancelAction}
             />
 
             {/* Toast Notification */}

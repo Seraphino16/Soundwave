@@ -95,6 +95,16 @@ export interface ChartData {
     }>;
 }
 
+// User creation interface
+export interface CreateUserData {
+    username: string;
+    email: string;
+    pseudo: string;
+    password: string;
+    role: 'USER' | 'ARTIST' | 'BAND' | 'ADMIN';
+    birthdate?: string;
+}
+
 // Mock data for development
 const mockUsers: User[] = [
     {
@@ -401,6 +411,64 @@ export const adminService = {
 
         return {
             message: 'Utilisateur supprimé avec succès',
+        };
+    },
+
+    // Create new user
+    createUser: async (userData: CreateUserData) => {
+        await delay(600);
+        
+        // Check if username or email already exists
+        const existingUser = mockUsers.find(u => 
+            u.username === userData.username || u.email === userData.email
+        );
+        
+        if (existingUser) {
+            throw new Error("Nom d'utilisateur ou email déjà utilisé");
+        }
+        
+        const newUser: User = {
+            id: Math.max(...mockUsers.map(u => u.id)) + 1,
+            username: userData.username,
+            email: userData.email,
+            pseudo: userData.pseudo,
+            roles: [userData.role],
+            is_verified: false,
+            is_active: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            ...(userData.birthdate && { birthdate: userData.birthdate }),
+        };
+        
+        mockUsers.unshift(newUser); // Add to beginning of array
+        
+        return {
+            message: 'Utilisateur créé avec succès',
+            user: newUser,
+        };
+    },
+
+    // Ban/unban user (toggle banned status)
+    banUser: async (id: number) => {
+        await delay(400);
+        
+        const userIndex = mockUsers.findIndex(u => u.id === id);
+        if (userIndex === -1) {
+            throw new Error("Utilisateur introuvable");
+        }
+
+        if (mockUsers[userIndex].roles.includes('ADMIN')) {
+            throw new Error("Impossible de bannir un administrateur");
+        }
+
+        // We'll use is_active to represent banned status (false = banned)
+        const wasBanned = !mockUsers[userIndex].is_active;
+        mockUsers[userIndex].is_active = wasBanned; // Toggle ban status
+        mockUsers[userIndex].updatedAt = new Date().toISOString();
+
+        return {
+            message: `Utilisateur ${wasBanned ? 'débanni' : 'banni'} avec succès`,
+            user: mockUsers[userIndex],
         };
     },
 
