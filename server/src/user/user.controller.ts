@@ -13,6 +13,8 @@ import {
   Get,
   InternalServerErrorException,
   Res,
+  NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
@@ -37,6 +39,8 @@ import {
 } from '@nestjs/swagger';
 import { TokenService } from '../token/token.service';
 import { MailerService } from '../mailer/mailer.service';
+import { CreateUserInfosDto } from './dto/create-user-infos.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 
 @ApiTags('users')
 @Controller('users')
@@ -46,7 +50,7 @@ export class UserController {
     private readonly mailerService: MailerService,
     private readonly tokenService: TokenService,
     private readonly spotifyService: SpotifyService,
-    private readonly googleService: GoogleService
+    private readonly googleService: GoogleService,
   ) {}
 
   @Post('create')
@@ -117,6 +121,36 @@ export class UserController {
     }
   }
 
+  @Post(':userId/infos')
+  @UseInterceptors(
+    FileInterceptor('profilePicture'),
+    FileInterceptor('bannerPicture'),
+  )
+  async createUserInfos(
+    @Param('userId') userId: number,
+    @Body() createUserInfosDto: CreateUserInfosDto,
+    @UploadedFile('profilePicture') profilePicture?: Express.Multer.File,
+    @UploadedFile('bannerPicture') bannerPicture?: Express.Multer.File,
+  ) {
+    try {
+      const userInfos = await this.userService.createUserInfos(
+        userId,
+        createUserInfosDto,
+        profilePicture,
+        bannerPicture,
+      );
+      return userInfos;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        "Erreur lors de l'enregistrement des informations utilisateur",
+      );
+    }
+  }
+
+  //@UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Mettre à jour les informations utilisateurs' })
   @ApiBody({ type: [UpdateUserInfosDto] })
   @ApiOkResponse({
@@ -168,7 +202,6 @@ export class UserController {
       );
     }
   }
-
   @Get('create/spotify')
   redirectToSpotifyAuth(@Query('isLogin') isLogin: string = 'false') {
     const isLoginBool = isLogin === 'true';
@@ -177,16 +210,14 @@ export class UserController {
   }
   @Get('create/spotify/callback')
   async spotifyCallback(
-    @Query('code') code: string,
-    @Query('isLogin') isLogin: string = 'false',
-    @Res() res,
+      @Query('code') code: string,
+      @Query('isLogin') isLogin: string = 'false',
+      @Res() res,
   ) {
     try {
       const isLoginBool = isLogin === 'true';
-      const accessToken =
-        await this.spotifyService.getAccessTokenFromCode(code);
-      const spotifyUser =
-        await this.spotifyService.getSpotifyUserData(accessToken);
+      const accessToken = await this.spotifyService.getAccessTokenFromCode(code);
+      const spotifyUser = await this.spotifyService.getSpotifyUserData(accessToken);
       const newUser = await this.userService.createUserWithSpotify(spotifyUser);
 
       return res.status(201).json({
@@ -195,7 +226,7 @@ export class UserController {
       });
     } catch (error) {
       return res.status(400).json({
-        message: "Erreur lors de l'inscription via Spotify",
+        message: 'Erreur lors de l\'inscription via Spotify',
         error: error.message,
       });
     }
@@ -273,17 +304,28 @@ export class UserController {
   async googleCallback(@Query('code') code: string, @Res() res) {
     try {
       const user = await this.googleService.registerWithGoogle(code);
-      return res.status(201).json(
-          UserSuccess.userCreated(user.id),
-      );
+      return res.status(201).json(UserSuccess.userCreated(user.id));
     } catch (error) {
       if (error instanceof UserErrors) {
         return res.status(400).json(error);
       }
 
-
       return res.status(500).json(UserErrors.unknownError());
     }
   }
 
+  @Get(':userId/profile')
+  @ApiOperation({ summary: 'Récupérer le profil utilisateur complet' })
+  @ApiOkResponse({ description: 'Profil utilisateur retourné avec succès' })
+  @ApiNotFoundResponse({ description: 'Utilisateur non trouvé' })
+  async getUserProfile(@Param('userId') userId: number) {
+    try {
+      return await this.userService.getUserProfile(userId);
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        'Erreur lors de la récupération du profil',
+      );
+    }
+  }
 }

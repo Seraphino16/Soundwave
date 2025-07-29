@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { User } from '../entities/user.entity';
 import { UserRole } from '../../config/user.config';
 import { UserErrors } from '../errors/user.errors';
-import {CreateUserDto} from "../dto/create-user.dto";
+import { CreateUserDto } from '../dto/create-user.dto';
 
 @Injectable()
 export class UserRepository {
