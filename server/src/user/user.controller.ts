@@ -311,11 +311,14 @@ export class UserController {
   async googleCallback(@Query('code') code: string, @Res() res) {
     try {
       const user = await this.googleService.registerWithGoogle(code);
-      return res.status(201).json(UserSuccess.userCreated(user.id));
+      return res.status(201).json(
+          UserSuccess.userCreated(user.id),
+      );
     } catch (error) {
       if (error instanceof UserErrors) {
         return res.status(400).json(error);
       }
+
 
       return res.status(500).json(UserErrors.unknownError());
     }
