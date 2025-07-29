@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsArray, IsDateString } from 'class-validator';
+import {IsOptional, IsString, IsArray, IsDateString, IsObject} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserInfosDto {
@@ -27,6 +27,11 @@ export class UpdateUserInfosDto {
   @IsOptional()
   @IsArray()
   musicStyle?: string[];
+
+  @ApiProperty()
+  @IsOptional()
+  @IsObject()
+  socialLinks?: { [network: string]: string };
 
   @ApiProperty()
   @IsOptional()

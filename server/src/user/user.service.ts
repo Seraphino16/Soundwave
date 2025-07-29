@@ -17,6 +17,7 @@ import { UserRole } from '../config/user.config';
 import { User, UserResponse } from './entities/user.entity';
 import axios from 'axios';
 import { SpotifyService } from '../spotify/spotify.service';
+import { CreateUserInfosDto } from './dto/create-user-infos.dto';
 
 @Injectable()
 export class UserService {
@@ -88,20 +89,52 @@ export class UserService {
       is_active,
     });
 
+    return newUser.id;
+  }
+
+  async createUserInfos(
+    userId: number,
+    infosDto: CreateUserInfosDto,
+    profilePicture?: Express.Multer.File,
+    bannerPicture?: Express.Multer.File,
+  ): Promise<UserSuccess> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(UserErrors.userNotFound().message);
+    }
+
+    const existingInfos = await this.userInfosRepository.findByUserId(userId);
+    if (existingInfos) {
+      throw new ConflictException('Les informations utilisateur existent déjà');
+    }
+
+    if (profilePicture) {
+      const uploaded = this.uploadsService.handleFileUpload(profilePicture);
+      if (uploaded) {
+        infosDto.profile_picture = uploaded.filePath;
+      }
+    }
+
+    if (bannerPicture) {
+      const uploaded = this.uploadsService.handleFileUpload(bannerPicture);
+      if (uploaded) {
+        infosDto.banner_picture = uploaded.filePath;
+      }
+    }
 
     const createUserInfosDto = {
-      user_id: newUser.id,
-      profile_picture: '',
-      banner_picture: '',
-      bio: '',
-      location: '',
-      musicStyle: [],
-      socialLinks: {},
+      user_id: userId,
+      profile_picture: infosDto.profile_picture || '',
+      banner_picture: infosDto.banner_picture || '',
+      bio: infosDto.bio || '',
+      location: infosDto.location || '',
+      musicStyle: infosDto.musicStyle || [],
+      socialLinks: infosDto.socialLinks || {},
     };
 
     await this.userInfosRepository.create(createUserInfosDto);
 
-    return newUser.id;
+    return UserSuccess.userInfosInsert();
   }
 
   async updateInfos(
@@ -162,7 +195,9 @@ export class UserService {
     }
 
     const id = await this.userRepository.setId();
-    const birthdate = spotifyUser.birthdate ? new Date(spotifyUser.birthdate) : undefined;
+    const birthdate = spotifyUser.birthdate
+      ? new Date(spotifyUser.birthdate)
+      : undefined;
 
     const newUser = await this.userRepository.create({
       id,
@@ -181,7 +216,6 @@ export class UserService {
       is_verified: true,
       is_active: true,
     });
-
 
     const createUserInfosDto = {
       user_id: newUser.id,
@@ -307,5 +341,34 @@ export class UserService {
     });
 
     return newUser;
+  }
+
+  async getUserProfile(userId: number): Promise<any> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(UserErrors.userNotFound().message);
+    }
+
+    const userInfos = await this.userInfosRepository.findByUserId(userId);
+
+    return {
+      id: user.id,
+      username: user.username,
+      pseudo: user.pseudo,
+      birthdate: user.birthdate,
+      roles: user.roles,
+      is_verified: user.is_verified,
+      is_active: user.is_active,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      ...(userInfos && {
+        profile_picture: userInfos.profile_picture,
+        banner_picture: userInfos.banner_picture,
+        bio: userInfos.bio,
+        location: userInfos.location,
+        musicStyle: userInfos.musicStyle,
+        socialLinks: userInfos.socialLinks,
+      }),
+    };
   }
 }
