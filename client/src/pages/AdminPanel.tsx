@@ -79,19 +79,6 @@ const AdminPanel: React.FC = () => {
 
                     <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center mb-4">
-                            <span className="text-2xl mr-3">🎵</span>
-                            <h3 className="text-xl font-semibold text-gray-800">Gestion du Contenu</h3>
-                        </div>
-                        <p className="text-gray-600 mb-4">
-                            Modérer albums, artistes et contenu musical.
-                        </p>
-                        <button className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">
-                            Accéder
-                        </button>
-                    </div>
-
-                    <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center mb-4">
                             <span className="text-2xl mr-3">📊</span>
                             <h3 className="text-xl font-semibold text-gray-800">Tableau de Bord</h3>
                         </div>
@@ -101,32 +88,6 @@ const AdminPanel: React.FC = () => {
                         <button 
                             onClick={() => navigate("/admin/dashboard")}
                             className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">
-                            Accéder
-                        </button>
-                    </div>
-
-                    <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center mb-4">
-                            <span className="text-2xl mr-3">🎉</span>
-                            <h3 className="text-xl font-semibold text-gray-800">Gestion des Événements</h3>
-                        </div>
-                        <p className="text-gray-600 mb-4">
-                            Créer et gérer les événements musicaux.
-                        </p>
-                        <button className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">
-                            Accéder
-                        </button>
-                    </div>
-
-                    <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center mb-4">
-                            <span className="text-2xl mr-3">⚙️</span>
-                            <h3 className="text-xl font-semibold text-gray-800">Configuration</h3>
-                        </div>
-                        <p className="text-gray-600 mb-4">
-                            Paramètres généraux de l'application.
-                        </p>
-                        <button className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">
                             Accéder
                         </button>
                     </div>
