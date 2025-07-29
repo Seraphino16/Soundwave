@@ -95,4 +95,9 @@ export class UserRepository {
     user.updatedAt = new Date();
     return user.save();
   }
+
+  async save(user: User): Promise<User> {
+    return user.save();
+  }
+
 }
