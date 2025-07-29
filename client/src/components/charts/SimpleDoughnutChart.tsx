@@ -115,4 +115,4 @@ const SimpleDoughnutChart: React.FC<SimpleDoughnutChartProps> = ({
     );
 };
 
-export default SimpleDoughnutChart;
+export default React.memo(SimpleDoughnutChart);

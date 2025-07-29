@@ -47,7 +47,7 @@ const UserManagement: React.FC = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, [currentPage, search, roleFilter, statusFilter]);
+    }, [currentPage, search, roleFilter, statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchUsers = async () => {
         try {

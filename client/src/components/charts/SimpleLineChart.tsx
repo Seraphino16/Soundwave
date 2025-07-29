@@ -109,4 +109,4 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
     );
 };
 
-export default SimpleLineChart;
+export default React.memo(SimpleLineChart);

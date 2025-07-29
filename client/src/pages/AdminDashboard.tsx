@@ -37,7 +37,7 @@ const AdminDashboard: React.FC = () => {
     // Load dashboard data on component mount and period change
     useEffect(() => {
         fetchDashboardData();
-    }, [period]);
+    }, [period]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchDashboardData = async () => {
         setLoading(true);

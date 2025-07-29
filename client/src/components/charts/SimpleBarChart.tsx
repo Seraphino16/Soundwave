@@ -78,4 +78,4 @@ const SimpleBarChart: React.FC<SimpleBarChartProps> = ({
     );
 };
 
-export default SimpleBarChart;
+export default React.memo(SimpleBarChart);
