@@ -11,6 +11,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import SearchBar from "../searchBar/SearchBar";
 import { MessagesIcon, ProfileIcon, SettingsIcon, BurgerMenuIcon } from "../utils/Icons";
+import AdminButton from "./AdminButton";
 
 interface NavItem {
     text: string;
@@ -119,6 +120,7 @@ const Navbar = () => {
                         <a href="#" className="hover:opacity-80 transition-opacity">
                             <SettingsIcon />
                         </a>
+                        <AdminButton />
                     </div>
                 )}
                 <div className="block lg:hidden">
@@ -163,24 +165,25 @@ const Navbar = () => {
                                         <a href="#" className="hover:opacity-80 transition-opacity">
                                             <ProfileIcon />
                                         </a>
-                                        {user && (
-                                            <div className="flex items-center space-x-4 ml-4">
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-lg font-semibold">{user.pseudo}</span>
-                                                    <span className="text-sm text-gray-500">@{user.username}</span>
-                                                </div>
-                                                <button
-                                                    onClick={handleLogout}
-                                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                                                >
-                                                    Déconnexion
-                                                </button>
-                                            </div>
-                                        )}
                                         <a href="#" className="hover:opacity-80 transition-opacity">
                                             <SettingsIcon />
                                         </a>
                                     </div>
+                                    {user && (
+                                        <div className="flex flex-col items-center space-y-2">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-lg font-semibold">{user.pseudo}</span>
+                                                <span className="text-sm text-gray-500">@{user.username}</span>
+                                            </div>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                                            >
+                                                Déconnexion
+                                            </button>
+                                        </div>
+                                    )}
+                                    <AdminButton />
                                     <SearchBar />
                                     {isGuestPage && (
                                         <>
