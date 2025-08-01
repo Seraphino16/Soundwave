@@ -54,4 +54,12 @@ export class UserSuccess {
       'Informations utilisateur enregistrée avec succès',
     );
   }
+
+  static accountDeleted() {
+    return UserSuccess.createSuccess(
+      'success',
+      200,
+      'Compte supprimé avec succèss',
+    );
+  }
 }
