@@ -112,7 +112,7 @@ export class UserService {
 
     const existingInfos = await this.userInfosRepository.findByUserId(userId);
     if (existingInfos) {
-      throw new ConflictException('Les informations utilisateur existent déjà');
+      throw new ConflictException(UserErrors.userInfosAlreadyExist());
     }
 
     if (profilePicture) {
@@ -162,7 +162,7 @@ export class UserService {
         updateUserInfosDto.profile_picture = uploadedProfilePicture.filePath;
       } else {
         throw new InternalServerErrorException(
-          'Erreur lors du téléchargement de la photo de profile',
+          UserErrors.photoDownloadError().message,
         );
       }
     }
@@ -173,7 +173,9 @@ export class UserService {
       if (uploadedBannerPicture) {
         updateUserInfosDto.banner_picture = uploadedBannerPicture.filePath;
       } else {
-        throw new InternalServerErrorException('Banner picture upload failed');
+        throw new InternalServerErrorException(
+          UserErrors.photoDownloadError().message,
+        );
       }
     }
 
@@ -381,25 +383,23 @@ export class UserService {
 
   async changePassword(userId: number, dto: ChangePasswordDto) {
     if (dto.newPassword !== dto.confirmPassword) {
-      throw new BadRequestException('Les mots de passe ne correspondent pas.');
+      throw new BadRequestException(UserErrors.passwordsDoNotMatch().message);
     }
 
     const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new NotFoundException('Utilisateur introuvable.');
+      throw new NotFoundException(UserErrors.userNotFound());
     }
 
     if (!user.password || user.password.trim() === '') {
       user.password = await this.passwordUtil.hashPassword(dto.newPassword);
       await this.userRepository.save(user);
 
-      return { message: 'Mot de passe défini avec succès.' };
+      return UserSuccess.passwordCreate();
     }
 
     if (!dto.oldPassword) {
-      throw new BadRequestException(
-        'L’ancien mot de passe est requis pour le changement.',
-      );
+      throw new BadRequestException(UserErrors.oldPasswordRequired().message);
     }
 
     const isValid = await this.passwordUtil.comparePasswords(
@@ -407,15 +407,15 @@ export class UserService {
       user.password,
     );
     if (!isValid) {
-      throw new UnauthorizedException('Ancien mot de passe incorrect.');
+      throw new UnauthorizedException(
+        UserErrors.oldPasswordDoNotMatch().message,
+      );
     }
 
     user.password = await this.passwordUtil.hashPassword(dto.newPassword);
     await this.userRepository.save(user);
 
-    return {
-      message: 'Mot de passe modifié avec succès.',
-    };
+    return UserSuccess.passwordUpdate();
   }
 
   async deleteAccount(

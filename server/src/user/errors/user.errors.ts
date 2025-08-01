@@ -179,9 +179,37 @@ export class UserErrors extends Error {
 
   static permissionDeletedAccountDenied() {
     return new UserErrors(
-      'success',
+      'error',
       403,
-      "  Vous n'avez pas l'autorisation de supprimer ce compte",
+      "Vous n'avez pas l'autorisation de supprimer ce compte",
     );
+  }
+
+  static userInfosAlreadyExist() {
+    return new UserErrors(
+      'error',
+      409,
+      'Les informations utilisateur existent déjà',
+    );
+  }
+
+  static photoDownloadError() {
+    return new UserErrors(
+      'error',
+      500,
+      'Erreur lors du téléchargement de la photo de profile',
+    );
+  }
+
+  static oldPasswordRequired() {
+    return new UserErrors(
+      'error',
+      400,
+      'L’ancien mot de passe est requis pour le changement',
+    );
+  }
+
+  static oldPasswordDoNotMatch() {
+    return new UserErrors('error', 401, 'Ancien mot de passe incorrect');
   }
 }
