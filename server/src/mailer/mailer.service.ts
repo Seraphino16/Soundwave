@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as Handlebars from 'handlebars';
 import { MailerErrors } from './errors/mailer.errors';
 import { MailerSuccess } from './success/mailer.success';
-import { SendValidationEmailParams } from './interfaces/mailer.interfaces';
+import {
+  SendSuppressionEmailParams,
+  SendValidationEmailParams,
+} from './interfaces/mailer.interfaces';
 
 @Injectable()
 export class MailerService {
@@ -90,17 +92,28 @@ export class MailerService {
 
   private loadTemplate(
     templateName: string,
-    context: Record<string, any>,
+    context: Record<string, string>,
   ): string | MailerErrors {
-    const templatesDir = path.join(__dirname, '..', 'mailer', 'templates');
-    const templatePath = path.join(templatesDir, `${templateName}.hbs`);
+    const templatePath = path.resolve(
+      'src',
+      'mailer',
+      'templates',
+      `${templateName}.html`,
+    );
+    console.log('Chemin template:', templatePath);
 
     if (!fs.existsSync(templatePath)) {
       return MailerErrors.mailTemplateNotFound();
     }
 
-    const source = fs.readFileSync(templatePath, 'utf8');
-    const compiled = Handlebars.compile(source);
-    return compiled(context);
+    let content = fs.readFileSync(templatePath, 'utf8');
+
+    for (const key in context) {
+      const value = context[key];
+      const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      content = content.replace(regex, value);
+    }
+
+    return content;
   }
 }
