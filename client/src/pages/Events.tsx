@@ -10,6 +10,7 @@ import {
     FiLoader
 } from 'react-icons/fi';
 import { eventsService, Event, EventFilters, Artist } from '../services/eventsService';
+import { calculateHaversineDistance } from '../utils/geoUtils';
 import GoogleEventMap from '../components/events/GoogleEventMap';
 import EventCard from '../components/events/EventCard';
 import EventDetailsModal from '../components/events/EventDetailsModal';
@@ -167,15 +168,12 @@ const Events: React.FC = () => {
     const calculateDistance = (event: Event): number | undefined => {
         if (!userLocation) return undefined;
         
-        const R = 6371; // Earth's radius in kilometers
-        const dLat = (event.location.latitude - userLocation.latitude) * Math.PI / 180;
-        const dLon = (event.location.longitude - userLocation.longitude) * Math.PI / 180;
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(userLocation.latitude * Math.PI / 180) * Math.cos(event.location.latitude * Math.PI / 180) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+        return calculateHaversineDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            event.location.latitude,
+            event.location.longitude
+        );
     };
 
     if (loading) {

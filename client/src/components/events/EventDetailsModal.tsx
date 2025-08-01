@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { Event } from '../../services/eventsService';
+import { calculateHaversineDistance } from '../../utils/geoUtils';
 import { 
     FiX, 
     FiMapPin, 
@@ -58,15 +59,12 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
     const calculateDistance = (): number | null => {
         if (!userLocation) return null;
         
-        const R = 6371; // Earth's radius in kilometers
-        const dLat = (event.location.latitude - userLocation.latitude) * Math.PI / 180;
-        const dLon = (event.location.longitude - userLocation.longitude) * Math.PI / 180;
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(userLocation.latitude * Math.PI / 180) * Math.cos(event.location.latitude * Math.PI / 180) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+        return calculateHaversineDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            event.location.latitude,
+            event.location.longitude
+        );
     };
 
     const getEventTypeLabel = (type: string) => {
@@ -277,7 +275,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                             onClick={() => {
                                 const { latitude, longitude } = event.location;
                                 const placeName = encodeURIComponent(`${event.location.venue}, ${event.location.address}, ${event.location.city}`);
-                                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${placeName}&query_place_id=${latitude},${longitude}`;
+                                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${placeName}&center=${latitude},${longitude}`;
                                 window.open(mapsUrl, '_blank');
                             }}
                             className="flex items-center justify-center space-x-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
