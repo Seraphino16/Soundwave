@@ -155,7 +155,6 @@ export class UserController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Mettre à jour les informations utilisateurs' })
   @ApiBody({ type: [UpdateUserInfosDto] })
   @ApiOkResponse({
