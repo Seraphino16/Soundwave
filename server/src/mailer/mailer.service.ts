@@ -99,7 +99,6 @@ export class MailerService {
       'templates',
       `${templateName}.html`,
     );
-    console.log('Chemin template:', templatePath);
 
     if (!fs.existsSync(templatePath)) {
       return MailerErrors.mailTemplateNotFound();
