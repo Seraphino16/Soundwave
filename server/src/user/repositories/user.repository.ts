@@ -100,4 +100,8 @@ export class UserRepository {
     return user.save();
   }
 
+  async deleteById(userId: number): Promise<User | null> {
+    return this.userModel.findOneAndDelete({ id: userId }).exec();
+  }
+
 }

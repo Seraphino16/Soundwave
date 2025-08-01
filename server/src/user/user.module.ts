@@ -14,6 +14,7 @@ import { UploadsModule } from '../uploads/uploads.module';
 import { SpotifyModule } from '../spotify/spotify.module';
 import { GoogleModule } from '../google/google.module';
 import { UtilsModule } from '../utils/utils.module';
+import { MailerService } from '../mailer/mailer.service';
 
 @Module({
   imports: [
@@ -29,7 +30,13 @@ import { UtilsModule } from '../utils/utils.module';
     forwardRef(() => GoogleModule),
     UtilsModule,
   ],
-  providers: [UserService, UserRepository, UserInfosRepository, JwtAuthGuard],
+  providers: [
+    UserService,
+    UserRepository,
+    UserInfosRepository,
+    JwtAuthGuard,
+    MailerService,
+  ],
   controllers: [UserController],
   exports: [UserRepository, UserInfosRepository, UserService],
 })

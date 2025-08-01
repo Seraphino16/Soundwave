@@ -15,6 +15,8 @@ import {
   Res,
   NotFoundException,
   UseGuards,
+  Delete,
+  Req,
 } from '@nestjs/common';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
@@ -42,6 +44,8 @@ import { MailerService } from '../mailer/mailer.service';
 import { CreateUserInfosDto } from './dto/create-user-infos.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { ChangePasswordDto } from './dto/change-password-dto';
+import { CurrentUser } from '../auth/decorator/current-user-decorator';
+import { JwtPayload } from 'jsonwebtoken';
 
 @ApiTags('users')
 @Controller('users')
@@ -151,7 +155,7 @@ export class UserController {
     }
   }
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Mettre à jour les informations utilisateurs' })
   @ApiBody({ type: [UpdateUserInfosDto] })
   @ApiOkResponse({
@@ -338,5 +342,16 @@ export class UserController {
     @Body() dto: ChangePasswordDto,
   ) {
     return this.userService.changePassword(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/:id')
+  async deleteUser(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
+    console.log('User in deleteUser:', user);
+    if (user.id !== Number(id)) {
+      return UserErrors.permissionDeletedAccountDenied();
+    }
+
+    return this.userService.deleteAccount(user.id, user.email, user.username);
   }
 }
