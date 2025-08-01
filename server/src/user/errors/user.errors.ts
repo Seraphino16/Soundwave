@@ -176,4 +176,12 @@ export class UserErrors extends Error {
       "Le compte doit d'abord être enregisté comme artiste",
     );
   }
+
+  static permissionDeletedAccountDenied() {
+    return new UserErrors(
+      'success',
+      403,
+      "  Vous n'avez pas l'autorisation de supprimer ce compte",
+    );
+  }
 }
