@@ -212,4 +212,22 @@ export class UserErrors extends Error {
   static oldPasswordDoNotMatch() {
     return new UserErrors('error', 401, 'Ancien mot de passe incorrect');
   }
+
+  static settingsNotFound(userId: number) {
+    return new UserErrors(
+      'error',
+      404,
+      'Paramètres non trouvés pour cet utilisateur',
+      userId,
+    );
+  }
+
+  static settingsDoNotUpdate(userId: number) {
+    return new UserErrors(
+      'error',
+      500,
+      "Une erreur est survenue lors de la mise à jour des paramètre de l'utilisateur",
+      userId,
+    );
+  }
 }

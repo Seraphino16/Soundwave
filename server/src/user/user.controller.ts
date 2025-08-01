@@ -46,6 +46,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { ChangePasswordDto } from './dto/change-password-dto';
 import { CurrentUser } from '../auth/decorator/current-user-decorator';
 import { JwtPayload } from 'jsonwebtoken';
+import { UpdateUserSettingsDto } from './dto/update-user-settings.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -99,6 +100,7 @@ export class UserController {
   ): Promise<UserSuccess | UserErrors> {
     try {
       const userId = await this.userService.createUser(createUserDto);
+      await this.userService.createUserSettings(userId);
 
       const activationToken = this.tokenService.generateEmailValidationToken({
         email: createUserDto.email,
@@ -311,14 +313,11 @@ export class UserController {
   async googleCallback(@Query('code') code: string, @Res() res) {
     try {
       const user = await this.googleService.registerWithGoogle(code);
-      return res.status(201).json(
-          UserSuccess.userCreated(user.id),
-      );
+      return res.status(201).json(UserSuccess.userCreated(user.id));
     } catch (error) {
       if (error instanceof UserErrors) {
         return res.status(400).json(error);
       }
-
 
       return res.status(500).json(UserErrors.unknownError());
     }
@@ -357,5 +356,20 @@ export class UserController {
     }
 
     return this.userService.deleteAccount(user.id, user.email, user.username);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/settings/:user_id')
+  async getSettings(@Param('user_id') user_id: number) {
+    return this.userService.getUserSettings(user_id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/settings/:user_id')
+  async updateSettings(
+    @Param('user_id') user_id: number,
+    @Body() dto: UpdateUserSettingsDto,
+  ) {
+    return this.userService.updateUserSettings(user_id, dto);
   }
 }
