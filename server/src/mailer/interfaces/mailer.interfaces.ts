@@ -4,4 +4,9 @@ interface SendValidationEmailParams {
   token: string;
 }
 
-export { SendValidationEmailParams };
+interface SendSuppressionEmailParams {
+  to: string;
+  username: string;
+}
+
+export { SendValidationEmailParams, SendSuppressionEmailParams };
