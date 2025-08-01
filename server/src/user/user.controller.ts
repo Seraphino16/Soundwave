@@ -106,6 +106,8 @@ export class UserController {
         id: userId,
       });
 
+      await this.userService.saveValidationToken(userId, activationToken);
+
       await this.mailerService.sendValidationEmail({
         to: createUserDto.email,
         username: createUserDto.username,
