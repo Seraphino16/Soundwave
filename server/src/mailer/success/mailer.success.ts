@@ -47,4 +47,13 @@ export class MailerSuccess {
       data,
     );
   }
+
+  static accountSuppressionEmailSent(data: any) {
+    return MailerSuccess.createSuccess(
+      'success',
+      200,
+      'Email de suppression de compte envoyé avec succès',
+      data,
+    );
+  }
 }
