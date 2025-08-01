@@ -12,6 +12,7 @@ import HomeLoggedOff from 'pages/HomeLoggedOff';
 import AdminPanel from './pages/AdminPanel';
 import UserManagement from './pages/UserManagement';
 import AdminDashboard from './pages/AdminDashboard';
+import Events from './pages/Events';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/events" element={<Events />} />
           </Routes>
         </div>
       </div>
