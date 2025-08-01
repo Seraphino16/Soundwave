@@ -21,6 +21,8 @@ import { SpotifyService } from '../spotify/spotify.service';
 import { CreateUserInfosDto } from './dto/create-user-infos.dto';
 import { PasswordUtil } from '../utils/password';
 import { ChangePasswordDto } from './dto/change-password-dto';
+import { MailerService } from '../mailer/mailer.service';
+import { MailerErrors } from '../mailer/errors/mailer.errors';
 
 @Injectable()
 export class UserService {
@@ -30,6 +32,7 @@ export class UserService {
     private readonly uploadsService: UploadsService,
     private readonly spotifyService: SpotifyService,
     private readonly passwordUtil: PasswordUtil,
+    private readonly mailerService: MailerService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<number> {
@@ -376,8 +379,6 @@ export class UserService {
     };
   }
 
-
-
   async changePassword(userId: number, dto: ChangePasswordDto) {
     if (dto.newPassword !== dto.confirmPassword) {
       throw new BadRequestException('Les mots de passe ne correspondent pas.');
@@ -392,14 +393,19 @@ export class UserService {
       user.password = await this.passwordUtil.hashPassword(dto.newPassword);
       await this.userRepository.save(user);
 
-      return {message: 'Mot de passe défini avec succès.'};
+      return { message: 'Mot de passe défini avec succès.' };
     }
 
     if (!dto.oldPassword) {
-      throw new BadRequestException('L’ancien mot de passe est requis pour le changement.');
+      throw new BadRequestException(
+        'L’ancien mot de passe est requis pour le changement.',
+      );
     }
 
-    const isValid = await this.passwordUtil.comparePasswords(dto.oldPassword, user.password);
+    const isValid = await this.passwordUtil.comparePasswords(
+      dto.oldPassword,
+      user.password,
+    );
     if (!isValid) {
       throw new UnauthorizedException('Ancien mot de passe incorrect.');
     }
@@ -408,7 +414,43 @@ export class UserService {
     await this.userRepository.save(user);
 
     return {
-      message: 'Mot de passe modifié avec succès.'
+      message: 'Mot de passe modifié avec succès.',
     };
   }
+
+  async deleteAccount(
+      userId: number,
+      userEmail: string,
+      username: string,
+  ): Promise<UserErrors | UserSuccess> {
+    try {
+      const deletedUser = await this.userRepository.deleteById(userId);
+
+      if (!deletedUser) {
+        return UserErrors.userNotFound();
+      }
+
+      console.log("Suppression réussie, on envoie le mail à :", userEmail);
+
+      const emailResult = await this.mailerService.sendSuppressionEmail({
+        to: userEmail,
+        username,
+      });
+
+      console.log("Résultat de l'envoi mail :", emailResult);
+
+      if (emailResult instanceof MailerErrors) {
+        return MailerErrors.emailNotSent();
+      }
+
+      return UserSuccess.accountDeleted();
+    } catch (error) {
+      console.error(
+          "Une erreur s'est produite lors la suppression du compte",
+          error,
+      );
+      return UserErrors.internalServerError();
+    }
+  }
+
 }
