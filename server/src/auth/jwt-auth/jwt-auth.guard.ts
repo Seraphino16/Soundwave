@@ -1,7 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  CanActivate,
+  ExecutionContext,
+} from '@nestjs/common';
 import { TokenService } from '../../token/token.service';
 import { AuthErrors } from '../errors/auth.errors';
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -21,7 +26,11 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException(tokenValidation.message);
     }
 
-    request.user = tokenValidation;
+    // Typage explicite
+    const user = tokenValidation as JwtPayload;
+
+    request.user = user;
+
     return true;
   }
 }

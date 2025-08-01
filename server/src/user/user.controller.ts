@@ -13,6 +13,10 @@ import {
   Get,
   InternalServerErrorException,
   Res,
+  NotFoundException,
+  UseGuards,
+  Delete,
+  Req,
 } from '@nestjs/common';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
@@ -37,6 +41,11 @@ import {
 } from '@nestjs/swagger';
 import { TokenService } from '../token/token.service';
 import { MailerService } from '../mailer/mailer.service';
+import { CreateUserInfosDto } from './dto/create-user-infos.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { ChangePasswordDto } from './dto/change-password-dto';
+import { CurrentUser } from '../auth/decorator/current-user-decorator';
+import { JwtPayload } from 'jsonwebtoken';
 
 @ApiTags('users')
 @Controller('users')
@@ -46,7 +55,7 @@ export class UserController {
     private readonly mailerService: MailerService,
     private readonly tokenService: TokenService,
     private readonly spotifyService: SpotifyService,
-    private readonly googleService: GoogleService
+    private readonly googleService: GoogleService,
   ) {}
 
   @Post('create')
@@ -117,6 +126,35 @@ export class UserController {
     }
   }
 
+  @Post(':userId/infos')
+  @UseInterceptors(
+    FileInterceptor('profilePicture'),
+    FileInterceptor('bannerPicture'),
+  )
+  async createUserInfos(
+    @Param('userId') userId: number,
+    @Body() createUserInfosDto: CreateUserInfosDto,
+    @UploadedFile('profilePicture') profilePicture?: Express.Multer.File,
+    @UploadedFile('bannerPicture') bannerPicture?: Express.Multer.File,
+  ) {
+    try {
+      const userInfos = await this.userService.createUserInfos(
+        userId,
+        createUserInfosDto,
+        profilePicture,
+        bannerPicture,
+      );
+      return userInfos;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        "Erreur lors de l'enregistrement des informations utilisateur",
+      );
+    }
+  }
+
   @ApiOperation({ summary: 'Mettre à jour les informations utilisateurs' })
   @ApiBody({ type: [UpdateUserInfosDto] })
   @ApiOkResponse({
@@ -143,6 +181,7 @@ export class UserController {
     description: 'Erreur inconnue du serveur',
     type: UserErrors,
   })
+  @UseGuards(JwtAuthGuard)
   @Put(':userId/infos')
   @UseInterceptors(
     FileInterceptor('profilePicture'),
@@ -168,7 +207,6 @@ export class UserController {
       );
     }
   }
-
   @Get('create/spotify')
   redirectToSpotifyAuth(@Query('isLogin') isLogin: string = 'false') {
     const isLoginBool = isLogin === 'true';
@@ -215,7 +253,7 @@ export class UserController {
       );
     }
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch('request-artist')
   async requestArtist(
     @Body('automatic') automatic: string,
@@ -233,7 +271,7 @@ export class UserController {
       throw new BadRequestException(UserErrors.unknownError().message);
     }
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch('request-band')
   async requestBand(@Body('id') id: number): Promise<UserSuccess> {
     try {
@@ -286,4 +324,38 @@ export class UserController {
     }
   }
 
+  @Get(':userId/profile')
+  @ApiOperation({ summary: 'Récupérer le profil utilisateur complet' })
+  @ApiOkResponse({ description: 'Profil utilisateur retourné avec succès' })
+  @ApiNotFoundResponse({ description: 'Utilisateur non trouvé' })
+  async getUserProfile(@Param('userId') userId: number) {
+    try {
+      return await this.userService.getUserProfile(userId);
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        'Erreur lors de la récupération du profil',
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/:id/password')
+  async changePassword(
+    @Param('id') id: number,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.userService.changePassword(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/:id')
+  async deleteUser(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
+    console.log('User in deleteUser:', user);
+    if (user.id !== Number(id)) {
+      return UserErrors.permissionDeletedAccountDenied();
+    }
+
+    return this.userService.deleteAccount(user.id, user.email, user.username);
+  }
 }

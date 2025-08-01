@@ -18,6 +18,7 @@ import { SpotifyModule } from './spotify/spotify.module';
 import { GoogleService } from './google/google.service';
 import { GoogleController } from './google/google.controller';
 import { GoogleModule } from './google/google.module';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { GoogleModule } from './google/google.module';
     UploadsModule,
     SpotifyModule,
     GoogleModule,
+    UtilsModule,
   ],
   controllers: [
     AppController,
