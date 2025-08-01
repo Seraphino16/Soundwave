@@ -182,6 +182,7 @@ export class UserController {
     description: 'Erreur inconnue du serveur',
     type: UserErrors,
   })
+  @UseGuards(JwtAuthGuard)
   @Put(':userId/infos')
   @UseInterceptors(
     FileInterceptor('profilePicture'),
@@ -253,7 +254,7 @@ export class UserController {
       );
     }
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch('request-artist')
   async requestArtist(
     @Body('automatic') automatic: string,
@@ -271,7 +272,7 @@ export class UserController {
       throw new BadRequestException(UserErrors.unknownError().message);
     }
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch('request-band')
   async requestBand(@Body('id') id: number): Promise<UserSuccess> {
     try {
@@ -339,6 +340,7 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/:id/password')
   async changePassword(
     @Param('id') id: number,
