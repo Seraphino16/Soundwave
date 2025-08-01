@@ -419,9 +419,9 @@ export class UserService {
   }
 
   async deleteAccount(
-      userId: number,
-      userEmail: string,
-      username: string,
+    userId: number,
+    userEmail: string,
+    username: string,
   ): Promise<UserErrors | UserSuccess> {
     try {
       const deletedUser = await this.userRepository.deleteById(userId);
@@ -430,14 +430,10 @@ export class UserService {
         return UserErrors.userNotFound();
       }
 
-      console.log("Suppression réussie, on envoie le mail à :", userEmail);
-
       const emailResult = await this.mailerService.sendSuppressionEmail({
         to: userEmail,
         username,
       });
-
-      console.log("Résultat de l'envoi mail :", emailResult);
 
       if (emailResult instanceof MailerErrors) {
         return MailerErrors.emailNotSent();
@@ -446,11 +442,10 @@ export class UserService {
       return UserSuccess.accountDeleted();
     } catch (error) {
       console.error(
-          "Une erreur s'est produite lors la suppression du compte",
-          error,
+        "Une erreur s'est produite lors la suppression du compte",
+        error,
       );
       return UserErrors.internalServerError();
     }
   }
-
 }
