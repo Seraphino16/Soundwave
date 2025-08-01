@@ -56,6 +56,38 @@ export class MailerService {
     }
   }
 
+  async sendSuppressionEmail({
+    to,
+    username,
+  }: SendValidationEmailParams): Promise<MailerSuccess | MailerErrors> {
+
+    const html = this.loadTemplate('account-suppression', {
+      username,
+    });
+
+    if (typeof html !== 'string') {
+      return html;
+    }
+
+    try {
+      const mailOptions = {
+        from: process.env.MAIL_FROM,
+        to,
+        subject: 'Suppression de votre compte',
+        html,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+
+      return MailerSuccess.accountSuppressionEmailSent({
+        email: to,
+      });
+    } catch (error) {
+      console.error("Erreur d'envoi mail :", error);
+      return MailerErrors.emailNotSent();
+    }
+  }
+
   private loadTemplate(
     templateName: string,
     context: Record<string, any>,
