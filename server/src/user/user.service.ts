@@ -23,12 +23,15 @@ import { PasswordUtil } from '../utils/password';
 import { ChangePasswordDto } from './dto/change-password-dto';
 import { MailerService } from '../mailer/mailer.service';
 import { MailerErrors } from '../mailer/errors/mailer.errors';
+import { UserSettingsRepository } from './repositories/user-settings.repository';
+import { UpdateUserSettingsDto } from './dto/update-user-settings.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly userInfosRepository: UserInfosRepository,
+    private readonly userSettingsRepository: UserSettingsRepository,
     private readonly uploadsService: UploadsService,
     private readonly spotifyService: SpotifyService,
     private readonly passwordUtil: PasswordUtil,
@@ -447,5 +450,31 @@ export class UserService {
       );
       return UserErrors.internalServerError();
     }
+  }
+
+  async getUserSettings(user_id: number) {
+    const settings =
+      await this.userSettingsRepository.getSettingsByUserId(user_id);
+    if (!settings) {
+      throw new NotFoundException(UserErrors.settingsNotFound(user_id).message);
+    }
+    return settings;
+  }
+
+  async createUserSettings(user_id: number) {
+    return this.userSettingsRepository.createSettings(user_id);
+  }
+
+  async updateUserSettings(user_id: number, dto: UpdateUserSettingsDto) {
+    const updated = await this.userSettingsRepository.updateSettingsByUserId(
+      user_id,
+      dto,
+    );
+    if (!updated) {
+      throw new InternalServerErrorException(
+        UserErrors.settingsDoNotUpdate(user_id).message,
+      );
+    }
+    return updated;
   }
 }
