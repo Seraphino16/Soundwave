@@ -10,3 +10,4 @@
 # API Keys and Secrets
 **/google-maps-api-key*
 **/api-keys*
+.DS_Store

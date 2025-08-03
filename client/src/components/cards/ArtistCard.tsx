@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 interface ArtistProps {
     id: string;
     name: string;
-    image: string;
+    image: string | null;
 }
 
 const ArtistCard: React.FC<ArtistProps> = ({ id, name, image }) => {
