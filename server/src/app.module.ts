@@ -15,6 +15,10 @@ import { UploadsService } from './uploads/uploads.service';
 import { UploadsController } from './uploads/uploads.controller';
 import { UploadsModule } from './uploads/uploads.module';
 import { SpotifyModule } from './spotify/spotify.module';
+import { GoogleService } from './google/google.service';
+import { GoogleController } from './google/google.controller';
+import { GoogleModule } from './google/google.module';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -32,13 +36,22 @@ import { SpotifyModule } from './spotify/spotify.module';
     AuthModule,
     UploadsModule,
     SpotifyModule,
+    GoogleModule,
+    UtilsModule,
   ],
   controllers: [
     AppController,
     SpotifyController,
     AuthController,
     UploadsController,
+    GoogleController,
   ],
-  providers: [AppService, MailerService, SpotifyService, UploadsService],
+  providers: [
+    AppService,
+    MailerService,
+    SpotifyService,
+    UploadsService,
+    GoogleService,
+  ],
 })
 export class AppModule {}

@@ -10,6 +10,10 @@ import Auth from './pages/Auth';
 import ArtistDetail from "pages/ArtistDetails";
 import HomeLoggedOff from 'pages/HomeLoggedOff';
 import EmailAlreadyExists from "./pages/EmailAlreadyExists";
+import AdminPanel from './pages/AdminPanel';
+import UserManagement from './pages/UserManagement';
+import AdminDashboard from './pages/AdminDashboard';
+import Events from './pages/Events';
 
 export default function App() {
   return (
@@ -27,6 +31,10 @@ export default function App() {
             <Route path="/alert" element={<AlertTestPage />} />
             <Route path="/auth" element={<Auth />} /> 
             <Route path="/error-email-already-exists" element={<EmailAlreadyExists />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/events" element={<Events />} />
           </Routes>
         </div>
       </div>

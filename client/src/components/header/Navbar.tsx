@@ -11,6 +11,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import SearchBar from "../searchBar/SearchBar";
 import { MessagesIcon, ProfileIcon, SettingsIcon, BurgerMenuIcon } from "../utils/Icons";
+import AdminButton from "./AdminButton";
 import { useUserContext } from "../../context/UserContext";
 
 interface NavItem {
@@ -105,6 +106,7 @@ const Navbar = () => {
             <a href="#" className="hover:opacity-80 transition-opacity">
               <SettingsIcon />
             </a>
+                        <AdminButton />
           </div>
         )}
         <div className="block lg:hidden">
@@ -113,79 +115,83 @@ const Navbar = () => {
           </button>
         </div>
 
-        <AnimatePresence>
-          {isOpen && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="fixed top-24 left-0 w-full h-[calc(100vh-6rem)] bg-black/50 z-40"
-                onClick={closeMenu}
-              />
-              <motion.div
-                initial={{ y: "-100%", opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: "-100%", opacity: 0 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
-                className="absolute top-24 left-0 w-full bg-white shadow-md lg:hidden transition-all ease-in-out overflow-hidden z-50"
-              >
-                <div className="flex flex-col items-center w-full py-4 space-y-4">
-                  {!isAuthRoute && !isGuestPage && (
-                    <>
-                      {navItems.map((item) => (
-                        <NavbarItem key={item.href} text={item.text} href={item.href} />
-                      ))}
-                    </>
-                  )}
-                  <div className="flex space-x-6 mt-4">
-                    <a href="#" className="hover:opacity-80 transition-opacity">
-                      <MessagesIcon />
-                    </a>
-                    <a href="#" className="hover:opacity-80 transition-opacity">
-                      <ProfileIcon />
-                    </a>
-                    {shouldShowUserInfo && (
-                      <div className="flex items-center space-x-4 ml-4">
-                        <div className="flex flex-col items-end">
-                          <span className="text-lg font-semibold">{user.pseudo}</span>
-                          <span className="text-sm text-gray-500">@{user.username}</span>
-                        </div>
-                        <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                          Déconnexion
-                        </button>
-                      </div>
+                <AnimatePresence>
+                    {isOpen && (
+                        <>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="fixed top-24 left-0 w-full h-[calc(100vh-6rem)] bg-black/50 z-40"
+                                onClick={closeMenu}
+                            />
+                            <motion.div
+                                initial={{ y: "-100%", opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: "-100%", opacity: 0 }}
+                                transition={{ duration: 0.2, ease: "easeInOut" }}
+                                className="absolute top-24 left-0 w-full bg-white shadow-md lg:hidden transition-all ease-in-out overflow-hidden z-50"
+                            >
+                                <div className="flex flex-col items-center w-full py-4 space-y-4">
+                                    {!isAuthRoute && !isGuestPage && (
+                                        <>
+                                            {navItems.map((item) => (
+                                                <NavbarItem key={item.href} text={item.text} href={item.href} />
+                                            ))}
+                                        </>
+                                    )}
+                                    <div className="flex space-x-6 mt-4">
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                            <MessagesIcon />
+                                        </a>
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                            <ProfileIcon />
+                                        </a>
+                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                            <SettingsIcon />
+                                        </a>
+                                    </div>
+                                    {shouldShowUserInfo && (
+                                        <div className="flex flex-col items-center space-y-2">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-lg font-semibold">{user.pseudo}</span>
+                                                <span className="text-sm text-gray-500">@{user.username}</span>
+                                            </div>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                                            >
+                                                Déconnexion
+                                            </button>
+                                        </div>
+                                    )}
+                                    <AdminButton />
+                                    <SearchBar />
+                                    {isGuestPage && (
+                                        <>
+                                            <Link
+                                                to="/auth"
+                                                className="bg-primaryBlue text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#B0C7E6] transition text-center"
+                                            >
+                                                S'inscrire
+                                            </Link>
+                                            <Link
+                                                to="/auth"
+                                                className="bg-white text-primaryBlue border border-primaryBlue px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition text-center"
+                                            >
+                                                Se connecter
+                                            </Link>
+                                        </>
+                                    )}
+                                </div>
+                            </motion.div>
+                        </>
                     )}
-                    <a href="#" className="hover:opacity-80 transition-opacity">
-                      <SettingsIcon />
-                    </a>
-                  </div>
-                  <SearchBar />
-                  {isGuestPage && (
-                    <>
-                      <Link
-                        to="/auth"
-                        className="bg-primaryBlue text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#B0C7E6] transition text-center"
-                      >
-                        S'inscrire
-                      </Link>
-                      <Link
-                        to="/auth"
-                        className="bg-white text-primaryBlue border border-primaryBlue px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition text-center"
-                      >
-                        Se connecter
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </nav>
-    </div>
-  );
+                </AnimatePresence>
+            </nav>
+        </div>
+    );
 };
 
 export default Navbar;

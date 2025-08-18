@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { SpotifyService } from './spotify.service';
 
 @Controller()
@@ -23,5 +23,18 @@ export class SpotifyController {
   @Get('artist/:id')
   async getArtist(@Param('id') id: string) {
     return await this.spotifyService.getArtistById(id);
+  }
+
+  @Get('albums/search')
+  async searchAlbums(
+    @Query('name') name?: string,
+    @Query('year') year?: string,
+  ) {
+    return await this.spotifyService.searchAlbums({ name, year });
+  }
+
+  @Get('artists/search')
+  searchArtists(@Query('name') name?: string, @Query('genre') genre?: string) {
+    return this.spotifyService.searchArtists({ name, genre });
   }
 }

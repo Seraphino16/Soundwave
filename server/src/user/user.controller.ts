@@ -19,7 +19,10 @@ import {
   Get,
   InternalServerErrorException,
   Res,
-  Req,
+  NotFoundException,
+  UseGuards,
+  Delete,
+  Req
 } from '@nestjs/common';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
@@ -30,6 +33,7 @@ import { UserService } from './user.service';
 import { SpotifyService } from '../spotify/spotify.service';
 import { UpdateUserInfosDto } from './dto/update-user-infos.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { GoogleService } from '../google/google.service';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -43,6 +47,12 @@ import {
 } from '@nestjs/swagger';
 import { TokenService } from '../token/token.service';
 import { MailerService } from '../mailer/mailer.service';
+import { CreateUserInfosDto } from './dto/create-user-infos.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
+import { ChangePasswordDto } from './dto/change-password-dto';
+import { CurrentUser } from '../auth/decorator/current-user-decorator';
+import { JwtPayload } from 'jsonwebtoken';
+import { UpdateUserSettingsDto } from './dto/update-user-settings.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -52,6 +62,7 @@ export class UserController {
     private readonly mailerService: MailerService,
     private readonly tokenService: TokenService,
     private readonly spotifyService: SpotifyService,
+    private readonly googleService: GoogleService,
   ) {}
 
   @Post('create')
@@ -95,12 +106,15 @@ export class UserController {
   ): Promise<UserSuccess | UserErrors> {
     try {
       const userId = await this.userService.createUser(createUserDto);
+      await this.userService.createUserSettings(userId);
 
       const activationToken = this.tokenService.generateEmailValidationToken({
         email: createUserDto.email,
         username: createUserDto.username,
         id: userId,
       });
+
+      await this.userService.saveValidationToken(userId, activationToken);
 
       await this.mailerService.sendValidationEmail({
         to: createUserDto.email,
@@ -119,6 +133,35 @@ export class UserController {
       }
 
       throw UserErrors.unknownError();
+    }
+  }
+
+  @Post(':userId/infos')
+  @UseInterceptors(
+    FileInterceptor('profilePicture'),
+    FileInterceptor('bannerPicture'),
+  )
+  async createUserInfos(
+    @Param('userId') userId: number,
+    @Body() createUserInfosDto: CreateUserInfosDto,
+    @UploadedFile('profilePicture') profilePicture?: Express.Multer.File,
+    @UploadedFile('bannerPicture') bannerPicture?: Express.Multer.File,
+  ) {
+    try {
+      const userInfos = await this.userService.createUserInfos(
+        userId,
+        createUserInfosDto,
+        profilePicture,
+        bannerPicture,
+      );
+      return userInfos;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        "Erreur lors de l'enregistrement des informations utilisateur",
+      );
     }
   }
 
@@ -148,6 +191,7 @@ export class UserController {
     description: 'Erreur inconnue du serveur',
     type: UserErrors,
   })
+  @UseGuards(JwtAuthGuard)
   @Put(':userId/infos')
   @UseInterceptors(
     FileInterceptor('profilePicture'),
@@ -173,7 +217,6 @@ export class UserController {
       );
     }
   }
-
   @Get('create/spotify')
   redirectToSpotifyAuth(@Query('isLogin') isLogin: string = 'false') {
     const authUrl = this.spotifyService.generateSpotifyAuthUrl();
@@ -277,6 +320,7 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('request-artist')
   async requestArtist(
     @Body('automatic') automatic: string,
@@ -294,7 +338,7 @@ export class UserController {
       throw new BadRequestException(UserErrors.unknownError().message);
     }
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch('request-band')
   async requestBand(@Body('id') id: number): Promise<UserSuccess> {
     try {
@@ -306,5 +350,91 @@ export class UserController {
       }
       throw new BadRequestException(UserErrors.unknownError().message);
     }
+  }
+
+  @Get('create/google')
+  redirectToGoogleAuth() {
+    const baseUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      throw new InternalServerErrorException('Google client ID non défini');
+    }
+
+    const params = new URLSearchParams();
+    params.set('client_id', process.env.GOOGLE_CLIENT_ID);
+    params.set(
+      'redirect_uri',
+      'http://localhost:5001/users/create/google/callback',
+    );
+    params.set('response_type', 'code');
+    params.set('scope', 'openid email profile');
+    params.set('access_type', 'offline');
+    params.set('prompt', 'consent');
+
+    return { url: `${baseUrl}?${params.toString()}` };
+  }
+
+  @Get('create/google/callback')
+  async googleCallback(@Query('code') code: string, @Res() res) {
+    try {
+      const user = await this.googleService.registerWithGoogle(code);
+      return res.status(201).json(UserSuccess.userCreated(user.id));
+    } catch (error) {
+      if (error instanceof UserErrors) {
+        return res.status(400).json(error);
+      }
+
+      return res.status(500).json(UserErrors.unknownError());
+    }
+  }
+
+  @Get(':userId/profile')
+  @ApiOperation({ summary: 'Récupérer le profil utilisateur complet' })
+  @ApiOkResponse({ description: 'Profil utilisateur retourné avec succès' })
+  @ApiNotFoundResponse({ description: 'Utilisateur non trouvé' })
+  async getUserProfile(@Param('userId') userId: number) {
+    try {
+      return await this.userService.getUserProfile(userId);
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        'Erreur lors de la récupération du profil',
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/:id/password')
+  async changePassword(
+    @Param('id') id: number,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.userService.changePassword(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/:id')
+  async deleteUser(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
+    console.log('User in deleteUser:', user);
+    if (user.id !== Number(id)) {
+      return UserErrors.permissionDeletedAccountDenied();
+    }
+
+    return this.userService.deleteAccount(user.id, user.email, user.username);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/settings/:user_id')
+  async getSettings(@Param('user_id') user_id: number) {
+    return this.userService.getUserSettings(user_id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/settings/:user_id')
+  async updateSettings(
+    @Param('user_id') user_id: number,
+    @Body() dto: UpdateUserSettingsDto,
+  ) {
+    return this.userService.updateUserSettings(user_id, dto);
   }
 }

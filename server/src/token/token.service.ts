@@ -35,8 +35,8 @@ export class TokenService {
   }
 
   generateLoginToken(generateTokenDto: GenerateTokenDto): string {
-    const { username, id } = generateTokenDto;
-    const payload = { username, id };
+    const { username, id, email } = generateTokenDto;
+    const payload = { username, id, email };
     return this.jwtService.sign(payload, { expiresIn: '24h' });
   }
 

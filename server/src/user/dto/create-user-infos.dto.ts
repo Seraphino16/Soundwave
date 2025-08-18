@@ -45,9 +45,8 @@ export class CreateUserInfosDto {
   @ApiProperty()
   @IsOptional()
   @IsObject()
-  @ValidateNested()
-  @Type(() => Object)
   socialLinks?: { [network: string]: string };
+
 
   @ApiProperty()
   @IsDate()

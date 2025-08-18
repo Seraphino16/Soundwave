@@ -176,4 +176,58 @@ export class UserErrors extends Error {
       "Le compte doit d'abord être enregisté comme artiste",
     );
   }
+
+  static permissionDeletedAccountDenied() {
+    return new UserErrors(
+      'error',
+      403,
+      "Vous n'avez pas l'autorisation de supprimer ce compte",
+    );
+  }
+
+  static userInfosAlreadyExist() {
+    return new UserErrors(
+      'error',
+      409,
+      'Les informations utilisateur existent déjà',
+    );
+  }
+
+  static photoDownloadError() {
+    return new UserErrors(
+      'error',
+      500,
+      'Erreur lors du téléchargement de la photo de profile',
+    );
+  }
+
+  static oldPasswordRequired() {
+    return new UserErrors(
+      'error',
+      400,
+      'L’ancien mot de passe est requis pour le changement',
+    );
+  }
+
+  static oldPasswordDoNotMatch() {
+    return new UserErrors('error', 401, 'Ancien mot de passe incorrect');
+  }
+
+  static settingsNotFound(userId: number) {
+    return new UserErrors(
+      'error',
+      404,
+      'Paramètres non trouvés pour cet utilisateur',
+      userId,
+    );
+  }
+
+  static settingsDoNotUpdate(userId: number) {
+    return new UserErrors(
+      'error',
+      500,
+      "Une erreur est survenue lors de la mise à jour des paramètre de l'utilisateur",
+      userId,
+    );
+  }
 }

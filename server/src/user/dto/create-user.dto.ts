@@ -13,6 +13,8 @@ import { UserErrors } from '../errors/user.errors';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
+  id?: number;
+
   @IsNotEmpty({ message: UserErrors.emailRequired().message })
   @IsEmail({}, { message: UserErrors.emailInvalid().message })
   email: string;
@@ -101,6 +103,7 @@ export class CreateUserDto {
   @IsOptional()
   spotifyId: string;
 
+  @IsOptional()
   @IsIn(['USER', 'ADMIN', 'ARTIST', 'BAND'], {
     each: true,
     message: UserErrors.missingRequiredFields().message,
@@ -121,6 +124,7 @@ export class CreateUserDto {
     example: true,
   })
   @IsBoolean()
+  @IsOptional()
   is_verified: boolean;
 
   @ApiProperty({
@@ -128,12 +132,14 @@ export class CreateUserDto {
     example: true,
   })
   @IsBoolean()
+  @IsOptional()
   is_active: boolean;
 
   @ApiProperty({
     description: "Date de création de l'utilisateur",
     example: '2023-01-01T00:00:00Z',
   })
+  @IsOptional()
   @IsDateString()
   createdAt: Date;
 
@@ -141,6 +147,7 @@ export class CreateUserDto {
     description: "Date de mise à jour de l'utilisateur",
     example: '2023-01-01T00:00:00Z',
   })
+  @IsOptional()
   @IsDateString()
   updatedAt: Date;
 }

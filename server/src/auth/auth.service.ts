@@ -61,10 +61,10 @@ export class AuthService {
     };
   }
 
-  private async getUserByUsernameOrEmail(username: string, email: string) {
+  private async getUserByUsernameOrEmail(username?: string, email?: string) {
     if (email) {
       return this.userRepository.findByEmail(email);
     }
-    return this.userRepository.findByUsername(username);
+    return this.userRepository.findByUsername(username as string);
   }
 }
