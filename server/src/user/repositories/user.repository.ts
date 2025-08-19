@@ -29,6 +29,11 @@ export class UserRepository {
   async findByUsername(username: string): Promise<User | null> {
     return this.userModel.findOne({ username }).exec();
   }
+
+  async findBySpotifyId(spotifyId: string): Promise<User | null> {
+    return this.userModel.findOne({ spotifyId }).exec();
+  }
+
   async findById(id: number): Promise<User | null> {
     return this.userModel.findOne({ id }).exec();
   }

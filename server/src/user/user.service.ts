@@ -1,3 +1,8 @@
+/**
+ * @description Service pour la gestion des utilisateurs
+ * @author SoundWave
+ */
+
 import {
   Injectable,
   BadRequestException,
@@ -186,6 +191,7 @@ export class UserService {
 
     return UserSuccess.userInfosInsert().message;
   }
+
   async createUserWithSpotify(spotifyUser: any): Promise<any> {
     const existingUserByEmail = await this.userRepository.findByEmail(
       spotifyUser.email,
@@ -231,7 +237,7 @@ export class UserService {
 
     const createUserInfosDto = {
       user_id: newUser.id,
-      profile_picture: spotifyUser.images[0]?.url || '',
+      profile_picture: spotifyUser.images?.[0]?.url || '',
       banner_picture: '',
       bio: '',
       location: '',
@@ -244,6 +250,23 @@ export class UserService {
     await this.userInfosRepository.create(createUserInfosDto);
 
     return newUser;
+  }
+
+  async loginWithSpotify(spotifyUser: any): Promise<any> {
+    const user =
+      (spotifyUser.id &&
+        (await this.userRepository.findBySpotifyId(spotifyUser.id))) ||
+      (spotifyUser.email &&
+        (await this.userRepository.findByEmail(spotifyUser.email)));
+
+    if (!user) {
+      throw new NotFoundException('Aucun compte associé à ce compte Spotify.');
+    }
+    return user;
+  }
+
+  async findUserById(id: number): Promise<User | null> {
+    return await this.userRepository.findById(id);
   }
 
   async getSpotifyUserData(accessToken: string): Promise<any> {

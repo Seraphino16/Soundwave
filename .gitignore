@@ -11,3 +11,5 @@
 **/google-maps-api-key*
 **/api-keys*
 .DS_Store
+
+package-lock.json

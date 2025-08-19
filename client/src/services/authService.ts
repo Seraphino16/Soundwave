@@ -7,7 +7,6 @@ const API_URL = "http://localhost:5001";
 
 export const registerUser = async (userData: any) => {
     try {
-        console.log("Registering user with data:", userData);
         const response = await fetch(`${API_URL}/users/create`, {
             method: "POST",
             headers: {
@@ -18,7 +17,6 @@ export const registerUser = async (userData: any) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Register Error Response:", errorData);
             throw new Error(errorData.message || "Échec de l'enregistrement de l'utilisateur");
         }
 
@@ -31,27 +29,30 @@ export const registerUser = async (userData: any) => {
 
 export const loginUser = async (loginData: any) => {
     try {
-        console.log("Logging in user with data:", loginData);
+        console.log("Tentative de connexion avec:", loginData);
+        
         const response = await fetch(`${API_URL}/auth`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify(loginData),
         });
 
+        console.log("Réponse de connexion - Status:", response.status);
+
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Login Error Response:", errorData);
             throw new Error(errorData.message || "Échec de la connexion de l'utilisateur");
         }
 
-        const userData = await response.json();
-
-        localStorage.setItem("user", JSON.stringify(userData));
-
-        return userData;
+        const result = await response.json();
+        console.log("Connexion réussie:", result);
+        
+        return result;
     } catch (error) {
+        console.error("Erreur de connexion:", error);
         throw error;
     }
 };

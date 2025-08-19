@@ -9,9 +9,7 @@ import { Link } from "react-router-dom";
 const HomePageGuest: React.FC = () => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-start relative">
-      {/* Background Image Container */}
       <div className="absolute top-0 left-0 w-full h-[70vh] bg-cover bg-center flex items-center justify-center" style={{ backgroundImage: "url('/background.jpg')" }}>
-        {/* White Content Box Centered on Image */}
         <div className="relative max-w-4xl text-center bg-white p-12 rounded-xl shadow-lg border border-gray-300 bg-opacity-95">
           <h1 className="text-4xl font-bold text-primaryBlue mb-6">Bienvenue sur SoundWave</h1>
           <p className="text-lg text-text-200 mb-6">
