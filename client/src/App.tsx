@@ -14,6 +14,7 @@ import AdminPanel from './pages/AdminPanel';
 import UserManagement from './pages/UserManagement';
 import AdminDashboard from './pages/AdminDashboard';
 import Events from './pages/Events';
+import Footer from "./components/footer/Footer";
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/events" element={<Events />} />
           </Routes>
         </div>
+        <Footer />
       </div>
     </Router>
   );
