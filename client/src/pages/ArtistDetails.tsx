@@ -4,7 +4,7 @@ import {
     fetchArtistById,
     fetchAlbumsByArtistId
 } from "../services/spotifyService";
-import AlbumCard from "../components/cards/AlbumCard"; // ✅ Import du composant
+import AlbumCard from "../components/cards/AlbumCard";
 
 interface Artist {
     id: string;
@@ -63,38 +63,36 @@ const ArtistDetail: React.FC = () => {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <div className="bg-white shadow-xl rounded-lg p-10 w-full max-w-5xl text-center">
-                {/* Artist Details */}
-                <h1 className="text-4xl font-bold text-primaryBlue mb-6">{artist.name}</h1>
+            <div className="bg-white shadow-xl rounded-lg p-10 w-full max-w-5xl">
 
-                <img
-                    src={artist.image || "/default-avatar.png"}
-                    alt={artist.name}
-                    className="w-56 h-56 object-cover rounded-full mx-auto mb-6 shadow-md border"
-                />
+                <div className="mb-10 w-full max-w-3xl mx-auto">
+                    <h1 className="text-4xl font-bold text-primaryBlue text-center mb-10">{artist.name}</h1>
 
-                <div className="text-lg text-gray-700 space-y-3 mb-6">
-                    <p><strong>Followers:</strong> {artist.followers.toLocaleString()}</p>
-                    <p><strong>Popularité:</strong> {artist.popularity}/100</p>
-                    <p>
-                        <strong>Genres:</strong>{" "}
-                        {artist.genres.length > 0 ? artist.genres.join(", ") : "Non spécifié"}
-                    </p>
+                    <div className="flex flex-col md:flex-row items-center md:items-center justify-center gap-8 md:gap-20">
+                        <img
+                            src={artist.image || "/default-avatar.png"}
+                            alt={artist.name}
+                            className="w-56 h-56 object-cover rounded-full shadow-md border"
+                        />
+
+                        <div className="text-center md:text-left">
+                            <div className="text-lg text-gray-700 space-y-2">
+                                <p><strong>Followers:</strong> {artist.followers.toLocaleString()}</p>
+                                <p><strong>Popularité:</strong> {artist.popularity}/100</p>
+                                <p>
+                                    <strong>Genres:</strong>{" "}
+                                    {artist.genres.length > 0
+                                        ? artist.genres.join(", ")
+                                        : "Non spécifié"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <a
-                    href={artist.spotifyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block px-5 py-3 bg-primaryBlue text-white rounded-md hover:bg-blue-700 transition"
-                >
-                    Écouter sur Spotify
-                </a>
-
-                {/* Albums */}
                 {albums.length > 0 && (
                     <>
-                        <h2 className="text-2xl font-semibold text-primaryBlue mt-12 mb-6">Albums</h2>
+                        <h2 className="text-2xl font-semibold text-primaryBlue mt-8 mb-4">Albums</h2>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {albums.map((album) => (
