@@ -4,7 +4,7 @@
  */
 
 
-import React, { createContext, useState, useContext, ReactNode, useCallback } from "react";
+import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from "react";
 
 interface User {
   _id: string;
@@ -34,7 +34,7 @@ const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUserState] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true); // Commencer en loading pour vérifier l'auth au démarrage
 
   const fetchUser = useCallback(async () => {
     setLoading(true);
@@ -96,6 +96,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     setUserState(null);
   }, []);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   return <UserContext.Provider value={{ user, loading, setUser, logout, refreshUser, checkAuth }}>{children}</UserContext.Provider>;
 };

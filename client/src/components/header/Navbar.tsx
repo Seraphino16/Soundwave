@@ -89,9 +89,9 @@ const Navbar = () => {
             <a href="#" className="hover:opacity-80 transition-opacity">
               <MessagesIcon />
             </a>
-            <a href="#" className="hover:opacity-80 transition-opacity">
+            <Link to="/settings" className="hover:opacity-80 transition-opacity">
               <ProfileIcon />
-            </a>
+            </Link>
             {shouldShowUserInfo && (
               <div className="flex items-center space-x-4 ml-4">
                 <div className="flex flex-col items-end">
@@ -103,10 +103,10 @@ const Navbar = () => {
                 </button>
               </div>
             )}
-            <a href="#" className="hover:opacity-80 transition-opacity">
+            <Link to="/settings?tab=settings" className="hover:opacity-80 transition-opacity">
               <SettingsIcon />
-            </a>
-                        <AdminButton />
+            </Link>
+            <AdminButton />
           </div>
         )}
         <div className="block lg:hidden">
