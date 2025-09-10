@@ -34,7 +34,7 @@ const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUserState] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // Commencer en loading pour vérifier l'auth au démarrage
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchUser = useCallback(async () => {
     setLoading(true);

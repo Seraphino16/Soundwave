@@ -20,7 +20,6 @@ const LogoutSection: React.FC<LogoutSectionProps> = ({ onLogout }) => {
     setIsLoggingOut(true);
     try {
       await logout();
-      // Redirection vers la page d'accueil après déconnexion
       navigate('/');
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
