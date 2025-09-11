@@ -16,6 +16,8 @@ const EditProfileTab: React.FC = () => {
     bio: "",
     location: "",
     musicPreferences: "",
+    profile_picture: "",
+    banner_picture: "",
   });
   const [usernameError, setUsernameError] = useState("");
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'updating' | 'success' | 'error'>('idle');
@@ -34,6 +36,8 @@ const EditProfileTab: React.FC = () => {
         bio: userProfile.bio || "",
         location: userProfile.location || "",
         musicPreferences: userProfile.musicPreferences || "",
+        profile_picture: userProfile.profile_picture || "",
+        banner_picture: userProfile.banner_picture || "",
       });
     }
   }, [userProfile]);
@@ -132,14 +136,14 @@ const EditProfileTab: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center space-x-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border">
           <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-            {userProfile?.profilePicture ? (
+            {userProfile?.profile_picture ? (
               <img 
-                src={userProfile.profilePicture} 
+                src={userProfile.profile_picture} 
                 alt="Photo de profil" 
                 className="w-full h-full rounded-full object-cover"
               />
             ) : (
-              <span className="text-white text-2xl font-bold">
+              <span className="text-red-500 text-2xl font-bold">
                 {userProfile?.pseudo?.charAt(0).toUpperCase() || user.pseudo?.charAt(0).toUpperCase() || 'U'}
               </span>
             )}

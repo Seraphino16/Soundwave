@@ -28,8 +28,8 @@ interface UserProfile {
     Deezer?: string;
     Facebook?: string;
   };
-  profilePicture?: string;
-  bannerPicture?: string;
+  profile_picture?: string;
+  banner_picture?: string;
   followers?: number;
   following?: number;
   totalPlaylists?: number;
