@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     fetchArtistById,
     fetchAlbumsByArtistId
@@ -24,6 +24,7 @@ interface Album {
 
 const ArtistDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate(); // 🔹 Ajout du hook pour navigation
     const [artist, setArtist] = useState<Artist | null>(null);
     const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(true);
@@ -63,10 +64,19 @@ const ArtistDetail: React.FC = () => {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <div className="bg-white shadow-xl rounded-lg p-10 w-full max-w-5xl">
+            <div className="bg-white shadow-xl rounded-lg p-10 w-full max-w-5xl relative">
+
+                <button
+                    onClick={() => navigate("/artists")}
+                    className="absolute top-6 left-6 text-primaryBlue font-semibold hover:underline"
+                >
+                    ←  Retour
+                </button>
 
                 <div className="mb-10 w-full max-w-3xl mx-auto">
-                    <h1 className="text-4xl font-bold text-primaryBlue text-center mb-10">{artist.name}</h1>
+                    <h1 className="text-4xl font-bold text-primaryBlue text-center mb-10">
+                        {artist.name}
+                    </h1>
 
                     <div className="flex flex-col md:flex-row items-center md:items-center justify-center gap-8 md:gap-20">
                         <img
@@ -92,7 +102,9 @@ const ArtistDetail: React.FC = () => {
 
                 {albums.length > 0 && (
                     <>
-                        <h2 className="text-2xl font-semibold text-primaryBlue mt-8 mb-4">Albums</h2>
+                        <h2 className="text-2xl font-semibold text-primaryBlue mt-8 mb-4">
+                            Albums
+                        </h2>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {albums.map((album) => (
