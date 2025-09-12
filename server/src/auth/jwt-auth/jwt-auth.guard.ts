@@ -20,6 +20,10 @@ export class JwtAuthGuard implements CanActivate {
       token = request.cookies?.token;
     }
 
+      if (!token && request.cookies) {
+          token = request.cookies['token'];
+      }
+
     if (!token) {
       throw new UnauthorizedException(AuthErrors.unauthorized().message);
     }

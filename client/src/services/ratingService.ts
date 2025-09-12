@@ -53,8 +53,7 @@ export const addOrUpdateRating = async (artistId: number, score: number) => {
         const response = await fetch(`${API_URL}/ratings`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                //authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+                "Content-Type": "application/json"
             },
             credentials: "include",
             body: JSON.stringify({
@@ -63,7 +62,6 @@ export const addOrUpdateRating = async (artistId: number, score: number) => {
             }),
         });
 
-        //console.log(process.env.REACT_APP_API_KEY);
 
         if (!response.ok) {
             const errorData = await response.json();

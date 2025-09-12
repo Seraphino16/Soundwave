@@ -18,7 +18,6 @@ export class RatingsController {
     return this.ratingsService.getSummary(artistId);
   }
 
-  /*
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() dto: CreateRatingDto, @Req() req) {
@@ -26,5 +25,5 @@ export class RatingsController {
     const username = req.user.username;
     return this.ratingsService.create(dto, userId, username);
   }
-   */
+
 }
