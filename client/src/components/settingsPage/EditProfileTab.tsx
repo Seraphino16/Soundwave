@@ -15,12 +15,13 @@ const EditProfileTab: React.FC = () => {
     username: "",
     bio: "",
     location: "",
-    musicPreferences: "",
+    musicStyle: [] as string[],
     profile_picture: "",
     banner_picture: "",
   });
   const [usernameError, setUsernameError] = useState("");
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'updating' | 'success' | 'error'>('idle');
+  const [newMusicPreference, setNewMusicPreference] = useState("");
 
   useEffect(() => {
     if (user && user.id) {
@@ -35,7 +36,7 @@ const EditProfileTab: React.FC = () => {
         username: userProfile.username || "",
         bio: userProfile.bio || "",
         location: userProfile.location || "",
-        musicPreferences: userProfile.musicPreferences || "",
+        musicStyle: Array.isArray(userProfile.musicStyle) ? userProfile.musicStyle : [],
         profile_picture: userProfile.profile_picture || "",
         banner_picture: userProfile.banner_picture || "",
       });
@@ -68,6 +69,32 @@ const EditProfileTab: React.FC = () => {
         ...prev,
         [name]: value,
       }));
+    }
+  };
+
+  const addMusicPreference = () => {
+    if (newMusicPreference.trim() && 
+        formData.musicStyle.length < 5 && 
+        !formData.musicStyle.includes(newMusicPreference.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        musicStyle: [...prev.musicStyle, newMusicPreference.trim()]
+      }));
+      setNewMusicPreference("");
+    }
+  };
+
+  const removeMusicPreference = (indexToRemove: number) => {
+    setFormData(prev => ({
+      ...prev,
+      musicStyle: prev.musicStyle.filter((_, index) => index !== indexToRemove)
+    }));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addMusicPreference();
     }
   };
 
@@ -262,15 +289,67 @@ const EditProfileTab: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Préférences musicales</label>
-            <input
-              type="text"
-              name="musicPreferences"
-              value={formData.musicPreferences}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Écrivez ici vos préférences musicales..."
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Styles musicaux ({formData.musicStyle.length}/5)
+            </label>
+            
+            {/* Zone d'ajout */}
+            <div className="flex gap-2 mb-3">
+              <input
+                type="text"
+                value={newMusicPreference}
+                onChange={(e) => setNewMusicPreference(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Ex: Rock, Jazz, Electronic..."
+                maxLength={30}
+                disabled={formData.musicStyle.length >= 5}
+              />
+              <button
+                type="button"
+                onClick={addMusicPreference}
+                disabled={!newMusicPreference.trim() || 
+                         formData.musicStyle.length >= 5 || 
+                         formData.musicStyle.includes(newMusicPreference.trim())}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Ajouter
+              </button>
+            </div>
+
+            {/* Cartes des préférences */}
+            {formData.musicStyle.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {formData.musicStyle.map((preference, index) => (
+                  <div
+                    key={index}
+                    className="inline-flex items-center gap-2 px-3 py-2 bg-sky-400 text-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                  >
+                    <span className="font-medium">{preference}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeMusicPreference(index)}
+                      className="ml-1 w-4 h-4 flex items-center justify-center rounded-full bg-gray-300 transition-colors"
+                      title="Supprimer cette préférence"
+                    >
+                      <span className="text-xs font-bold">×</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {formData.musicStyle.length === 0 && (
+              <p className="text-sm text-gray-500 italic">
+                Aucune préférence musicale ajoutée. Ajoutez jusqu'à 5 genres que vous aimez !
+              </p>
+            )}
+
+            {formData.musicStyle.length >= 5 && (
+              <p className="text-sm text-orange-600">
+                ⚠️ Limite atteinte : vous avez ajouté le maximum de 5 Styles musicaux.
+              </p>
+            )}
           </div>
 
           <div className="bg-purple-50 border border-purple-200 p-4 rounded-lg">

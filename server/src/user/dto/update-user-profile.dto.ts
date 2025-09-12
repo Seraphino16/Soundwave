@@ -24,11 +24,6 @@ export class UpdateUserProfileDto {
 
   @ApiProperty()
   @IsOptional()
-  @IsString()
-  musicPreferences?: string;
-
-  @ApiProperty()
-  @IsOptional()
   @IsArray()
   musicStyle?: string[];
 }

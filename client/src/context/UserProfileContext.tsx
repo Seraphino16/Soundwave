@@ -20,7 +20,7 @@ interface UserProfile {
   verification_token: string;
   bio?: string;
   location?: string;
-  musicPreferences?: string;
+  musicStyle?: string[];
   socialLinks?: {
     instagram?: string;
     twitter?: string;
@@ -38,7 +38,6 @@ interface UserProfile {
   lastActive?: string;
   accountType?: 'free' | 'premium' | 'artist';
   spotifyId?: string;
-  musicStyle?: string[];
 }
 
 interface UserProfileContextProps {

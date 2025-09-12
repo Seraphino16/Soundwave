@@ -431,7 +431,7 @@ export class UserService {
       await this.userRepository.save(user);
     }
 
-    if (updateData.bio !== undefined || updateData.location !== undefined || updateData.musicPreferences !== undefined || updateData.musicStyle !== undefined) {
+    if (updateData.bio !== undefined || updateData.location !== undefined || updateData.musicStyle !== undefined || updateData.musicStyle !== undefined) {
       const userInfosUpdateData: any = {};
       
       if (updateData.bio !== undefined) {
@@ -440,6 +440,10 @@ export class UserService {
       
       if (updateData.location !== undefined) {
         userInfosUpdateData.location = updateData.location;
+      }
+      
+      if (updateData.musicStyle !== undefined) {
+        userInfosUpdateData.musicStyle = updateData.musicStyle;
       }
       
       if (updateData.musicStyle !== undefined) {
