@@ -19,6 +19,7 @@ import { GoogleService } from './google/google.service';
 import { GoogleController } from './google/google.controller';
 import { GoogleModule } from './google/google.module';
 import { UtilsModule } from './utils/utils.module';
+import { RatingsModule } from './ratings/ratings.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UtilsModule } from './utils/utils.module';
     SpotifyModule,
     GoogleModule,
     UtilsModule,
+    RatingsModule,
   ],
   controllers: [
     AppController,

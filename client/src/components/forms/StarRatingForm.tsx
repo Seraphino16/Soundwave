@@ -9,12 +9,11 @@ interface Rating {
 }
 
 const ArtistRatingSection: React.FC = () => {
-    const { id: artistId } = useParams<{ id: string }>(); // id de l'artiste (Spotify ou interne)
+    const { id: artistId } = useParams<{ id: string }>();
     const [selected, setSelected] = useState<number>(0);
     const [ratings, setRatings] = useState<Rating[]>([]);
     const [average, setAverage] = useState<number>(0);
 
-    // Charger les notes au montage
     useEffect(() => {
         if (!artistId) return;
 
@@ -43,13 +42,13 @@ const ArtistRatingSection: React.FC = () => {
         setSelected(value);
 
         try {
-            const token = localStorage.getItem("token"); // JWT stocké côté client
+            const token = localStorage.getItem("token");
 
             const res = await fetch("http://localhost:3000/ratings", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`, // envoi du token JWT
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     artistId,
@@ -61,7 +60,6 @@ const ArtistRatingSection: React.FC = () => {
                 throw new Error("Impossible d'enregistrer la note");
             }
 
-            // Recharge les notes après ajout
             const updatedRatings = await fetch(
                 `http://localhost:3000/ratings/${artistId}`
             ).then((r) => r.json());
