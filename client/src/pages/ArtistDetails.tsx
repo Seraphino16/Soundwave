@@ -5,6 +5,8 @@ import {
     fetchAlbumsByArtistId
 } from "../services/spotifyService";
 import AlbumCard from "../components/cards/AlbumCard";
+import ArtistRatingSection from "components/forms/StarRatingForm";
+import WavesDetails from "components/waves/WavesDetails";
 
 interface Artist {
     id: string;
@@ -24,7 +26,7 @@ interface Album {
 
 const ArtistDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate(); // 🔹 Ajout du hook pour navigation
+    const navigate = useNavigate();
     const [artist, setArtist] = useState<Artist | null>(null);
     const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(true);
@@ -118,6 +120,11 @@ const ArtistDetail: React.FC = () => {
                         </div>
                     </>
                 )}
+
+                <ArtistRatingSection />
+
+                <WavesDetails />
+
             </div>
         </div>
     );
