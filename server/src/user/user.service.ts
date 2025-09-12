@@ -391,6 +391,7 @@ export class UserService {
       username: user.username,
       pseudo: user.pseudo,
       birthdate: user.birthdate,
+      email: user.email,
       roles: user.roles,
       is_verified: user.is_verified,
       is_active: user.is_active,
@@ -405,6 +406,69 @@ export class UserService {
         socialLinks: userInfos.socialLinks,
       }),
     };
+  }
+
+  async updateUserProfile(userId: number, updateData: any): Promise<any> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException(UserErrors.userNotFound().message);
+    }
+
+    if (updateData.pseudo || updateData.username) {
+      if (updateData.pseudo) {
+        user.pseudo = updateData.pseudo;
+      }
+      
+      if (updateData.username) {
+        const existingUser = await this.userRepository.findByUsername(updateData.username);
+        if (existingUser && existingUser.id !== userId) {
+          throw new BadRequestException('Ce nom d\'utilisateur est déjà utilisé');
+        }
+        user.username = updateData.username;
+      }
+
+      user.updatedAt = new Date();
+      await this.userRepository.save(user);
+    }
+
+    if (updateData.bio !== undefined || updateData.location !== undefined || updateData.musicPreferences !== undefined || updateData.musicStyle !== undefined) {
+      const userInfosUpdateData: any = {};
+      
+      if (updateData.bio !== undefined) {
+        userInfosUpdateData.bio = updateData.bio;
+      }
+      
+      if (updateData.location !== undefined) {
+        userInfosUpdateData.location = updateData.location;
+      }
+      
+      if (updateData.musicStyle !== undefined) {
+        userInfosUpdateData.musicStyle = updateData.musicStyle;
+      }
+
+      userInfosUpdateData.updatedAt = new Date();
+
+      const existingUserInfos = await this.userInfosRepository.findByUserId(userId);
+      if (existingUserInfos) {
+        await this.userInfosRepository.update(userId, userInfosUpdateData);
+      } else {
+        const id = await this.userInfosRepository.setId();
+        const createUserInfosData = {
+          id,
+          user_id: userId,
+          profile_picture: '',
+          banner_picture: '',
+          bio: updateData.bio || '',
+          location: updateData.location || '',
+          musicStyle: updateData.musicStyle || [],
+          socialLinks: {},
+          ...userInfosUpdateData
+        };
+        await this.userInfosRepository.create(createUserInfosData);
+      }
+    }
+
+    return await this.getUserProfile(userId);
   }
 
   async changePassword(userId: number, dto: ChangePasswordDto) {
