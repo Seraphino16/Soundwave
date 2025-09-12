@@ -134,51 +134,71 @@ const EditProfileTab: React.FC = () => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Profil</h2>
 
       <div className="space-y-6">
-        <div className="flex space-x-6 p-6 bg-gray-100 rounded-lg border shadow-xl">
-          <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex">
-            {userProfile?.profile_picture ? (
+        <div className="bg-gray-100 rounded-lg border shadow-xl overflow-hidden">
+          {/* Bannière */}
+          <div className="w-full h-32 relative">
+            {userProfile?.banner_picture ? (
               <img 
-                src={userProfile.profile_picture} 
-                alt="Photo de profil" 
-                className="w-full h-full rounded-full object-cover"
+                src={userProfile.banner_picture} 
+                alt="Bannière de profil" 
+                className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-red-500 text-2xl font-bold">
-                {userProfile?.pseudo?.charAt(0).toUpperCase() || user.pseudo?.charAt(0).toUpperCase() || 'U'}
-              </span>
+              <img 
+                src="https://placehold.co/1500x500?text=Placeholder" 
+                alt="Bannière placeholder" 
+                className="w-full h-full object-cover"
+              />
             )}
           </div>
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold text-gray-800">{userProfile?.pseudo || user.pseudo}</h3>
-            <p className="text-gray-600 font-mono">{userProfile?.username || user.username}</p>
-            <p className="text-sm text-gray-500">{userProfile?.email || user.email}</p>
-            
-            {/* Statistiques du profil */}
-            <div className="flex items-center space-x-4 mt-3">
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-600">{userProfile?.followers || 0}</div>
-                <div className="text-xs text-gray-500">Abonnés</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-purple-600">{userProfile?.following || 0}</div>
-                <div className="text-xs text-gray-500">Abonnements</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-green-600">{userProfile?.totalPlaylists || 0}</div>
-                <div className="text-xs text-gray-500">Playlists</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-orange-600">{userProfile?.totalEvents || 0}</div>
-                <div className="text-xs text-gray-500">Événements</div>
-              </div>
+          
+          {/* Section profil avec avatar */}
+          <div className="flex space-x-6 p-6">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex -mt-16 relative border-4 border-white">
+              {userProfile?.profile_picture ? (
+                <img 
+                  src={userProfile.profile_picture} 
+                  alt="Photo de profil" 
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                <span className="text-white text-2xl font-bold flex items-center justify-center w-full h-full">
+                  {userProfile?.pseudo?.charAt(0).toUpperCase() || user.pseudo?.charAt(0).toUpperCase() || 'U'}
+                </span>
+              )}
             </div>
-            
-            <button className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              Changer la photo
-            </button>
-            <button className="mt-3 ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              Changer la bannière
-            </button>
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold text-gray-800">{userProfile?.pseudo || user.pseudo}</h3>
+              <p className="text-gray-600 font-mono">{userProfile?.username || user.username}</p>
+              <p className="text-sm text-gray-500">{userProfile?.email || user.email}</p>
+              
+              {/* Statistiques du profil */}
+              <div className="flex items-center space-x-4 mt-3">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-blue-600">{userProfile?.followers || 0}</div>
+                  <div className="text-xs text-gray-500">Abonnés</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-purple-600">{userProfile?.following || 0}</div>
+                  <div className="text-xs text-gray-500">Abonnements</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-green-600">{userProfile?.totalPlaylists || 0}</div>
+                  <div className="text-xs text-gray-500">Playlists</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-orange-600">{userProfile?.totalEvents || 0}</div>
+                  <div className="text-xs text-gray-500">Événements</div>
+                </div>
+              </div>
+              
+              <button className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                Changer la photo
+              </button>
+              <button className="mt-3 ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                Changer la bannière
+              </button>
+            </div>
           </div>
         </div>
 
