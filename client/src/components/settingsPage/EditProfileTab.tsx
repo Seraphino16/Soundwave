@@ -134,8 +134,8 @@ const EditProfileTab: React.FC = () => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Profil</h2>
 
       <div className="space-y-6">
-        <div className="flex items-center space-x-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border">
-          <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
+        <div className="flex space-x-6 p-6 bg-gray-100 rounded-lg border shadow-xl">
+          <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex">
             {userProfile?.profile_picture ? (
               <img 
                 src={userProfile.profile_picture} 
@@ -175,6 +175,9 @@ const EditProfileTab: React.FC = () => {
             
             <button className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
               Changer la photo
+            </button>
+            <button className="mt-3 ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+              Changer la bannière
             </button>
           </div>
         </div>
