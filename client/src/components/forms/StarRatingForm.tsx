@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+    getRatings,
+    getRatingSummary,
+    addOrUpdateRating,
+} from "../../services/ratingService";
 
 interface Rating {
-    id: number;
+    id: string;
     username: string;
     score: number;
     createdAt: string;
@@ -14,60 +19,37 @@ const ArtistRatingSection: React.FC = () => {
     const [ratings, setRatings] = useState<Rating[]>([]);
     const [average, setAverage] = useState<number>(0);
 
+    // Charger les notes et la moyenne
     useEffect(() => {
         if (!artistId) return;
 
-        const fetchRatings = async () => {
+        const fetchData = async () => {
             try {
-                const res = await fetch(`http://localhost:3000/ratings/${artistId}`);
-                const data: Rating[] = await res.json();
-                setRatings(data);
+                const ratingsData = await getRatings(Number(artistId));
+                setRatings(ratingsData);
 
-                const summaryRes = await fetch(
-                    `http://localhost:3000/ratings/${artistId}/summary`
-                );
-                const summary = await summaryRes.json();
+                const summary = await getRatingSummary(Number(artistId));
                 setAverage(summary.average || 0);
             } catch (error) {
                 console.error("Erreur lors du chargement des notes :", error);
             }
         };
 
-        fetchRatings();
+        fetchData();
     }, [artistId]);
 
+    // Envoyer une nouvelle note
     const handleRatingClick = async (value: number) => {
         if (!artistId) return;
-
         setSelected(value);
 
         try {
-            const token = localStorage.getItem("token");
+            await addOrUpdateRating(Number(artistId), value);
 
-            const res = await fetch("http://localhost:3000/ratings", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    artistId,
-                    score: value,
-                }),
-            });
+            const ratingsData = await getRatings(Number(artistId));
+            setRatings(ratingsData);
 
-            if (!res.ok) {
-                throw new Error("Impossible d'enregistrer la note");
-            }
-
-            const updatedRatings = await fetch(
-                `http://localhost:3000/ratings/${artistId}`
-            ).then((r) => r.json());
-            setRatings(updatedRatings);
-
-            const summary = await fetch(
-                `http://localhost:3000/ratings/${artistId}/summary`
-            ).then((r) => r.json());
+            const summary = await getRatingSummary(Number(artistId));
             setAverage(summary.average || 0);
 
             alert(`Merci pour votre note de ${value} étoile(s) !`);
@@ -132,6 +114,27 @@ const ArtistRatingSection: React.FC = () => {
                         {ratings.length > 1 ? "s" : ""})
                     </p>
                 </div>
+            </div>
+
+            {/* Liste des notes */}
+            <div className="mt-8">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                    Dernières notes :
+                </h3>
+                <ul className="space-y-2">
+                    {ratings.map((r) => (
+                        <li
+                            key={r.id}
+                            className="border-b border-gray-200 pb-2 text-center md:text-left"
+                        >
+                            <span className="font-medium">{r.username}</span> :{" "}
+                            <span className="text-yellow-500">{r.score} ★</span>{" "}
+                            <span className="text-gray-400 text-sm">
+                ({new Date(r.createdAt).toLocaleDateString()})
+              </span>
+                        </li>
+                    ))}
+                </ul>
             </div>
         </div>
     );
