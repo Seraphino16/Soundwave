@@ -3,6 +3,7 @@ import { UploadsService } from './uploads.service';
 import { UploadsController } from './uploads.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { TokenModule } from '../token/token.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { diskStorage } from 'multer';
         },
       }),
     }),
+    TokenModule,
   ],
   controllers: [UploadsController],
   providers: [UploadsService],

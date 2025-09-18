@@ -26,4 +26,14 @@ export class UpdateUserProfileDto {
   @IsOptional()
   @IsArray()
   musicStyle?: string[];
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  profile_picture?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  banner_picture?: string;
 }

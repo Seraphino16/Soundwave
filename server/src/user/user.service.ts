@@ -431,7 +431,7 @@ export class UserService {
       await this.userRepository.save(user);
     }
 
-    if (updateData.bio !== undefined || updateData.location !== undefined || updateData.musicStyle !== undefined || updateData.musicStyle !== undefined) {
+    if (updateData.bio !== undefined || updateData.location !== undefined || updateData.musicStyle !== undefined || updateData.profile_picture !== undefined || updateData.banner_picture !== undefined) {
       const userInfosUpdateData: any = {};
       
       if (updateData.bio !== undefined) {
@@ -446,8 +446,12 @@ export class UserService {
         userInfosUpdateData.musicStyle = updateData.musicStyle;
       }
       
-      if (updateData.musicStyle !== undefined) {
-        userInfosUpdateData.musicStyle = updateData.musicStyle;
+      if (updateData.profile_picture !== undefined) {
+        userInfosUpdateData.profile_picture = updateData.profile_picture;
+      }
+      
+      if (updateData.banner_picture !== undefined) {
+        userInfosUpdateData.banner_picture = updateData.banner_picture;
       }
 
       userInfosUpdateData.updatedAt = new Date();
@@ -460,8 +464,8 @@ export class UserService {
         const createUserInfosData = {
           id,
           user_id: userId,
-          profile_picture: '',
-          banner_picture: '',
+          profile_picture: updateData.profile_picture || '',
+          banner_picture: updateData.banner_picture || '',
           bio: updateData.bio || '',
           location: updateData.location || '',
           musicStyle: updateData.musicStyle || [],

@@ -46,6 +46,8 @@ interface UserProfileContextProps {
   error: string | null;
   fetchUserProfile: (userId: number) => Promise<void>;
   updateUserProfile: (profileData: Partial<UserProfile>) => Promise<boolean>;
+  uploadProfilePicture: (file: File) => Promise<boolean>;
+  uploadBannerPicture: (file: File) => Promise<boolean>;
   refreshProfile: () => Promise<void>;
 }
 
@@ -122,6 +124,92 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     }
   }, [userProfile]);
 
+  const uploadProfilePicture = useCallback(async (file: File): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch(`http://localhost:5001/uploads/upload`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.log("Erreur lors de l'upload de la photo de profil:", errorData.message);
+        setError(errorData.message || "Erreur lors de l'upload de la photo de profil");
+        return false;
+      }
+
+      const result = await res.json();
+      console.log("Photo de profil uploadée:", result);
+      
+      // Met à jour temporairement le profil local avec la nouvelle URL
+      // La sauvegarde en BDD se fera lors du clic sur "Sauvegarder les modifications"
+      if (userProfile && result.filePath) {
+        const imageUrl = `http://localhost:5001/${result.filePath}`;
+        setUserProfile({
+          ...userProfile,
+          profile_picture: imageUrl
+        });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Erreur lors de l'upload de la photo de profil:", error);
+      setError("Erreur de connexion");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [userProfile]);
+
+  const uploadBannerPicture = useCallback(async (file: File): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch(`http://localhost:5001/uploads/upload`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.log("Erreur lors de l'upload de la bannière:", errorData.message);
+        setError(errorData.message || "Erreur lors de l'upload de la bannière");
+        return false;
+      }
+
+      const result = await res.json();
+      console.log("Bannière uploadée:", result);
+      
+      // Met à jour temporairement le profil local avec la nouvelle URL
+      // La sauvegarde en BDD se fera lors du clic sur "Sauvegarder les modifications"
+      if (userProfile && result.filePath) {
+        const imageUrl = `http://localhost:5001/${result.filePath}`;
+        setUserProfile({
+          ...userProfile,
+          banner_picture: imageUrl
+        });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Erreur lors de l'upload de la bannière:", error);
+      setError("Erreur de connexion");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [userProfile]);
+
   const refreshProfile = useCallback(async () => {
     if (userProfile) {
       await fetchUserProfile(userProfile.id);
@@ -135,7 +223,9 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
         loading, 
         error, 
         fetchUserProfile, 
-        updateUserProfile, 
+        updateUserProfile,
+        uploadProfilePicture,
+        uploadBannerPicture,
         refreshProfile 
       }}
     >

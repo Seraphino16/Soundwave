@@ -3,13 +3,22 @@
  * @author SoundWave
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useUserContext } from "../../context/UserContext";
 import { useUserProfileContext } from "../../context/UserProfileContext";
 
 const EditProfileTab: React.FC = () => {
   const { user } = useUserContext();
-  const { userProfile, loading: profileLoading, error, fetchUserProfile, updateUserProfile } = useUserProfileContext();
+  const { 
+    userProfile, 
+    loading: profileLoading, 
+    error, 
+    fetchUserProfile, 
+    updateUserProfile,
+    uploadProfilePicture,
+    uploadBannerPicture
+  } = useUserProfileContext();
+  
   const [formData, setFormData] = useState({
     pseudo: "",
     username: "",
@@ -22,6 +31,9 @@ const EditProfileTab: React.FC = () => {
   const [usernameError, setUsernameError] = useState("");
   const [updateStatus, setUpdateStatus] = useState<'idle' | 'updating' | 'success' | 'error'>('idle');
   const [newMusicPreference, setNewMusicPreference] = useState("");
+  
+  const profilePictureRef = useRef<HTMLInputElement>(null);
+  const bannerPictureRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user && user.id) {
@@ -98,7 +110,68 @@ const EditProfileTab: React.FC = () => {
     }
   };
 
+  const handleProfilePictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
 
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner un fichier image');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Le fichier est trop volumineux. Taille maximale: 5MB');
+      return;
+    }
+
+    setUpdateStatus('updating');
+    const success = await uploadProfilePicture(file);
+    if (success) {
+      if (userProfile?.profile_picture) {
+        setFormData(prev => ({
+          ...prev,
+          profile_picture: userProfile.profile_picture || ""
+        }));
+      }
+      setUpdateStatus('success');
+      setTimeout(() => setUpdateStatus('idle'), 3000);
+    } else {
+      setUpdateStatus('error');
+      setTimeout(() => setUpdateStatus('idle'), 3000);
+    }
+  };
+
+  const handleBannerPictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner un fichier image');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Le fichier est trop volumineux. Taille maximale: 5MB');
+      return;
+    }
+
+    setUpdateStatus('updating');
+    const success = await uploadBannerPicture(file);
+    if (success) {
+      // Mettre à jour le formData avec la nouvelle URL de l'image
+      if (userProfile?.banner_picture) {
+        setFormData(prev => ({
+          ...prev,
+          banner_picture: userProfile.banner_picture || ""
+        }));
+      }
+      setUpdateStatus('success');
+      setTimeout(() => setUpdateStatus('idle'), 3000);
+    } else {
+      setUpdateStatus('error');
+      setTimeout(() => setUpdateStatus('idle'), 3000);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,11 +292,19 @@ const EditProfileTab: React.FC = () => {
                 </div>
               </div>
               
-              <button className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                Changer la photo
+              <button 
+                onClick={() => profilePictureRef.current?.click()}
+                className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                disabled={loading}
+              >
+                {loading ? "Upload..." : "Changer la photo"}
               </button>
-              <button className="mt-3 ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                Changer la bannière
+              <button 
+                onClick={() => bannerPictureRef.current?.click()}
+                className="mt-3 ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                disabled={loading}
+              >
+                {loading ? "Upload..." : "Changer la bannière"}
               </button>
             </div>
           </div>
@@ -317,7 +398,7 @@ const EditProfileTab: React.FC = () => {
               </button>
             </div>
 
-            {/* Cartes des préférences */}
+            {/* Cartes des préférences musicales */}
             {formData.musicStyle.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {formData.musicStyle.map((preference, index) => (
@@ -451,7 +532,7 @@ const EditProfileTab: React.FC = () => {
             </div>
           )}
 
-          {/* Feedback de mise à jour */}
+          {/* Notification de mise à jour */}
           {updateStatus === 'success' && (
             <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
               <p className="text-green-800">✓ Profil mis à jour avec succès !</p>
@@ -471,6 +552,22 @@ const EditProfileTab: React.FC = () => {
           >
             {loading ? "Sauvegarde..." : "Sauvegarder les modifications"}
           </button>
+
+          {/* Inputs cachés pour l'upload d'images */}
+          <input
+            ref={profilePictureRef}
+            type="file"
+            accept="image/*"
+            onChange={handleProfilePictureUpload}
+            style={{ display: 'none' }}
+          />
+          <input
+            ref={bannerPictureRef}
+            type="file"
+            accept="image/*"
+            onChange={handleBannerPictureUpload}
+            style={{ display: 'none' }}
+          />
         </form>
       </div>
     </div>
