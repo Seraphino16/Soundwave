@@ -6,9 +6,7 @@ import { CreateRatingDto } from './dto/create-rating.dto';
 
 @Injectable()
 export class RatingsService {
-  constructor(
-    @InjectModel('Rating') private ratingModel: Model<Rating>,
-  ) {}
+  constructor(@InjectModel('Rating') private ratingModel: Model<Rating>) {}
 
   async create(dto: CreateRatingDto, userId: number, username: string) {
     try {
@@ -18,6 +16,7 @@ export class RatingsService {
         username,
         score: dto.score,
       });
+
       return await rating.save();
     } catch (err) {
       if (err.code === 11000) {
@@ -27,14 +26,14 @@ export class RatingsService {
     }
   }
 
-  async findAllByArtist(artistId: number) {
+  async findAllByArtist(artistId: string) {
     return this.ratingModel
       .find({ artist_id: artistId })
       .sort({ createdAt: -1 })
       .exec();
   }
 
-  async getSummary(artistId: number) {
+  async getSummary(artistId: string) {
     const result = await this.ratingModel.aggregate([
       { $match: { artist_id: artistId } },
       {
@@ -46,7 +45,10 @@ export class RatingsService {
       },
     ]);
 
-    if (!result.length) return { average: 0, count: 0 };
+    if (!result.length) {
+      return { average: 0, count: 0 };
+    }
+
     return { average: result[0].average, count: result[0].count };
   }
 }

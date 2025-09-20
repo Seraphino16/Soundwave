@@ -4,20 +4,35 @@ import {
     getRatings,
     getRatingSummary,
     addOrUpdateRating,
+    Rating,
+    RatingSummary,
 } from "../../services/ratingService";
-
-interface Rating {
-    id: string;
-    username: string;
-    score: number;
-    createdAt: string;
-}
 
 const ArtistRatingSection: React.FC = () => {
     const { id: artistId } = useParams<{ id: string }>();
     const [selected, setSelected] = useState<number>(0);
     const [ratings, setRatings] = useState<Rating[]>([]);
     const [average, setAverage] = useState<number>(0);
+    const [hasRated, setHasRated] = useState<boolean>(false);
+    const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+    // Charger l'utilisateur connecté
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const res = await fetch("http://localhost:5001/users/me", {
+                    credentials: "include",
+                });
+                if (!res.ok) return;
+                const user = await res.json();
+                setCurrentUser(user.username);
+            } catch (error) {
+                console.error("Impossible de récupérer l'utilisateur connecté :", error);
+            }
+        };
+
+        fetchCurrentUser();
+    }, []);
 
     // Charger les notes et la moyenne
     useEffect(() => {
@@ -25,34 +40,46 @@ const ArtistRatingSection: React.FC = () => {
 
         const fetchData = async () => {
             try {
-                const ratingsData = await getRatings(Number(artistId));
+                const ratingsData: Rating[] = await getRatings(artistId);
                 setRatings(ratingsData);
 
-                const summary = await getRatingSummary(Number(artistId));
+                const summary: RatingSummary = await getRatingSummary(artistId);
                 setAverage(summary.average || 0);
+
+                // Vérifier si l'utilisateur a déjà noté
+                if (currentUser) {
+                    const myRating = ratingsData.find(
+                        (r) => r.username === currentUser
+                    );
+                    if (myRating) {
+                        setHasRated(true);
+                        setSelected(myRating.score);
+                    }
+                }
             } catch (error) {
                 console.error("Erreur lors du chargement des notes :", error);
             }
         };
 
         fetchData();
-    }, [artistId]);
+    }, [artistId, currentUser]);
 
     // Envoyer une nouvelle note
     const handleRatingClick = async (value: number) => {
-        if (!artistId) return;
+        if (!artistId || hasRated) return; // blocage si déjà noté
         setSelected(value);
 
         try {
-            await addOrUpdateRating(Number(artistId), value);
+            await addOrUpdateRating(artistId, value);
 
-            const ratingsData = await getRatings(Number(artistId));
+            const ratingsData: Rating[] = await getRatings(artistId);
             setRatings(ratingsData);
 
-            const summary = await getRatingSummary(Number(artistId));
+            const summary: RatingSummary = await getRatingSummary(artistId);
             setAverage(summary.average || 0);
 
             alert(`Merci pour votre note de ${value} étoile(s) !`);
+            setHasRated(true);
         } catch (error) {
             console.error("Erreur en envoyant la note :", error);
         }
@@ -72,28 +99,31 @@ const ArtistRatingSection: React.FC = () => {
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Votre note :
                     </h3>
-                    <div className="flex justify-center md:justify-start space-x-2 text-3xl">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <button
-                                key={star}
-                                type="button"
-                                onClick={() => handleRatingClick(star)}
-                                className="focus:outline-none"
-                            >
-                <span
-                    className={
-                        star <= selected ? "text-yellow-400" : "text-gray-300"
-                    }
-                >
-                  ★
-                </span>
-                            </button>
-                        ))}
-                    </div>
-                    {selected > 0 && (
-                        <p className="mt-4 text-green-600 font-medium">
-                            Vous avez noté : {selected} étoile(s)
+
+                    {hasRated ? (
+                        <p className="text-gray-600">
+                            Vous avez déjà noté cet artiste :{" "}
+                            <span className="text-yellow-500">{selected} ★</span>
                         </p>
+                    ) : (
+                        <div className="flex justify-center md:justify-start space-x-2 text-3xl">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => handleRatingClick(star)}
+                                    className="focus:outline-none"
+                                >
+                  <span
+                      className={
+                          star <= selected ? "text-yellow-400" : "text-gray-300"
+                      }
+                  >
+                    ★
+                  </span>
+                                </button>
+                            ))}
+                        </div>
                     )}
                 </div>
 
@@ -114,27 +144,6 @@ const ArtistRatingSection: React.FC = () => {
                         {ratings.length > 1 ? "s" : ""})
                     </p>
                 </div>
-            </div>
-
-            {/* Liste des notes */}
-            <div className="mt-8">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-                    Dernières notes :
-                </h3>
-                <ul className="space-y-2">
-                    {ratings.map((r) => (
-                        <li
-                            key={r.id}
-                            className="border-b border-gray-200 pb-2 text-center md:text-left"
-                        >
-                            <span className="font-medium">{r.username}</span> :{" "}
-                            <span className="text-yellow-500">{r.score} ★</span>{" "}
-                            <span className="text-gray-400 text-sm">
-                ({new Date(r.createdAt).toLocaleDateString()})
-              </span>
-                        </li>
-                    ))}
-                </ul>
             </div>
         </div>
     );

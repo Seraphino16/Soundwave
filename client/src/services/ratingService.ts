@@ -1,11 +1,22 @@
 /**
  * @description Service de gestion des notes (Ratings) de SoundWave
- * @author
  */
 
 const API_URL = "http://localhost:5001";
 
-export const getRatings = async (artistId: number) => {
+export interface Rating {
+    id: string;
+    username: string;
+    score: number;
+    createdAt: string;
+}
+
+export interface RatingSummary {
+    average: number;
+    count: number;
+}
+
+export const getRatings = async (artistId: string): Promise<Rating[]> => {
     try {
         const response = await fetch(`${API_URL}/ratings/${artistId}`, {
             credentials: "include",
@@ -30,7 +41,9 @@ export const getRatings = async (artistId: number) => {
     }
 };
 
-export const getRatingSummary = async (artistId: number) => {
+export const getRatingSummary = async (
+    artistId: string,
+): Promise<RatingSummary> => {
     try {
         const response = await fetch(`${API_URL}/ratings/${artistId}/summary`, {
             credentials: "include",
@@ -38,7 +51,9 @@ export const getRatingSummary = async (artistId: number) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Échec du chargement du résumé des notes");
+            throw new Error(
+                errorData.message || "Échec du chargement du résumé des notes",
+            );
         }
 
         return response.json();
@@ -48,12 +63,15 @@ export const getRatingSummary = async (artistId: number) => {
     }
 };
 
-export const addOrUpdateRating = async (artistId: number, score: number) => {
+export const addOrUpdateRating = async (
+    artistId: string,
+    score: number,
+): Promise<Rating> => {
     try {
         const response = await fetch(`${API_URL}/ratings`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
             credentials: "include",
             body: JSON.stringify({
@@ -62,10 +80,11 @@ export const addOrUpdateRating = async (artistId: number, score: number) => {
             }),
         });
 
-
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Impossible d'enregistrer la note");
+            throw new Error(
+                errorData.message || "Impossible d'enregistrer la note",
+            );
         }
 
         return response.json();
