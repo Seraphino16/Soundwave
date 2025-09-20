@@ -16,6 +16,7 @@ export interface RatingSummary {
     count: number;
 }
 
+
 export const getRatings = async (artistId: string): Promise<Rating[]> => {
     try {
         const response = await fetch(`${API_URL}/ratings/${artistId}`, {
@@ -41,6 +42,7 @@ export const getRatings = async (artistId: string): Promise<Rating[]> => {
     }
 };
 
+
 export const getRatingSummary = async (
     artistId: string,
 ): Promise<RatingSummary> => {
@@ -62,6 +64,7 @@ export const getRatingSummary = async (
         throw error;
     }
 };
+
 
 export const addOrUpdateRating = async (
     artistId: string,
@@ -90,6 +93,50 @@ export const addOrUpdateRating = async (
         return response.json();
     } catch (error) {
         console.error("Erreur addOrUpdateRating:", error);
+        throw error;
+    }
+};
+
+
+export const updateRating = async (
+    ratingId: string,
+    score: number,
+): Promise<Rating> => {
+    try {
+        const response = await fetch(`${API_URL}/ratings/${ratingId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ score }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Impossible de modifier la note");
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error("Erreur updateRating:", error);
+        throw error;
+    }
+};
+
+export const deleteRating = async (ratingId: string): Promise<void> => {
+    try {
+        const response = await fetch(`${API_URL}/ratings/${ratingId}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Impossible de supprimer la note");
+        }
+    } catch (error) {
+        console.error("Erreur deleteRating:", error);
         throw error;
     }
 };

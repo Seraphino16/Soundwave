@@ -1,4 +1,9 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Rating } from './rating.schema';
@@ -50,5 +55,30 @@ export class RatingsService {
     }
 
     return { average: result[0].average, count: result[0].count };
+  }
+
+  async update(id: string, score: number, userId: number) {
+    const rating = await this.ratingModel.findById(id).exec();
+    if (!rating) {
+      throw new NotFoundException('Note non trouvée');
+    }
+    if (rating.user_id !== userId) {
+      throw new ForbiddenException('Vous ne pouvez modifier que votre propre note');
+    }
+
+    rating.score = score;
+    return rating.save();
+  }
+
+  async remove(id: string, userId: number) {
+    const rating = await this.ratingModel.findById(id).exec();
+    if (!rating) {
+      throw new NotFoundException('Note non trouvée');
+    }
+    if (rating.user_id !== userId) {
+      throw new ForbiddenException('Vous ne pouvez supprimer que votre propre note');
+    }
+
+    return rating.deleteOne();
   }
 }
