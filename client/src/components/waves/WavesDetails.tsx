@@ -1,42 +1,95 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { FiMoreHorizontal } from "react-icons/fi";
 import { motion } from "framer-motion";
-
-type Wave = {
-    id: number;
-    username: string;
-    avatar: string;
-    content: string;
-    timestamp: string;
-    isEditing?: boolean;
-};
+import {
+    getWavesByArtist,
+    getMyWave,
+    createWave,
+    updateWave,
+    deleteWave,
+    LocalWave,
+} from "../../services/waveService";
 
 const WavesDetails = () => {
-    const [waves, setWaves] = useState<Wave[]>([]);
-    const [content, setContent] = useState("");
-    const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+    const { id: artistId } = useParams<{ id: string }>();
+    const [waves, setWaves] = useState<LocalWave[]>([]);
+    const [message, setMessage] = useState("");
+    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-    const handlePostWave = () => {
-        if (!content.trim()) return;
+    const [currentUser, setCurrentUser] = useState<string | null>(null);
+    const [hasPosted, setHasPosted] = useState<boolean>(false);
+    const [myWave, setMyWave] = useState<LocalWave | null>(null);
 
-        const newWave: Wave = {
-            id: Date.now(),
-            username: "JohnDoe", // à remplacer avec utilisateur réel
-            avatar: "https://via.placeholder.com/50",
-            content,
-            timestamp: new Date().toLocaleString(),
-            isEditing: false,
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const res = await fetch("http://localhost:5001/users/me", {
+                    credentials: "include",
+                });
+                if (!res.ok) return;
+                const user = await res.json();
+                setCurrentUser(user.username);
+            } catch (error) {
+                console.error("Impossible de récupérer l'utilisateur :", error);
+            }
         };
 
-        setWaves([newWave, ...waves]);
-        setContent("");
+        fetchCurrentUser();
+    }, []);
+
+    useEffect(() => {
+        if (!artistId) return;
+
+        const fetchData = async () => {
+            try {
+                const wavesData = await getWavesByArtist(artistId);
+                setWaves(wavesData.map((w) => ({ ...w, isEditing: false })));
+
+                if (currentUser) {
+                    const userWave = await getMyWave(artistId);
+                    if (userWave) {
+                        setMyWave(userWave);
+                        setHasPosted(true);
+                    } else {
+                        setMyWave(null);
+                        setHasPosted(false);
+                    }
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement des waves :", error);
+            }
+        };
+
+        fetchData();
+    }, [artistId, currentUser]);
+
+    const handlePostWave = async () => {
+        if (!message.trim() || !currentUser || hasPosted || !artistId) return;
+
+        try {
+            const newWave = await createWave(artistId, message);
+            setWaves([{ ...newWave, isEditing: false }, ...waves]);
+            setMessage("");
+            setMyWave(newWave);
+            setHasPosted(true);
+        } catch (error) {
+            console.error("Erreur lors de la création de la wave :", error);
+        }
     };
 
-    const handleDeleteWave = (id: number) => {
-        setWaves(waves.filter((wave) => wave.id !== id));
+    const handleDeleteWave = async (id: string) => {
+        try {
+            await deleteWave(id);
+            setWaves(waves.filter((wave) => wave.id !== id));
+            setHasPosted(false);
+            setMyWave(null);
+        } catch (error) {
+            console.error("Erreur lors de la suppression de la wave :", error);
+        }
     };
 
-    const handleEditWave = (id: number) => {
+    const handleEditWave = (id: string) => {
         setWaves(
             waves.map((wave) =>
                 wave.id === id ? { ...wave, isEditing: true } : wave
@@ -45,43 +98,56 @@ const WavesDetails = () => {
         setOpenDropdown(null);
     };
 
-    const handleUpdateWave = (id: number, newContent: string) => {
-        setWaves(
-            waves.map((wave) =>
-                wave.id === id ? { ...wave, content: newContent, isEditing: false } : wave
-            )
-        );
+    const handleUpdateWave = async (id: string, newMessage: string) => {
+        try {
+            const updated = await updateWave(id, newMessage);
+            setWaves(
+                waves.map((wave) =>
+                    wave.id === id ? { ...updated, isEditing: false } : wave
+                )
+            );
+            if (myWave && myWave.id === id) {
+                setMyWave(updated);
+            }
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour de la wave :", error);
+        }
     };
 
-    const handleShareWave = (id: number) => {
-        alert(`Wave ${id} partagé ! 🚀`);
+    const handleShareWave = (id: string) => {
+        alert(`Wave ${id} partagé !`);
         setOpenDropdown(null);
     };
 
     return (
         <div className="max-w-6xl mx-auto py-12 px-4 md:px-8">
-            <h2 className="text-2xl font-semibold text-primaryBlue mb-8 text-center">
-                Waves
-            </h2>
+            <h2 className="text-2xl font-semibold text-primaryBlue mb-8 text-center">Waves</h2>
 
             <div className="flex flex-col md:flex-row gap-10 items-start justify-between">
-                {/* Formulaire à gauche */}
                 <div className="w-full md:w-1/2 bg-white p-8 rounded-xl shadow-lg border border-gray-300">
-          <textarea
-              className="w-full p-5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200"
-              placeholder="Exprimez-vous..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-          />
-                    <button
-                        className="mt-5 w-full bg-primaryBlue text-white py-4 rounded-lg hover:bg-[#B0C7E6] transition font-semibold"
-                        onClick={handlePostWave}
-                    >
-                        Publier
-                    </button>
+                    {hasPosted ? (
+                        <p className="text-gray-600">
+                            ✅ Vous avez déjà publié une Wave.
+                        </p>
+                    ) : (
+                        <>
+                      <textarea
+                          className="w-full p-5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200"
+                          placeholder="Exprimez-vous..."
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                      />
+                            <button
+                                className="mt-5 w-full bg-primaryBlue text-white py-4 rounded-lg hover:bg-[#B0C7E6] transition font-semibold"
+                                onClick={handlePostWave}
+                            >
+                                Publier
+                            </button>
+                        </>
+                    )}
                 </div>
 
-                {/* Liste des Waves à droite */}
+
                 <div className="w-full md:w-1/2 space-y-8">
                     {waves.map((wave) => (
                         <div
@@ -89,7 +155,7 @@ const WavesDetails = () => {
                             className="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex space-x-4 relative"
                         >
                             <img
-                                src={wave.avatar}
+                                src={wave.profile_picture || "https://via.placeholder.com/50"}
                                 alt="User Avatar"
                                 className="w-14 h-14 rounded-full"
                             />
@@ -97,75 +163,82 @@ const WavesDetails = () => {
                                 <p className="font-semibold text-primaryBlue text-lg">
                                     {wave.username}
                                 </p>
-                                <p className="text-gray-500 text-sm">{wave.timestamp}</p>
+                                <p className="text-gray-500 text-sm">
+                                    {new Date(wave.createdAt).toLocaleString()}
+                                </p>
 
                                 {wave.isEditing ? (
                                     <textarea
                                         className="w-full mt-3 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200"
-                                        value={wave.content}
+                                        value={wave.message}
                                         onChange={(e) =>
                                             setWaves(
                                                 waves.map((w) =>
-                                                    w.id === wave.id ? { ...w, content: e.target.value } : w
+                                                    w.id === wave.id
+                                                        ? { ...w, message: e.target.value }
+                                                        : w
                                                 )
                                             )
                                         }
                                     />
                                 ) : (
-                                    <p className="mt-3 text-text-200 text-base">{wave.content}</p>
+                                    <p className="mt-3 text-text-200 text-base">{wave.message}</p>
                                 )}
 
                                 {wave.isEditing && (
                                     <button
                                         className="text-green-500 hover:underline font-medium mt-2"
-                                        onClick={() => handleUpdateWave(wave.id, wave.content)}
+                                        onClick={() => handleUpdateWave(wave.id, wave.message)}
                                     >
                                         Sauvegarder
                                     </button>
                                 )}
                             </div>
 
-                            <div className="relative">
-                                <button
-                                    className="text-gray-500 hover:text-primaryBlue"
-                                    onClick={() =>
-                                        setOpenDropdown(openDropdown === wave.id ? null : wave.id)
-                                    }
-                                >
-                                    <FiMoreHorizontal size={24} />
-                                </button>
-
-                                {openDropdown === wave.id && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -5 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -5 }}
-                                        className="absolute top-10 right-0 bg-white border border-gray-200 shadow-md rounded-lg w-40"
+                            {currentUser === wave.username && (
+                                <div className="relative">
+                                    <button
+                                        className="text-gray-500 hover:text-primaryBlue"
+                                        onClick={() =>
+                                            setOpenDropdown(openDropdown === wave.id ? null : wave.id)
+                                        }
                                     >
-                                        <button
-                                            className="block w-full text-left px-4 py-2 text-primaryBlue hover:bg-gray-100"
-                                            onClick={() => handleEditWave(wave.id)}
+                                        <FiMoreHorizontal size={24} />
+                                    </button>
+
+                                    {openDropdown === wave.id && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -5 }}
+                                            className="absolute top-10 right-0 bg-white border border-gray-200 shadow-md rounded-lg w-40"
                                         >
-                                            Modifier
-                                        </button>
-                                        <button
-                                            className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
-                                            onClick={() => handleDeleteWave(wave.id)}
-                                        >
-                                            Supprimer
-                                        </button>
-                                        <button
-                                            className="block w-full text-left px-4 py-2 text-green-500 hover:bg-gray-100"
-                                            onClick={() => handleShareWave(wave.id)}
-                                        >
-                                            Partager
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </div>
+                                            <button
+                                                className="block w-full text-left px-4 py-2 text-yellow-500 hover:bg-gray-100"
+                                                onClick={() => handleEditWave(wave.id)}
+                                            >
+                                                Modifier
+                                            </button>
+                                            <button
+                                                className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                                                onClick={() => handleDeleteWave(wave.id)}
+                                            >
+                                                Supprimer
+                                            </button>
+                                            <button
+                                                className="block w-full text-left px-4 py-2 text-green-500 hover:bg-gray-100"
+                                                onClick={() => handleShareWave(wave.id)}
+                                            >
+                                                Partager
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
+
             </div>
         </div>
     );
