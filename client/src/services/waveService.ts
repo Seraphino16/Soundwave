@@ -55,14 +55,17 @@ export const getMyWave = async (artistId: string): Promise<LocalWave | null> => 
         if (response.status === 404) return null;
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const text = await response.text();
+            const errorData = text ? JSON.parse(text) : {};
             throw new Error(
-                errorData.message ||
-                "Échec du chargement de la wave de l'utilisateur"
+                errorData.message || "Échec du chargement de la wave de l'utilisateur"
             );
         }
 
-        const w = await response.json();
+        const text = await response.text();
+        if (!text) return null;
+
+        const w = JSON.parse(text);
         return mapWave(w);
     } catch (error) {
         console.error("Erreur getMyWave:", error);
