@@ -10,9 +10,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadsService } from './uploads.service';
 import { Express, Request } from 'express';
-import { diskStorage } from 'multer';
 import { TokenService } from '../token/token.service';
-import * as path from 'path';
 
 @Controller('uploads')
 export class UploadsController {
@@ -22,27 +20,7 @@ export class UploadsController {
   ) {}
 
   @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const uploadsService = new UploadsService();
-          const filename = uploadsService.generateFileName(file.originalname, 'upload');
-          cb(null, filename);
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        const uploadsService = new UploadsService();
-        try {
-          uploadsService.validateImageFile(file);
-          cb(null, true);
-        } catch (error) {
-          cb(error, false);
-        }
-      },
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
@@ -62,37 +40,20 @@ export class UploadsController {
       throw new BadRequestException('Aucun fichier fourni');
     }
 
-    const fileUrl = this.uploadsService.getFileUrl(file.filename);
+    const payload: any = this.tokenService.verifyToken(token);
+    const typeParam = (req.query?.type as string) || 'profile';
+    const type = typeParam === 'banner' ? 'banner' : 'profile';
+    const result = await this.uploadsService.processUserImage(payload.id, payload.username, type, file);
 
     return {
       message: 'Fichier uploadé avec succès',
-      url: fileUrl,
-      filePath: `uploads/${file.filename}`,
+      url: result.url,
+      filename: result.filename,
     };
   }
 
   @Post('profile-picture/:userId')
-  @UseInterceptors(
-    FileInterceptor('profilePicture', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const uploadsService = new UploadsService();
-          const filename = uploadsService.generateFileName(file.originalname, 'profile');
-          cb(null, filename);
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        const uploadsService = new UploadsService();
-        try {
-          uploadsService.validateImageFile(file);
-          cb(null, true);
-        } catch (error) {
-          cb(error, false);
-        }
-      },
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   async uploadProfilePicture(
     @Param('userId') userId: string,
     @UploadedFile() file: Express.Multer.File,
@@ -116,36 +77,18 @@ export class UploadsController {
       throw new BadRequestException('Aucun fichier fourni');
     }
 
-    const fileUrl = this.uploadsService.getFileUrl(file.filename);
+    const payload: any = this.tokenService.verifyToken(token);
+    const result = await this.uploadsService.processUserImage(parseInt(userId), payload.username, 'profile', file);
 
     return {
       message: 'Photo de profil uploadée avec succès',
-      url: fileUrl,
+  url: result.url,
+  filename: result.filename,
     };
   }
 
   @Post('banner-picture/:userId')
-  @UseInterceptors(
-    FileInterceptor('bannerPicture', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const uploadsService = new UploadsService();
-          const filename = uploadsService.generateFileName(file.originalname, 'banner');
-          cb(null, filename);
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        const uploadsService = new UploadsService();
-        try {
-          uploadsService.validateImageFile(file);
-          cb(null, true);
-        } catch (error) {
-          cb(error, false);
-        }
-      },
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   async uploadBannerPicture(
     @Param('userId') userId: string,
     @UploadedFile() file: Express.Multer.File,
@@ -169,11 +112,13 @@ export class UploadsController {
       throw new BadRequestException('Aucun fichier fourni');
     }
 
-    const fileUrl = this.uploadsService.getFileUrl(file.filename);
+    const payload: any = this.tokenService.verifyToken(token);
+    const result = await this.uploadsService.processUserImage(parseInt(userId), payload.username, 'banner', file);
 
     return {
       message: 'Bannière uploadée avec succès',
-      url: fileUrl,
+  url: result.url,
+  filename: result.filename,
     };
   }
 }

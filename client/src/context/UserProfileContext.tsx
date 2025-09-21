@@ -149,11 +149,10 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       
       // Met à jour temporairement le profil local avec la nouvelle URL
       // La sauvegarde en BDD se fera lors du clic sur "Sauvegarder les modifications"
-      if (userProfile && result.filePath) {
-        const imageUrl = `http://localhost:5001/${result.filePath}`;
+      if (userProfile && result.url) {
         setUserProfile({
           ...userProfile,
-          profile_picture: imageUrl
+          profile_picture: result.url
         });
       }
       
@@ -174,7 +173,7 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch(`http://localhost:5001/uploads/upload`, {
+  const res = await fetch(`http://localhost:5001/uploads/banner-picture/${userProfile?.id}`, {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -192,11 +191,10 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       
       // Met à jour temporairement le profil local avec la nouvelle URL
       // La sauvegarde en BDD se fera lors du clic sur "Sauvegarder les modifications"
-      if (userProfile && result.filePath) {
-        const imageUrl = `http://localhost:5001/${result.filePath}`;
+      if (userProfile && result.url) {
         setUserProfile({
           ...userProfile,
-          banner_picture: imageUrl
+          banner_picture: result.url
         });
       }
       

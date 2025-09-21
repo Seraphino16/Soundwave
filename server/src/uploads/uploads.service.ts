@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Express } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
+const Sharp = require('sharp');
 
 @Injectable()
 export class UploadsService {
@@ -49,8 +49,9 @@ export class UploadsService {
     return `${prefix}-${timestamp}-${random}${extension}`;
   }
 
-  getFileUrl(filename: string): string {
-    return `http://localhost:5001/uploads/${filename}`;
+  getFileUrl(filename: string, subdir?: string): string {
+    const base = 'http://localhost:5001/uploads';
+    return subdir ? `${base}/${subdir}/${filename}` : `${base}/${filename}`;
   }
 
   deleteFile(filePath: string): void {
@@ -61,5 +62,66 @@ export class UploadsService {
     } catch (error) {
       console.error('Erreur lors de la suppression du fichier:', error);
     }
+  }
+
+  private sanitizeName(name: string): string {
+    return name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9-_]/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_+|_+$/g, '');
+  }
+
+  private ensureDir(dirPath: string): void {
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+  }
+
+  private deleteExistingTypeFiles(userDir: string, type: 'profile' | 'banner') {
+    if (!fs.existsSync(userDir)) return;
+    const suffix = type === 'profile' ? '_pfp' : '_banner';
+    const entries = fs.readdirSync(userDir);
+    for (const entry of entries) {
+      if (entry.endsWith(`${suffix}.webp`) || entry.includes(`${suffix}.`)) {
+        try {
+          fs.unlinkSync(path.join(userDir, entry));
+        } catch (e) {
+          // noop
+        }
+      }
+    }
+  }
+
+  async processUserImage(
+    userId: number,
+    username: string | undefined,
+    type: 'profile' | 'banner',
+    file: Express.Multer.File,
+  ): Promise<{ url: string; filePath: string; filename: string }> {
+    if (!file) {
+      throw new BadRequestException('Aucun fichier fourni');
+    }
+
+    this.validateImageFile(file);
+
+  // Use only userId in filename to avoid future username changes breaking URLs
+  const suffix = type === 'profile' ? 'pfp' : 'banner';
+  const filename = `${userId}_${suffix}.webp`;
+    const userDir = path.join(this.uploadPath, 'users', String(userId));
+    this.ensureDir(userDir);
+
+    this.deleteExistingTypeFiles(userDir, type);
+
+    const destPath = path.join(userDir, filename);
+
+  await Sharp(file.buffer).webp({ quality: 85 }).toFile(destPath);
+
+    const relativeSubdir = path.posix.join('users', String(userId));
+    const url = this.getFileUrl(filename, relativeSubdir);
+
+    return { url, filePath: destPath, filename };
   }
 }
