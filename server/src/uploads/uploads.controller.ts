@@ -47,7 +47,6 @@ export class UploadsController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
-    // Vérification de l'authentification
     const token = req.cookies?.token;
     if (!token) {
       throw new BadRequestException('Accès non autorisé');
@@ -63,7 +62,6 @@ export class UploadsController {
       throw new BadRequestException('Aucun fichier fourni');
     }
 
-    // Générer l'URL du fichier
     const fileUrl = this.uploadsService.getFileUrl(file.filename);
 
     return {
@@ -100,7 +98,6 @@ export class UploadsController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
-    // Vérification de l'authentification
     const token = req.cookies?.token;
     if (!token) {
       throw new BadRequestException('Accès non autorisé');
@@ -119,7 +116,6 @@ export class UploadsController {
       throw new BadRequestException('Aucun fichier fourni');
     }
 
-    // Générer l'URL du fichier
     const fileUrl = this.uploadsService.getFileUrl(file.filename);
 
     return {
@@ -155,7 +151,6 @@ export class UploadsController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
-    // Vérification de l'authentification
     const token = req.cookies?.token;
     if (!token) {
       throw new BadRequestException('Accès non autorisé');
@@ -174,7 +169,6 @@ export class UploadsController {
       throw new BadRequestException('Aucun fichier fourni');
     }
 
-    // Générer l'URL du fichier
     const fileUrl = this.uploadsService.getFileUrl(file.filename);
 
     return {

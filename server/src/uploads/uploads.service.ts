@@ -10,7 +10,6 @@ export class UploadsService {
   private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
 
   constructor() {
-    // Créer le dossier uploads s'il n'existe pas
     if (!fs.existsSync(this.uploadPath)) {
       fs.mkdirSync(this.uploadPath, { recursive: true });
     }
