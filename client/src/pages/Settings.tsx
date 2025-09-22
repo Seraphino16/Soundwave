@@ -3,7 +3,7 @@
  * @author SoundWave
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 
@@ -29,6 +29,12 @@ const Settings: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading } = useUserContext();
   const [activeTab, setActiveTab] = useState<TabType>('profile');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchCurrentX = useRef<number | null>(null);
+  const burgerBtnRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   const menuItems: MenuItem[] = [
     { id: 'profile', label: 'Profil', icon: '👤', component: EditProfileTab },
@@ -55,9 +61,58 @@ const Settings: React.FC = () => {
   const handleTabChange = (tabId: TabType) => {
     setActiveTab(tabId);
     navigate(`/settings?tab=${tabId}`);
+    setIsSidebarOpen(false);
   };
 
   const ActiveComponent = menuItems.find(item => item.id === activeTab)?.component || EditProfileTab;
+  const activeLabel = menuItems.find(item => item.id === activeTab)?.label || 'Profil';
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const x = e.touches[0]?.clientX ?? 0;
+    if (!isSidebarOpen && x > 32) return;
+    touchStartX.current = x;
+    touchCurrentX.current = x;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current == null) return;
+    touchCurrentX.current = e.touches[0]?.clientX ?? 0;
+  };
+
+  const onTouchEnd = () => {
+    if (touchStartX.current == null || touchCurrentX.current == null) return;
+    const delta = (touchCurrentX.current as number) - (touchStartX.current as number);
+    if (!isSidebarOpen && touchStartX.current <= 32 && delta > 50) {
+      setIsSidebarOpen(true);
+    }
+    if (isSidebarOpen && delta < -50) {
+      setIsSidebarOpen(false);
+    }
+    touchStartX.current = null;
+    touchCurrentX.current = null;
+  };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsSidebarOpen(false);
+    };
+
+    if (isSidebarOpen) {
+      document.addEventListener('keydown', onKeyDown);
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.removeEventListener('keydown', onKeyDown);
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
+    if (isSidebarOpen) {
+      closeBtnRef.current?.focus();
+    }
+  }, [isSidebarOpen]);
 
   if (loading) {
     return (
@@ -94,14 +149,20 @@ const Settings: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+    <div
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
           <div className="flex">
-            <div className="w-80 bg-gradient-to-b from-slate-900 to-slate-800">
+            {/* Sidebar desktop */}
+            <div className="w-80 bg-gradient-to-b from-slate-900 to-slate-800 hidden md:block">
               <div className="p-6 border-b border-slate-700">
                 <h1 className="text-2xl font-bold mb-2">Paramètres</h1>
-                <p className="text-sm">Gérez votre compte et vos préférences</p>
+                <p className="text-sm italic">Gérez votre compte et vos préférences</p>
               </div>
               <nav className="py-4">
                 {menuItems.map((item) => (
@@ -131,7 +192,77 @@ const Settings: React.FC = () => {
               </nav>
             </div>
 
+            {/* Sidebar mobile (drawer) */}
+            {isSidebarOpen && (
+              <div
+                id="settings-drawer"
+                ref={drawerRef}
+                className="md:hidden fixed inset-y-0 left-0 w-72 bg-slate-50 transform translate-x-0 transition-transform duration-300 ease-in-out z-40"
+                role="navigation"
+                aria-label="Menu des paramètres"
+              >
+                <div className="p-5 border-b border-slate-700 flex items-center justify-between">
+                    <div className="flex flex-col">
+                    <h2 className="text-xl font-semibold">Paramètres</h2>
+                    <p className="text-sm italic">Gérez votre compte et vos préférences</p>
+                    </div>
+                  <button
+                    aria-label="Fermer le menu"
+                    className="p-2 rounded hover:bg-slate-800"
+                    type="button"
+                    onClick={() => setIsSidebarOpen(false)}
+                    ref={closeBtnRef}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                      <path fillRule="evenodd" d="M6.225 4.811a1 1 0 011.414 0L12 9.172l4.361-4.361a1 1 0 011.414 1.414L13.414 10.586l4.361 4.361a1 1 0 01-1.414 1.414L12 12l-4.361 4.361a1 1 0 01-1.414-1.414l4.361-4.361-4.361-4.361a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+                <nav className="py-2">
+                  {menuItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => handleTabChange(item.id)}
+                      className={`w-full flex items-center px-5 py-4 text-left transition-all duration-200 relative ${
+                        activeTab === item.id ? 'bg-sky-500/20' : 'hover:bg-slate-800'
+                      }`}
+                    >
+                      <span className="text-xl mr-4">{item.icon}</span>
+                      <span className="font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            )}
+
+            {/* Overlay */}
+            {isSidebarOpen && (
+              <button
+                className="md:hidden fixed inset-0 bg-black/40 z-30"
+                aria-label="Fermer le menu"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+            )}
+
             <div className="flex-1 bg-gray-50">
+              {/* Barre supérieure mobile avec burger + titre */}
+        <div className="md:hidden sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-3">
+                <button
+                  aria-label="Ouvrir le menu"
+                  className="p-2 rounded-md border bg-white text-slate-700 hover:bg-slate-50"
+          onClick={() => setIsSidebarOpen(true)}
+          aria-controls="settings-drawer"
+          aria-expanded={isSidebarOpen}
+          ref={burgerBtnRef}
+                >
+                  {/* Burger icon */}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                    <path fillRule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zm.75 4.5a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5H3.75z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <h2 className="text-lg font-semibold text-slate-800">{activeLabel}</h2>
+              </div>
+
               <div className="h-full overflow-y-auto">
                 <div className="animate-fadeIn">
                   <ActiveComponent />
