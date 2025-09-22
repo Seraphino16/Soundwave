@@ -10,7 +10,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadsService } from './uploads.service';
 import { Express, Request } from 'express';
+import { diskStorage } from 'multer';
 import { TokenService } from '../token/token.service';
+import * as path from 'path';
 
 @Controller('uploads')
 export class UploadsController {
@@ -20,7 +22,9 @@ export class UploadsController {
   ) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file')
+  )
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
@@ -41,13 +45,12 @@ export class UploadsController {
     }
 
     const payload: any = this.tokenService.verifyToken(token);
-    const typeParam = (req.query?.type as string) || 'profile';
-    const type = typeParam === 'banner' ? 'banner' : 'profile';
-    const result = await this.uploadsService.processUserImage(payload.id, payload.username, type, file);
+    const result = await this.uploadsService.processUserImage(payload.id, payload.username, 'profile', file);
 
     return {
       message: 'Fichier uploadé avec succès',
       url: result.url,
+      filePath: result.filePath,
       filename: result.filename,
     };
   }
@@ -82,8 +85,9 @@ export class UploadsController {
 
     return {
       message: 'Photo de profil uploadée avec succès',
-  url: result.url,
-  filename: result.filename,
+      url: result.url,
+      filePath: result.filePath,
+      filename: result.filename,
     };
   }
 
@@ -117,8 +121,9 @@ export class UploadsController {
 
     return {
       message: 'Bannière uploadée avec succès',
-  url: result.url,
-  filename: result.filename,
+      url: result.url,
+      filePath: result.filePath,
+      filename: result.filename,
     };
   }
 }

@@ -49,6 +49,9 @@ interface UserProfileContextProps {
   uploadProfilePicture: (file: File) => Promise<boolean>;
   uploadBannerPicture: (file: File) => Promise<boolean>;
   refreshProfile: () => Promise<void>;
+  previewImages: { profile?: string; banner?: string };
+  hasUnsavedChanges: boolean;
+  resetPreview: () => void;
 }
 
 const UserProfileContext = createContext<UserProfileContextProps | undefined>(undefined);
@@ -57,6 +60,9 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewImages, setPreviewImages] = useState<{ profile?: string; banner?: string }>({});
+  const [pendingFiles, setPendingFiles] = useState<{ profile?: File; banner?: File }>({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
 
   const fetchUserProfile = useCallback(async (userId: number) => {
     setLoading(true);
@@ -95,13 +101,55 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     setLoading(true);
     setError(null);
     try {
+      const dataToSend: Partial<UserProfile> = { ...profileData };
+
+      if (pendingFiles.profile) {
+        const fd = new FormData();
+        fd.append('file', pendingFiles.profile);
+        const res = await fetch(`http://localhost:5001/uploads/profile-picture/${userProfile.id}`, {
+          method: 'POST',
+          credentials: 'include',
+          body: fd,
+        });
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.log("Erreur lors de l'upload de la photo de profil:", errorData.message);
+          setError(errorData.message || "Erreur lors de l'upload de la photo de profil");
+          return false;
+        }
+        const result = await res.json();
+        if (result?.url) {
+          dataToSend.profile_picture = result.url;
+        }
+      }
+
+      if (pendingFiles.banner) {
+        const fd = new FormData();
+        fd.append('file', pendingFiles.banner);
+        const res = await fetch(`http://localhost:5001/uploads/banner-picture/${userProfile.id}`, {
+          method: 'POST',
+          credentials: 'include',
+          body: fd,
+        });
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.log("Erreur lors de l'upload de la bannière:", errorData.message);
+          setError(errorData.message || "Erreur lors de l'upload de la bannière");
+          return false;
+        }
+        const result = await res.json();
+        if (result?.url) {
+          dataToSend.banner_picture = result.url;
+        }
+      }
+
       const res = await fetch(`http://localhost:5001/users/${userProfile.id}/profile`, {
         method: "PUT",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(profileData),
+        body: JSON.stringify(dataToSend),
       });
 
       if (!res.ok) {
@@ -114,6 +162,11 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       const updatedProfile = await res.json();
       console.log("Profil mis à jour:", updatedProfile);
       setUserProfile(updatedProfile);
+      if (previewImages.profile) URL.revokeObjectURL(previewImages.profile);
+      if (previewImages.banner) URL.revokeObjectURL(previewImages.banner);
+      setPreviewImages({});
+      setPendingFiles({});
+      setHasUnsavedChanges(false);
       return true;
     } catch (error) {
       console.error("Erreur lors de la mise à jour du profil:", error);
@@ -122,97 +175,51 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     } finally {
       setLoading(false);
     }
-  }, [userProfile]);
+  }, [userProfile, pendingFiles, previewImages]);
 
   const uploadProfilePicture = useCallback(async (file: File): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch(`http://localhost:5001/uploads/upload`, {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.log("Erreur lors de l'upload de la photo de profil:", errorData.message);
-        setError(errorData.message || "Erreur lors de l'upload de la photo de profil");
-        return false;
-      }
-
-      const result = await res.json();
-      console.log("Photo de profil uploadée:", result);
-      
-      // Met à jour temporairement le profil local avec la nouvelle URL
-      // La sauvegarde en BDD se fera lors du clic sur "Sauvegarder les modifications"
-      if (userProfile && result.url) {
-        setUserProfile({
-          ...userProfile,
-          profile_picture: result.url
-        });
-      }
-      
+      const objectUrl = URL.createObjectURL(file);
+      if (previewImages.profile) URL.revokeObjectURL(previewImages.profile);
+      setPreviewImages(prev => ({ ...prev, profile: objectUrl }));
+      setPendingFiles(prev => ({ ...prev, profile: file }));
+      setHasUnsavedChanges(true);
       return true;
-    } catch (error) {
-      console.error("Erreur lors de l'upload de la photo de profil:", error);
-      setError("Erreur de connexion");
+    } catch (e) {
+      console.error("Erreur lors de la création de l'aperçu de la photo de profil:", e);
+      setError("Impossible d'afficher la prévisualisation");
       return false;
-    } finally {
-      setLoading(false);
     }
-  }, [userProfile]);
+  }, [previewImages.profile]);
 
   const uploadBannerPicture = useCallback(async (file: File): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-  const res = await fetch(`http://localhost:5001/uploads/banner-picture/${userProfile?.id}`, {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.log("Erreur lors de l'upload de la bannière:", errorData.message);
-        setError(errorData.message || "Erreur lors de l'upload de la bannière");
-        return false;
-      }
-
-      const result = await res.json();
-      console.log("Bannière uploadée:", result);
-      
-      // Met à jour temporairement le profil local avec la nouvelle URL
-      // La sauvegarde en BDD se fera lors du clic sur "Sauvegarder les modifications"
-      if (userProfile && result.url) {
-        setUserProfile({
-          ...userProfile,
-          banner_picture: result.url
-        });
-      }
-      
+      const objectUrl = URL.createObjectURL(file);
+      if (previewImages.banner) URL.revokeObjectURL(previewImages.banner);
+      setPreviewImages(prev => ({ ...prev, banner: objectUrl }));
+      setPendingFiles(prev => ({ ...prev, banner: file }));
+      setHasUnsavedChanges(true);
       return true;
-    } catch (error) {
-      console.error("Erreur lors de l'upload de la bannière:", error);
-      setError("Erreur de connexion");
+    } catch (e) {
+      console.error("Erreur lors de la création de l'aperçu de la bannière:", e);
+      setError("Impossible d'afficher la prévisualisation");
       return false;
-    } finally {
-      setLoading(false);
     }
-  }, [userProfile]);
+  }, [previewImages.banner]);
 
   const refreshProfile = useCallback(async () => {
     if (userProfile) {
       await fetchUserProfile(userProfile.id);
     }
   }, [userProfile, fetchUserProfile]);
+
+  const resetPreview = useCallback(() => {
+    if (previewImages.profile) URL.revokeObjectURL(previewImages.profile);
+    if (previewImages.banner) URL.revokeObjectURL(previewImages.banner);
+    setPreviewImages({});
+    setPendingFiles({});
+    setHasUnsavedChanges(false);
+  }, [previewImages]);
 
   return (
     <UserProfileContext.Provider 
@@ -224,7 +231,10 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
         updateUserProfile,
         uploadProfilePicture,
         uploadBannerPicture,
-        refreshProfile 
+        refreshProfile,
+        previewImages,
+        hasUnsavedChanges,
+        resetPreview,
       }}
     >
       {children}

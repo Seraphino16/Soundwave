@@ -86,11 +86,7 @@ export class UploadsService {
     const entries = fs.readdirSync(userDir);
     for (const entry of entries) {
       if (entry.endsWith(`${suffix}.webp`) || entry.includes(`${suffix}.`)) {
-        try {
-          fs.unlinkSync(path.join(userDir, entry));
-        } catch (e) {
-          // noop
-        }
+        fs.unlinkSync(path.join(userDir, entry));
       }
     }
   }
@@ -107,7 +103,6 @@ export class UploadsService {
 
     this.validateImageFile(file);
 
-  // Use only userId in filename to avoid future username changes breaking URLs
   const suffix = type === 'profile' ? 'pfp' : 'banner';
   const filename = `${userId}_${suffix}.webp`;
     const userDir = path.join(this.uploadPath, 'users', String(userId));
@@ -119,8 +114,8 @@ export class UploadsService {
 
   await Sharp(file.buffer).webp({ quality: 85 }).toFile(destPath);
 
-    const relativeSubdir = path.posix.join('users', String(userId));
-    const url = this.getFileUrl(filename, relativeSubdir);
+  const relativeSubdir = path.posix.join('users', String(userId));
+  const url = `${this.getFileUrl(filename, relativeSubdir)}?v=${Date.now()}`;
 
     return { url, filePath: destPath, filename };
   }

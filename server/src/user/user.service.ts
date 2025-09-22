@@ -22,7 +22,6 @@ import { UserSuccess } from './success/user.success';
 import { UserRole } from '../config/user.config';
 import { User, UserResponse } from './entities/user.entity';
 import axios from 'axios';
-import * as path from 'path';
 import { SpotifyService } from '../spotify/spotify.service';
 import { CreateUserInfosDto } from './dto/create-user-infos.dto';
 import { PasswordUtil } from '../utils/password';
@@ -43,27 +42,6 @@ export class UserService {
     private readonly passwordUtil: PasswordUtil,
     private readonly mailerService: MailerService,
   ) {}
-
-  private normalizePictureUrl(value?: string): string | undefined {
-    if (!value) return value;
-    // Already an http(s) URL
-    if (/^https?:\/\//i.test(value)) return value;
-    const uploadsPath = path.join(process.cwd(), 'uploads');
-    // Absolute filesystem path to uploads -> convert to public URL
-    if (value.startsWith(uploadsPath)) {
-      const rel = value
-        .slice(uploadsPath.length)
-        .replace(/^[/\\]+/, '')
-        .split(path.sep)
-        .join('/');
-      return `http://localhost:5001/uploads/${rel}`;
-    }
-    // Already a web path under /uploads -> prefix with server
-    if (value.startsWith('/uploads/')) {
-      return `http://localhost:5001${value}`;
-    }
-    return value;
-  }
 
   async createUser(createUserDto: CreateUserDto): Promise<number> {
     const {
@@ -209,18 +187,6 @@ export class UserService {
         bannerPicture,
       );
       updateUserInfosDto.banner_picture = uploadedBannerPicture.url;
-    }
-
-    // Normalize any incoming URLs (avoid saving local file system paths)
-    if (updateUserInfosDto.profile_picture) {
-      updateUserInfosDto.profile_picture = this.normalizePictureUrl(
-        updateUserInfosDto.profile_picture,
-      ) as string;
-    }
-    if (updateUserInfosDto.banner_picture) {
-      updateUserInfosDto.banner_picture = this.normalizePictureUrl(
-        updateUserInfosDto.banner_picture,
-      ) as string;
     }
 
     await this.userInfosRepository.update(userId, updateUserInfosDto);

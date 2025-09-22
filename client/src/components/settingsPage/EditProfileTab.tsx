@@ -16,7 +16,10 @@ const EditProfileTab: React.FC = () => {
     fetchUserProfile, 
     updateUserProfile,
     uploadProfilePicture,
-    uploadBannerPicture
+  uploadBannerPicture,
+  previewImages,
+  hasUnsavedChanges,
+  resetPreview,
   } = useUserProfileContext();
   
   const [formData, setFormData] = useState({
@@ -124,18 +127,9 @@ const EditProfileTab: React.FC = () => {
       return;
     }
 
-    setUpdateStatus('updating');
+    // Déclenche uniquement la preview locale, pas d'upload serveur
     const success = await uploadProfilePicture(file);
-    if (success) {
-      if (userProfile?.profile_picture) {
-        setFormData(prev => ({
-          ...prev,
-          profile_picture: userProfile.profile_picture || ""
-        }));
-      }
-      setUpdateStatus('success');
-      setTimeout(() => setUpdateStatus('idle'), 3000);
-    } else {
+    if (!success) {
       setUpdateStatus('error');
       setTimeout(() => setUpdateStatus('idle'), 3000);
     }
@@ -155,19 +149,9 @@ const EditProfileTab: React.FC = () => {
       return;
     }
 
-    setUpdateStatus('updating');
+    // Déclenche uniquement la preview locale, pas d'upload serveur
     const success = await uploadBannerPicture(file);
-    if (success) {
-      // Mettre à jour le formData avec la nouvelle URL de l'image
-      if (userProfile?.banner_picture) {
-        setFormData(prev => ({
-          ...prev,
-          banner_picture: userProfile.banner_picture || ""
-        }));
-      }
-      setUpdateStatus('success');
-      setTimeout(() => setUpdateStatus('idle'), 3000);
-    } else {
+    if (!success) {
       setUpdateStatus('error');
       setTimeout(() => setUpdateStatus('idle'), 3000);
     }
@@ -178,7 +162,7 @@ const EditProfileTab: React.FC = () => {
     setUpdateStatus('updating');
     
     try {
-      const success = await updateUserProfile(formData);
+  const success = await updateUserProfile(formData);
       if (success) {
         setUpdateStatus('success');
         setTimeout(() => setUpdateStatus('idle'), 3000);
@@ -237,9 +221,9 @@ const EditProfileTab: React.FC = () => {
         <div className="bg-gray-100 rounded-lg border shadow-xl overflow-hidden">
           {/* Bannière */}
           <div className="w-full h-32 relative">
-            {userProfile?.banner_picture ? (
+            {(previewImages.banner || userProfile?.banner_picture) ? (
               <img 
-                src={userProfile.banner_picture} 
+                src={previewImages.banner || userProfile?.banner_picture || ''} 
                 alt="Bannière de profil" 
                 className="w-full h-full object-cover"
               />
@@ -250,14 +234,19 @@ const EditProfileTab: React.FC = () => {
                 className="w-full h-full object-cover"
               />
             )}
+            {previewImages.banner && (
+              <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
+                Prévisualisation
+              </div>
+            )}
           </div>
           
           {/* Section profil avec avatar */}
           <div className="flex space-x-6 p-6">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex -mt-16 relative border-4 border-white">
-              {userProfile?.profile_picture ? (
+              {(previewImages.profile || userProfile?.profile_picture) ? (
                 <img 
-                  src={userProfile.profile_picture} 
+                  src={previewImages.profile || userProfile?.profile_picture || ''} 
                   alt="Photo de profil" 
                   className="w-full h-full rounded-full object-cover"
                 />
@@ -265,6 +254,11 @@ const EditProfileTab: React.FC = () => {
                 <span className="text-white text-2xl font-bold flex items-center justify-center w-full h-full">
                   {userProfile?.pseudo?.charAt(0).toUpperCase() || user.pseudo?.charAt(0).toUpperCase() || 'U'}
                 </span>
+              )}
+              {previewImages.profile && (
+                <div className="absolute -bottom-2 -translate-x-1/2 bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  Prévisualisation
+                </div>
               )}
             </div>
             <div className="flex-1">
@@ -309,6 +303,19 @@ const EditProfileTab: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {hasUnsavedChanges && (
+          <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg flex items-center justify-between">
+            <span className="text-yellow-800 text-sm">Vous avez des modifications non sauvegardées (images).</span>
+            <button
+              type="button"
+              onClick={resetPreview}
+              className="px-3 py-1.5 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
+            >
+              Annuler les changements d'images
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
