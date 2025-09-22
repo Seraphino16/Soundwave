@@ -5,7 +5,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useUserContext } from '../context/UserContext';
+import { BurgerMenuIcon } from '../components/utils/Icons';
 
 import EditProfileTab from '../components/settingsPage/EditProfileTab';
 import FollowFollowersTab from '../components/settingsPage/FollowFollowersTab';
@@ -169,7 +171,7 @@ const Settings: React.FC = () => {
                   <button
                     key={item.id}
                     onClick={() => handleTabChange(item.id)}
-                    className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 relative group ${
+                    className={`hover:cursor-pointer w-full flex items-center px-6 py-4 text-left transition-all duration-200 relative group ${
                       activeTab === item.id
                         ? 'bg-sky-400 text-white shadow-lg transform scale-[1.02]'
                         : 'text-slate-500 hover:text-white hover:bg-slate-700'
@@ -193,60 +195,67 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Sidebar mobile (drawer) */}
-            {isSidebarOpen && (
-              <div
-                id="settings-drawer"
-                ref={drawerRef}
-                className="md:hidden fixed inset-y-0 left-0 w-72 bg-slate-50 transform translate-x-0 transition-transform duration-300 ease-in-out z-40"
-                role="navigation"
-                aria-label="Menu des paramètres"
-              >
-                <div className="p-5 border-b border-slate-700 flex items-center justify-between">
-                    <div className="flex flex-col">
-                    <h2 className="text-xl font-semibold">Paramètres</h2>
-                    <p className="text-sm italic">Gérez votre compte et vos préférences</p>
-                    </div>
-                  <button
-                    aria-label="Fermer le menu"
-                    className="p-2 rounded hover:bg-slate-800"
-                    type="button"
+            <AnimatePresence>
+              {isSidebarOpen && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="md:hidden fixed inset-0 bg-black/40 z-30"
                     onClick={() => setIsSidebarOpen(false)}
-                    ref={closeBtnRef}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                      <path fillRule="evenodd" d="M6.225 4.811a1 1 0 011.414 0L12 9.172l4.361-4.361a1 1 0 011.414 1.414L13.414 10.586l4.361 4.361a1 1 0 01-1.414 1.414L12 12l-4.361 4.361a1 1 0 01-1.414-1.414l4.361-4.361-4.361-4.361a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
-                <nav className="py-2">
-                  {menuItems.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => handleTabChange(item.id)}
-                      className={`w-full flex items-center px-5 py-4 text-left transition-all duration-200 relative ${
-                        activeTab === item.id ? 'bg-sky-500/20' : 'hover:bg-slate-800'
-                      }`}
+                  />
+                    <motion.div
+                      initial={{ x: "-100%", opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: "-100%", opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      id="settings-drawer"
+                      ref={drawerRef}
+                      className="md:hidden fixed inset-y-0 left-0 w-72 bg-slate-50 z-40"
+                      role="navigation"
+                      aria-label="Menu des paramètres"
                     >
-                      <span className="text-xl mr-4">{item.icon}</span>
-                      <span className="font-medium">{item.label}</span>
-                    </button>
-                  ))}
-                </nav>
-              </div>
-            )}
-
-            {/* Overlay */}
-            {isSidebarOpen && (
-              <button
-                className="md:hidden fixed inset-0 bg-black/40 z-30"
-                aria-label="Fermer le menu"
-                onClick={() => setIsSidebarOpen(false)}
-              />
-            )}
+                      <div className="p-5 border-b border-slate-700 flex items-center justify-between">
+                          <div className="flex flex-col">
+                          <h2 className="text-xl font-semibold">Paramètres</h2>
+                          <p className="text-sm italic">Gérez votre compte et vos préférences</p>
+                          </div>
+                        <button
+                          aria-label="Fermer le menu"
+                          className="p-2 rounded hover:bg-slate-800"
+                          type="button"
+                          onClick={() => setIsSidebarOpen(false)}
+                          ref={closeBtnRef}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                            <path fillRule="evenodd" d="M6.225 4.811a1 1 0 011.414 0L12 9.172l4.361-4.361a1 1 0 011.414 1.414L13.414 10.586l4.361 4.361a1 1 0 01-1.414 1.414L12 12l-4.361 4.361a1 1 0 01-1.414-1.414l4.361-4.361-4.361-4.361a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      </div>
+                      <nav className="py-2">
+                        {menuItems.map((item) => (
+                          <button
+                            key={item.id}
+                            onClick={() => handleTabChange(item.id)}
+                            className={`w-full flex items-center px-5 py-4 text-left transition-all duration-200 relative ${
+                              activeTab === item.id ? 'bg-sky-500/20' : 'hover:bg-slate-800'
+                            }`}
+                          >
+                            <span className="text-xl mr-4">{item.icon}</span>
+                            <span className="font-medium">{item.label}</span>
+                          </button>
+                        ))}
+                      </nav>
+                    </motion.div>
+                  </>
+                )}
+            </AnimatePresence>
 
             <div className="flex-1 bg-gray-50">
-              {/* Barre supérieure mobile avec burger + titre */}
-        <div className="md:hidden sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-3">
+              {/* Barre supérieure mobile (icône burger menu + titre) */}
+              <div className="md:hidden sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-3">
                 <button
                   aria-label="Ouvrir le menu"
                   className="p-2 rounded-md border bg-white text-slate-700 hover:bg-slate-50"
@@ -255,18 +264,21 @@ const Settings: React.FC = () => {
           aria-expanded={isSidebarOpen}
           ref={burgerBtnRef}
                 >
-                  {/* Burger icon */}
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                    <path fillRule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zm.75 4.5a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5H3.75z" clipRule="evenodd" />
-                  </svg>
+                  <BurgerMenuIcon />
                 </button>
                 <h2 className="text-lg font-semibold text-slate-800">{activeLabel}</h2>
               </div>
 
               <div className="h-full overflow-y-auto">
-                <div className="animate-fadeIn">
+                <motion.div 
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="animate-fadeIn"
+                >
                   <ActiveComponent />
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>

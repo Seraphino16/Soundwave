@@ -204,7 +204,7 @@ const EditProfileTab: React.FC = () => {
           <p className="text-red-800">Erreur lors du chargement du profil: {error}</p>
           <button 
             onClick={() => fetchUserProfile(user.id)}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors hover:cursor-pointer"
           >
             Réessayer
           </button>
@@ -288,14 +288,14 @@ const EditProfileTab: React.FC = () => {
               
               <button 
                 onClick={() => profilePictureRef.current?.click()}
-                className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors hover:cursor-pointer"
                 disabled={loading}
               >
                 {loading ? "Upload..." : "Changer la photo"}
               </button>
               <button 
                 onClick={() => bannerPictureRef.current?.click()}
-                className="mt-3 ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="mt-3 ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors hover:cursor-pointer"
                 disabled={loading}
               >
                 {loading ? "Upload..." : "Changer la bannière"}
@@ -310,7 +310,7 @@ const EditProfileTab: React.FC = () => {
             <button
               type="button"
               onClick={resetPreview}
-              className="px-3 py-1.5 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
+              className="px-3 py-1.5 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm hover:cursor-pointer"
             >
               Annuler les changements d'images
             </button>
@@ -399,7 +399,7 @@ const EditProfileTab: React.FC = () => {
                 disabled={!newMusicPreference.trim() || 
                          formData.musicStyle.length >= 5 || 
                          formData.musicStyle.includes(newMusicPreference.trim())}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
               >
                 Ajouter
               </button>
@@ -417,7 +417,7 @@ const EditProfileTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => removeMusicPreference(index)}
-                      className="ml-1 w-4 h-4 flex items-center justify-center rounded-full bg-gray-300 transition-colors"
+                      className="ml-1 w-4 h-4 flex items-center justify-center rounded-full bg-gray-300 transition-colors hover:cursor-pointer"
                       title="Supprimer cette préférence"
                     >
                       <span className="text-xs font-bold">×</span>
@@ -554,7 +554,7 @@ const EditProfileTab: React.FC = () => {
 
           <button
             type="submit"
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
             disabled={loading || !!usernameError || formData.username.length < 4}
           >
             {loading ? "Sauvegarde..." : "Sauvegarder les modifications"}
