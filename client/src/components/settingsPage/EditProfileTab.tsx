@@ -9,19 +9,19 @@ import { useUserProfileContext } from "../../context/UserProfileContext";
 
 const EditProfileTab: React.FC = () => {
   const { user } = useUserContext();
-  const { 
-    userProfile, 
-    loading: profileLoading, 
-    error, 
-    fetchUserProfile, 
+  const {
+    userProfile,
+    loading: profileLoading,
+    error,
+    fetchUserProfile,
     updateUserProfile,
     uploadProfilePicture,
-  uploadBannerPicture,
-  previewImages,
-  hasUnsavedChanges,
-  resetPreview,
+    uploadBannerPicture,
+    previewImages,
+    hasUnsavedChanges,
+    resetPreview,
   } = useUserProfileContext();
-  
+
   const [formData, setFormData] = useState({
     pseudo: "",
     username: "",
@@ -32,9 +32,9 @@ const EditProfileTab: React.FC = () => {
     banner_picture: "",
   });
   const [usernameError, setUsernameError] = useState("");
-  const [updateStatus, setUpdateStatus] = useState<'idle' | 'updating' | 'success' | 'error'>('idle');
+  const [updateStatus, setUpdateStatus] = useState<"idle" | "updating" | "success" | "error">("idle");
   const [newMusicPreference, setNewMusicPreference] = useState("");
-  
+
   const profilePictureRef = useRef<HTMLInputElement>(null);
   const bannerPictureRef = useRef<HTMLInputElement>(null);
 
@@ -88,26 +88,24 @@ const EditProfileTab: React.FC = () => {
   };
 
   const addMusicPreference = () => {
-    if (newMusicPreference.trim() && 
-        formData.musicStyle.length < 5 && 
-        !formData.musicStyle.includes(newMusicPreference.trim())) {
-      setFormData(prev => ({
+    if (newMusicPreference.trim() && formData.musicStyle.length < 5 && !formData.musicStyle.includes(newMusicPreference.trim())) {
+      setFormData((prev) => ({
         ...prev,
-        musicStyle: [...prev.musicStyle, newMusicPreference.trim()]
+        musicStyle: [...prev.musicStyle, newMusicPreference.trim()],
       }));
       setNewMusicPreference("");
     }
   };
 
   const removeMusicPreference = (indexToRemove: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      musicStyle: prev.musicStyle.filter((_, index) => index !== indexToRemove)
+      musicStyle: prev.musicStyle.filter((_, index) => index !== indexToRemove),
     }));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       addMusicPreference();
     }
@@ -117,21 +115,21 @@ const EditProfileTab: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file || !user?.id) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert('Veuillez sélectionner un fichier image');
+    if (!file.type.startsWith("image/")) {
+      alert("Veuillez sélectionner un fichier image");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Le fichier est trop volumineux. Taille maximale: 5MB');
+      alert("Le fichier est trop volumineux. Taille maximale: 5MB");
       return;
     }
 
     // Déclenche uniquement la preview locale, pas d'upload serveur
     const success = await uploadProfilePicture(file);
     if (!success) {
-      setUpdateStatus('error');
-      setTimeout(() => setUpdateStatus('idle'), 3000);
+      setUpdateStatus("error");
+      setTimeout(() => setUpdateStatus("idle"), 3000);
     }
   };
 
@@ -139,44 +137,44 @@ const EditProfileTab: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file || !user?.id) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert('Veuillez sélectionner un fichier image');
+    if (!file.type.startsWith("image/")) {
+      alert("Veuillez sélectionner un fichier image");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Le fichier est trop volumineux. Taille maximale: 5MB');
+      alert("Le fichier est trop volumineux. Taille maximale: 5MB");
       return;
     }
 
     // Déclenche uniquement la preview locale, pas d'upload serveur
     const success = await uploadBannerPicture(file);
     if (!success) {
-      setUpdateStatus('error');
-      setTimeout(() => setUpdateStatus('idle'), 3000);
+      setUpdateStatus("error");
+      setTimeout(() => setUpdateStatus("idle"), 3000);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUpdateStatus('updating');
-    
+    setUpdateStatus("updating");
+
     try {
-  const success = await updateUserProfile(formData);
+      const success = await updateUserProfile(formData);
       if (success) {
-        setUpdateStatus('success');
-        setTimeout(() => setUpdateStatus('idle'), 3000);
+        setUpdateStatus("success");
+        setTimeout(() => setUpdateStatus("idle"), 3000);
       } else {
-        setUpdateStatus('error');
-        setTimeout(() => setUpdateStatus('idle'), 3000);
+        setUpdateStatus("error");
+        setTimeout(() => setUpdateStatus("idle"), 3000);
       }
     } catch (err) {
-      setUpdateStatus('error');
-      setTimeout(() => setUpdateStatus('idle'), 3000);
+      setUpdateStatus("error");
+      setTimeout(() => setUpdateStatus("idle"), 3000);
     }
   };
 
-  const loading = profileLoading || updateStatus === 'updating';
+  const loading = profileLoading || updateStatus === "updating";
 
   if (profileLoading && !userProfile) {
     return (
@@ -202,7 +200,7 @@ const EditProfileTab: React.FC = () => {
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
           <p className="text-red-800">Erreur lors du chargement du profil: {error}</p>
-          <button 
+          <button
             onClick={() => fetchUserProfile(user.id)}
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors hover:cursor-pointer"
           >
@@ -214,92 +212,83 @@ const EditProfileTab: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Profil</h2>
+    <div className="p-4 sm:p-6">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 hidden sm:block">Profil</h2>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="bg-gray-100 rounded-lg border shadow-xl overflow-hidden">
-          {/* Bannière */}
-          <div className="w-full h-32 relative">
-            {(previewImages.banner || userProfile?.banner_picture) ? (
-              <img 
-                src={previewImages.banner || userProfile?.banner_picture || ''} 
-                alt="Bannière de profil" 
-                className="w-full h-full object-cover"
-              />
+          <button
+            onClick={() => bannerPictureRef.current?.click()}
+            className="w-full h-32 sm:h-40 relative hover:opacity-90 transition-opacity cursor-pointer group"
+            title="Cliquez pour modifier la bannière"
+          >
+            {previewImages.banner || userProfile?.banner_picture ? (
+              <img src={previewImages.banner || userProfile?.banner_picture || ""} alt="Bannière de profil" className="w-full h-full object-cover" />
             ) : (
-              <img 
-                src="https://placehold.co/1500x500?text=Placeholder" 
-                alt="Bannière placeholder" 
-                className="w-full h-full object-cover"
-              />
-            )}
-            {previewImages.banner && (
-              <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
-                Prévisualisation
+              <div className="w-full h-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+                <span className="text-white text-lg opacity-70">Cliquez pour ajouter une bannière</span>
               </div>
             )}
-          </div>
-          
-          {/* Section profil avec avatar */}
-          <div className="flex space-x-6 p-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex -mt-16 relative border-4 border-white">
-              {(previewImages.profile || userProfile?.profile_picture) ? (
-                <img 
-                  src={previewImages.profile || userProfile?.profile_picture || ''} 
-                  alt="Photo de profil" 
+            {previewImages.banner && (
+              <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">Prévisualisation</div>
+            )}
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-white text-sm bg-black bg-opacity-50 px-3 py-1 rounded">
+                Modifier la bannière
+              </div>
+            </div>
+          </button>
+
+          <div className="flex flex-col sm:flex-row sm:space-x-6 p-4 sm:p-6">
+            <button
+              onClick={() => profilePictureRef.current?.click()}
+              className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex -mt-12 sm:-mt-16 relative border-4 border-white hover:scale-105 transition-transform duration-200 cursor-pointer group mx-auto sm:mx-0 flex-shrink-0"
+              title="Cliquez pour modifier la photo de profil"
+            >
+              {previewImages.profile || userProfile?.profile_picture ? (
+                <img
+                  src={previewImages.profile || userProfile?.profile_picture || ""}
+                  alt="Photo de profil"
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
-                <span className="text-white text-2xl font-bold flex items-center justify-center w-full h-full">
-                  {userProfile?.pseudo?.charAt(0).toUpperCase() || user.pseudo?.charAt(0).toUpperCase() || 'U'}
+                <span className="text-white text-xl sm:text-2xl font-bold flex items-center justify-center w-full h-full">
+                  {userProfile?.pseudo?.charAt(0).toUpperCase() || user.pseudo?.charAt(0).toUpperCase() || "U"}
                 </span>
               )}
               {previewImages.profile && (
-                <div className="absolute -bottom-2 -translate-x-1/2 bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">
                   Prévisualisation
                 </div>
               )}
-            </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-800">{userProfile?.pseudo || user.pseudo}</h3>
-              <p className="text-gray-600 font-mono">{userProfile?.username || user.username}</p>
-              <p className="text-sm text-gray-500">{userProfile?.email || user.email}</p>
-              
-              {/* Statistiques du profil */}
-              <div className="flex items-center space-x-4 mt-3">
+              <div className="absolute inset-0 rounded-full bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-white text-xs text-center">
+                  <div>📷</div>
+                </div>
+              </div>
+            </button>
+            <div className="flex-1 text-center sm:text-left mt-2 sm:mt-0">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800">{userProfile?.pseudo || user.pseudo}</h3>
+              <p className="text-gray-600 font-mono text-sm sm:text-base">@{userProfile?.username || user.username}</p>
+              {userProfile?.bio && <div className="text-sm text-gray-500 pt-2 rounded italic sm:text-left">{userProfile.bio}</div>}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-3">
                 <div className="text-center">
-                  <div className="text-lg font-bold text-blue-600">{userProfile?.followers || 0}</div>
+                  <div className="text-sm sm:text-lg font-bold text-blue-600">{userProfile?.followers || 0}</div>
                   <div className="text-xs text-gray-500">Abonnés</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-purple-600">{userProfile?.following || 0}</div>
+                  <div className="text-sm sm:text-lg font-bold text-purple-600">{userProfile?.following || 0}</div>
                   <div className="text-xs text-gray-500">Abonnements</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-green-600">{userProfile?.totalPlaylists || 0}</div>
+                  <div className="text-sm sm:text-lg font-bold text-green-600">{userProfile?.totalPlaylists || 0}</div>
                   <div className="text-xs text-gray-500">Playlists</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-orange-600">{userProfile?.totalEvents || 0}</div>
+                  <div className="text-sm sm:text-lg font-bold text-orange-600">{userProfile?.totalEvents || 0}</div>
                   <div className="text-xs text-gray-500">Événements</div>
                 </div>
               </div>
-              
-              <button 
-                onClick={() => profilePictureRef.current?.click()}
-                className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors hover:cursor-pointer"
-                disabled={loading}
-              >
-                {loading ? "Upload..." : "Changer la photo"}
-              </button>
-              <button 
-                onClick={() => bannerPictureRef.current?.click()}
-                className="mt-3 ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors hover:cursor-pointer"
-                disabled={loading}
-              >
-                {loading ? "Upload..." : "Changer la bannière"}
-              </button>
             </div>
           </div>
         </div>
@@ -318,7 +307,7 @@ const EditProfileTab: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Pseudo</label>
               <input
@@ -343,12 +332,7 @@ const EditProfileTab: React.FC = () => {
                 placeholder="votre_nom_utilisateur"
               />
               {usernameError && <p className="text-xs text-red-600 mt-1">{usernameError}</p>}
-              {!usernameError && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Votre nom d'utilisateur doit être unique. Seuls les lettres, chiffres, points, tirets et underscores sont
-                  autorisés.
-                </p>
-              )}
+              {!usernameError && <p className="text-xs text-gray-500 mt-1">Lettres, chiffres, points, tirets et underscores autorisés.</p>}
             </div>
           </div>
 
@@ -377,12 +361,10 @@ const EditProfileTab: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Styles musicaux ({formData.musicStyle.length}/5)
-            </label>
-            
+            <label className="block text-sm font-medium text-gray-700 mb-2">Styles musicaux ({formData.musicStyle.length}/5)</label>
+
             {/* Zone d'ajout */}
-            <div className="flex gap-2 mb-3">
+            <div className="flex flex-col sm:flex-row gap-2 mb-3">
               <input
                 type="text"
                 value={newMusicPreference}
@@ -396,10 +378,8 @@ const EditProfileTab: React.FC = () => {
               <button
                 type="button"
                 onClick={addMusicPreference}
-                disabled={!newMusicPreference.trim() || 
-                         formData.musicStyle.length >= 5 || 
-                         formData.musicStyle.includes(newMusicPreference.trim())}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
+                disabled={!newMusicPreference.trim() || formData.musicStyle.length >= 5 || formData.musicStyle.includes(newMusicPreference.trim())}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer w-full sm:w-auto"
               >
                 Ajouter
               </button>
@@ -428,15 +408,11 @@ const EditProfileTab: React.FC = () => {
             )}
 
             {formData.musicStyle.length === 0 && (
-              <p className="text-sm text-gray-500 italic">
-                Aucune préférence musicale ajoutée. Ajoutez jusqu'à 5 genres que vous aimez !
-              </p>
+              <p className="text-sm text-gray-500 italic">Aucune préférence musicale ajoutée. Ajoutez jusqu'à 5 genres que vous aimez !</p>
             )}
 
             {formData.musicStyle.length >= 5 && (
-              <p className="text-sm text-orange-600">
-                ⚠️ Limite atteinte : vous avez ajouté le maximum de 5 Styles musicaux.
-              </p>
+              <p className="text-sm text-orange-600">⚠️ Limite atteinte : vous avez ajouté le maximum de 5 Styles musicaux.</p>
             )}
           </div>
 
@@ -462,44 +438,44 @@ const EditProfileTab: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Type de compte :</span>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  userProfile?.accountType === 'premium' ? 'bg-gold-100 text-gold-800' :
-                  userProfile?.accountType === 'artist' ? 'bg-purple-100 text-purple-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {userProfile?.accountType === 'premium' ? '⭐ Premium' :
-                   userProfile?.accountType === 'artist' ? '🎵 Artiste' : 
-                   '🆓 Gratuit'}
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${
+                    userProfile?.accountType === "premium"
+                      ? "bg-gold-100 text-gold-800"
+                      : userProfile?.accountType === "artist"
+                      ? "bg-purple-100 text-purple-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {userProfile?.accountType === "premium" ? "⭐ Premium" : userProfile?.accountType === "artist" ? "🎵 Artiste" : "🆓 Gratuit"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Compte vérifié :</span>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  userProfile?.is_verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${
+                    userProfile?.is_verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                  }`}
+                >
                   {userProfile?.is_verified ? "✓ Vérifié" : "⚠ Non vérifié"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Statut :</span>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  userProfile?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${userProfile?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                >
                   {userProfile?.is_active ? "Actif" : "Inactif"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Membre depuis :</span>
-                <span className="text-gray-800">
-                  {new Date(userProfile?.createdAt || user.createdAt).toLocaleDateString("fr-FR")}
-                </span>
+                <span className="text-gray-800">{new Date(userProfile?.createdAt || user.createdAt).toLocaleDateString("fr-FR")}</span>
               </div>
               {userProfile?.lastActive && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Dernière activité :</span>
-                  <span className="text-gray-800">
-                    {new Date(userProfile.lastActive).toLocaleDateString("fr-FR")}
-                  </span>
+                  <span className="text-gray-800">{new Date(userProfile.lastActive).toLocaleDateString("fr-FR")}</span>
                 </div>
               )}
             </div>
@@ -511,10 +487,7 @@ const EditProfileTab: React.FC = () => {
               <h3 className="text-sm font-medium text-purple-800 mb-3">Genres musicaux favoris</h3>
               <div className="flex flex-wrap gap-2">
                 {userProfile.favoriteGenres.map((genre, index) => (
-                  <span 
-                    key={index}
-                    className="px-3 py-1 bg-purple-100 text-purple-800 text-xs rounded-full"
-                  >
+                  <span key={index} className="px-3 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
                     {genre}
                   </span>
                 ))}
@@ -528,10 +501,7 @@ const EditProfileTab: React.FC = () => {
               <h3 className="text-sm font-medium text-green-800 mb-3">Styles musicaux</h3>
               <div className="flex flex-wrap gap-2">
                 {userProfile.musicStyle.map((style, index) => (
-                  <span 
-                    key={index}
-                    className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full"
-                  >
+                  <span key={index} className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                     {style}
                   </span>
                 ))}
@@ -540,41 +510,31 @@ const EditProfileTab: React.FC = () => {
           )}
 
           {/* Notification de mise à jour */}
-          {updateStatus === 'success' && (
+          {updateStatus === "success" && (
             <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
               <p className="text-green-800">✓ Profil mis à jour avec succès !</p>
             </div>
           )}
-          
-          {updateStatus === 'error' && (
+
+          {updateStatus === "error" && (
             <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
               <p className="text-red-800">✗ Erreur lors de la mise à jour du profil</p>
             </div>
           )}
 
-          <button
-            type="submit"
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
-            disabled={loading || !!usernameError || formData.username.length < 4}
-          >
-            {loading ? "Sauvegarde..." : "Sauvegarder les modifications"}
-          </button>
+          <div className="flex justify-center sm:justify-start">
+            <button
+              type="submit"
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer w-full sm:w-auto font-medium"
+              disabled={loading || !!usernameError || formData.username.length < 4}
+            >
+              {loading ? "Sauvegarde..." : "Sauvegarder les modifications"}
+            </button>
+          </div>
 
           {/* Inputs cachés pour l'upload d'images */}
-          <input
-            ref={profilePictureRef}
-            type="file"
-            accept="image/*"
-            onChange={handleProfilePictureUpload}
-            style={{ display: 'none' }}
-          />
-          <input
-            ref={bannerPictureRef}
-            type="file"
-            accept="image/*"
-            onChange={handleBannerPictureUpload}
-            style={{ display: 'none' }}
-          />
+          <input ref={profilePictureRef} type="file" accept="image/*" onChange={handleProfilePictureUpload} style={{ display: "none" }} />
+          <input ref={bannerPictureRef} type="file" accept="image/*" onChange={handleBannerPictureUpload} style={{ display: "none" }} />
         </form>
       </div>
     </div>
