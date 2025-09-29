@@ -6,6 +6,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useUserContext } from "../../context/UserContext";
 import { useUserProfileContext } from "../../context/UserProfileContext";
+import DeleteAccountModal from "../modals/DeleteAccountModal";
+import { EditProfileTabService } from "../../services/editProfileTabService";
+import { useAlert } from "../../hooks/useAlert";
+import AlertContainer from "../alerts/Alert";
 
 const EditProfileTab: React.FC = () => {
   const { user } = useUserContext();
@@ -22,6 +26,8 @@ const EditProfileTab: React.FC = () => {
     resetPreview,
   } = useUserProfileContext();
 
+  const { alerts, showSuccess, showError, removeAlert } = useAlert();
+
   const [formData, setFormData] = useState({
     pseudo: "",
     username: "",
@@ -34,6 +40,8 @@ const EditProfileTab: React.FC = () => {
   const [usernameError, setUsernameError] = useState("");
   const [updateStatus, setUpdateStatus] = useState<"idle" | "updating" | "success" | "error">("idle");
   const [newMusicPreference, setNewMusicPreference] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const profilePictureRef = useRef<HTMLInputElement>(null);
   const bannerPictureRef = useRef<HTMLInputElement>(null);
@@ -115,21 +123,19 @@ const EditProfileTab: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file || !user?.id) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Veuillez sélectionner un fichier image");
+    const validation = EditProfileTabService.validateImageFile(file);
+    if (!validation.isValid) {
+      showError("Erreur de fichier", validation.message!);
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Le fichier est trop volumineux. Taille maximale: 5MB");
-      return;
-    }
-
-    // Déclenche uniquement la preview locale, pas d'upload serveur
     const success = await uploadProfilePicture(file);
     if (!success) {
+      showError("Erreur d'upload", "Impossible de télécharger la photo de profil");
       setUpdateStatus("error");
       setTimeout(() => setUpdateStatus("idle"), 3000);
+    } else {
+      showSuccess("Image ajoutée", "Photo de profil ajoutée avec succès");
     }
   };
 
@@ -137,21 +143,19 @@ const EditProfileTab: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file || !user?.id) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Veuillez sélectionner un fichier image");
+    const validation = EditProfileTabService.validateImageFile(file);
+    if (!validation.isValid) {
+      showError("Erreur de fichier", validation.message!);
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Le fichier est trop volumineux. Taille maximale: 5MB");
-      return;
-    }
-
-    // Déclenche uniquement la preview locale, pas d'upload serveur
     const success = await uploadBannerPicture(file);
     if (!success) {
+      showError("Erreur d'upload", "Impossible de télécharger la bannière");
       setUpdateStatus("error");
       setTimeout(() => setUpdateStatus("idle"), 3000);
+    } else {
+      showSuccess("Image ajoutée", "Bannière ajoutée avec succès");
     }
   };
 
@@ -171,6 +175,32 @@ const EditProfileTab: React.FC = () => {
     } catch (err) {
       setUpdateStatus("error");
       setTimeout(() => setUpdateStatus("idle"), 3000);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user?.id) return;
+    
+    setIsDeleting(true);
+    try {
+      const result = await EditProfileTabService.deleteAccount(user.id);
+      
+      if (result.success) {
+        showSuccess("Suppression réussie", "Compte supprimé avec succès. Vous allez être déconnecté.");
+        // Attendre un peu pour que l'utilisateur voit l'alerte
+        setTimeout(() => {
+          EditProfileTabService.clearLocalData();
+          EditProfileTabService.redirectToHome();
+        }, 2000);
+      } else {
+        showError("Erreur de suppression", result.message || "Erreur inconnue");
+      }
+    } catch (error) {
+      console.error("Erreur inattendue:", error);
+      showError("Erreur inattendue", "Une erreur inattendue s'est produite");
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -332,7 +362,7 @@ const EditProfileTab: React.FC = () => {
                 placeholder="votre_nom_utilisateur"
               />
               {usernameError && <p className="text-xs text-red-600 mt-1">{usernameError}</p>}
-              {!usernameError && <p className="text-xs text-gray-500 mt-1">Lettres, chiffres, points, tirets et underscores autorisés.</p>}
+              {!usernameError && <p className="text-xs text-gray-500 mt-1">Seuls les lettres, chiffres, points, tirets et underscores sont autorisés.</p>}
             </div>
           </div>
 
@@ -479,6 +509,22 @@ const EditProfileTab: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* Suppression du compte */}
+            <div className="mt-4 p-4 border border-red-200 bg-red-50">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                  <h4 className="text-sm font-medium text-red-800">Zone de danger</h4>
+                  <p className="text-xs text-red-600">Action irréversible</p>
+                </div>
+                <button
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  🗑️ Supprimer le compte
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Genres musicaux favoris */}
@@ -537,6 +583,17 @@ const EditProfileTab: React.FC = () => {
           <input ref={bannerPictureRef} type="file" accept="image/*" onChange={handleBannerPictureUpload} style={{ display: "none" }} />
         </form>
       </div>
+
+      {/* Modale de suppression du compte */}
+      <DeleteAccountModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteAccount}
+        isDeleting={isDeleting}
+      />
+
+      {/* Conteneur des alertes */}
+      <AlertContainer alerts={alerts} onRemoveAlert={removeAlert} />
     </div>
   );
 };

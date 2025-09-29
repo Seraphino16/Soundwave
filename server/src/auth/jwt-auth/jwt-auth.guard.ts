@@ -14,7 +14,11 @@ export class JwtAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers['authorization']?.split(' ')[1];
+    let token = request.headers['authorization']?.split(' ')[1];
+    
+    if (!token) {
+      token = request.cookies?.token;
+    }
 
     if (!token) {
       throw new UnauthorizedException(AuthErrors.unauthorized().message);
@@ -26,7 +30,6 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException(tokenValidation.message);
     }
 
-    // Typage explicite
     const user = tokenValidation as JwtPayload;
 
     request.user = user;
