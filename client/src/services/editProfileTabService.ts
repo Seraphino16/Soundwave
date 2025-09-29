@@ -15,6 +15,17 @@ export interface FileValidationResult {
   message?: string;
 }
 
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  success: boolean;
+  message?: string;
+}
+
 export class EditProfileTabService {
   /**
    * Supprime définitivement le compte utilisateur
@@ -95,5 +106,121 @@ export class EditProfileTabService {
    */
   static redirectToHome(): void {
     window.location.href = "/";
+  }
+
+  /**
+   * Change le mot de passe de l'utilisateur
+   * @param userId ID de l'utilisateur
+   * @param passwordData Données du changement de mot de passe
+   * @returns Promise<ChangePasswordResponse>
+   */
+  static async changePassword(userId: number, passwordData: ChangePasswordRequest): Promise<ChangePasswordResponse> {
+    try {
+      console.log("Tentative de changement de mot de passe pour l'utilisateur:", userId);
+      
+      const response = await fetch(`${API_BASE_URL}/users/${userId}/password`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(passwordData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          success: true,
+          message: data.message || "Mot de passe changé avec succès"
+        };
+      } else {
+        const errorData = await response.json();
+        console.error("Erreur API:", errorData);
+        return {
+          success: false,
+          message: errorData.message || "Erreur lors du changement de mot de passe"
+        };
+      }
+    } catch (error) {
+      console.error("Erreur lors du changement de mot de passe:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion lors du changement de mot de passe"
+      };
+    }
+  }
+
+  /**
+   * Valide les données de changement de mot de passe
+   * @param passwordData Données à valider
+   * @returns FileValidationResult
+   */
+  static validatePasswordChange(passwordData: ChangePasswordRequest): FileValidationResult {
+    if (!passwordData.oldPassword) {
+      return {
+        isValid: false,
+        message: "L'ancien mot de passe est requis"
+      };
+    }
+
+    if (!passwordData.newPassword) {
+      return {
+        isValid: false,
+        message: "Le nouveau mot de passe est requis"
+      };
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      return {
+        isValid: false,
+        message: "Le mot de passe doit contenir au moins 6 caractères"
+      };
+    }
+
+    if (!/[A-Z]/.test(passwordData.newPassword)) {
+      return {
+        isValid: false,
+        message: "Le mot de passe doit contenir au moins une majuscule"
+      };
+    }
+
+    if (!/[a-z]/.test(passwordData.newPassword)) {
+      return {
+        isValid: false,
+        message: "Le mot de passe doit contenir au moins une minuscule"
+      };
+    }
+
+    if (!/[0-9]/.test(passwordData.newPassword)) {
+      return {
+        isValid: false,
+        message: "Le mot de passe doit contenir au moins un chiffre"
+      };
+    }
+
+    if (!/[@$!%*?&]/.test(passwordData.newPassword)) {
+      return {
+        isValid: false,
+        message: "Le mot de passe doit contenir au moins un caractère spécial (@$!%*?&)"
+      };
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      return {
+        isValid: false,
+        message: "Les mots de passe ne correspondent pas"
+      };
+    }
+
+    if (passwordData.oldPassword === passwordData.newPassword) {
+      return {
+        isValid: false,
+        message: "Le nouveau mot de passe doit être différent de l'ancien"
+      };
+    }
+
+    return {
+      isValid: true
+    };
   }
 }

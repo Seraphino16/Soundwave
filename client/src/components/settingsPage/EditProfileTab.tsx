@@ -7,9 +7,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useUserContext } from "../../context/UserContext";
 import { useUserProfileContext } from "../../context/UserProfileContext";
 import DeleteAccountModal from "../modals/DeleteAccountModal";
-import { EditProfileTabService } from "../../services/editProfileTabService";
+import ChangePasswordModal from "../modals/ChangePasswordModal";
+import { EditProfileTabService, ChangePasswordRequest } from "../../services/editProfileTabService";
 import { useAlert } from "../../hooks/useAlert";
-import AlertContainer from "../alerts/Alert";
+import Alert from "../alerts/AlertContainer";
 
 const EditProfileTab: React.FC = () => {
   const { user } = useUserContext();
@@ -42,6 +43,8 @@ const EditProfileTab: React.FC = () => {
   const [newMusicPreference, setNewMusicPreference] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const profilePictureRef = useRef<HTMLInputElement>(null);
   const bannerPictureRef = useRef<HTMLInputElement>(null);
@@ -201,6 +204,33 @@ const EditProfileTab: React.FC = () => {
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleChangePassword = async (passwordData: ChangePasswordRequest) => {
+    if (!user?.id) return;
+    
+    setIsChangingPassword(true);
+    try {
+      const validation = EditProfileTabService.validatePasswordChange(passwordData);
+      if (!validation.isValid) {
+        showError("Erreur de validation", validation.message!);
+        return;
+      }
+
+      const result = await EditProfileTabService.changePassword(user.id, passwordData);
+      
+      if (result.success) {
+        showSuccess("Mot de passe changé", result.message || "Mot de passe modifié avec succès");
+        setIsPasswordModalOpen(false);
+      } else {
+        showError("Erreur de changement", result.message || "Erreur lors du changement de mot de passe");
+      }
+    } catch (error) {
+      console.error("Erreur inattendue:", error);
+      showError("Erreur inattendue", "Une erreur inattendue s'est produite");
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -393,7 +423,7 @@ const EditProfileTab: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Styles musicaux ({formData.musicStyle.length}/5)</label>
 
-            {/* Zone d'ajout */}
+            {/* Zone d'ajout des styles musicaux */}
             <div className="flex flex-col sm:flex-row gap-2 mb-3">
               <input
                 type="text"
@@ -510,6 +540,22 @@ const EditProfileTab: React.FC = () => {
               )}
             </div>
 
+            {/* Changement de mot de passe */}
+            <div className="mt-4 p-4 border border-blue-200 bg-blue-50">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                  <h4 className="text-sm font-medium text-blue-800">Sécurité du compte</h4>
+                  <p className="text-xs text-blue-600">Modifier votre mot de passe</p>
+                </div>
+                <button
+                  onClick={() => setIsPasswordModalOpen(true)}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  🔒 Changer le mot de passe
+                </button>
+              </div>
+            </div>
+
             {/* Suppression du compte */}
             <div className="mt-4 p-4 border border-red-200 bg-red-50">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -592,8 +638,16 @@ const EditProfileTab: React.FC = () => {
         isDeleting={isDeleting}
       />
 
+      {/* Modale de changement de mot de passe */}
+      <ChangePasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        onConfirm={handleChangePassword}
+        isChanging={isChangingPassword}
+      />
+
       {/* Conteneur des alertes */}
-      <AlertContainer alerts={alerts} onRemoveAlert={removeAlert} />
+      <Alert alerts={alerts} onRemoveAlert={removeAlert} />
     </div>
   );
 };
