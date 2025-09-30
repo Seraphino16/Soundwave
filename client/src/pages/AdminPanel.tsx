@@ -1,51 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-
-interface User {
-    id: number;
-    pseudo: string;
-    username: string;
-    roles: string[];
-}
+import { useRequireAdmin } from "../hooks/useRequireAdmin";
 
 const AdminPanel: React.FC = () => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user, loading, isAdmin } = useRequireAdmin();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        // Check if user is logged in and has admin role
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            const parsedData = JSON.parse(storedUser);
-            const userData = parsedData.user;
-            
-            if (userData && userData.roles && userData.roles.includes('ADMIN')) {
-                setUser(userData);
-            } else {
-                // Redirect if not admin
-                navigate("/home", { replace: true });
-                return;
-            }
-        } else {
-            // Redirect if not logged in
-            navigate("/auth", { replace: true });
-            return;
-        }
-        
-        setLoading(false);
-    }, [navigate]);
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen">
-                <p className="text-center">Vérification des permissions...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryBlue mx-auto"></div>
+                <p className="text-center mt-4">Vérification des permissions...</p>
             </div>
         );
     }
 
-    if (!user) {
-        return null; // If user is not set, do not render the panel
+    if (!isAdmin) {
+        return null;
     }
 
     return (
@@ -56,7 +27,7 @@ const AdminPanel: React.FC = () => {
                         🔧 PANEL ADMINISTRATEUR
                     </h1>
                     <p className="text-gray-600">
-                        Bienvenue dans le panel d'administration, {user.pseudo}
+                        Bienvenue dans le panel d'administration, {user?.pseudo}
                     </p>
                 </div>
 

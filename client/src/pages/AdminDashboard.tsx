@@ -13,6 +13,7 @@ import Alert from '../components/utils/Alert';
 import SimpleBarChart from '../components/charts/SimpleBarChart';
 import SimpleLineChart from '../components/charts/SimpleLineChart';
 import SimpleDoughnutChart from '../components/charts/SimpleDoughnutChart';
+import { useRequireAdmin } from '../hooks/useRequireAdmin';
 
 interface AlertState {
     id: number;
@@ -22,6 +23,8 @@ interface AlertState {
 }
 
 const AdminDashboard: React.FC = () => {
+    const { loading: userLoading, isAdmin } = useRequireAdmin();
+    
     // State management
     const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
     const [userGrowthChart, setUserGrowthChart] = useState<ChartData | null>(null);
@@ -34,10 +37,11 @@ const AdminDashboard: React.FC = () => {
     
     const navigate = useNavigate();
 
-    // Load dashboard data on component mount and period change
     useEffect(() => {
-        fetchDashboardData();
-    }, [period]); // eslint-disable-line react-hooks/exhaustive-deps
+        if (!userLoading && isAdmin) {
+            fetchDashboardData();
+        }
+    }, [period, isAdmin, userLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchDashboardData = async () => {
         setLoading(true);
@@ -84,15 +88,21 @@ const AdminDashboard: React.FC = () => {
         setAlerts(prev => prev.filter(alert => alert.id !== id));
     };
 
-    if (loading) {
+    if (userLoading || loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Chargement du tableau de bord...</p>
+                    <p className="mt-4 text-gray-600">
+                        {userLoading ? "Vérification des permissions..." : "Chargement du tableau de bord..."}
+                    </p>
                 </div>
             </div>
         );
+    }
+
+    if (!isAdmin) {
+        return null;
     }
 
     if (!dashboardStats) {
