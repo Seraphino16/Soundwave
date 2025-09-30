@@ -15,6 +15,7 @@ import UserManagement from './pages/UserManagement';
 import AdminDashboard from './pages/AdminDashboard';
 import Events from './pages/Events';
 import Footer from "./components/footer/Footer";
+import Settings from "pages/Settings";
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </div>
         <Footer />

@@ -55,6 +55,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const user = await res.json();
       console.log("Utilisateur récupéré:", user);
+      console.log("Rôles de l'utilisateur:", user.roles);
+      console.log("Est admin?", user.roles?.includes('ADMIN'));
       setUserState(user);
     } catch (error) {
       console.error("Erreur lors de la récupération de l'utilisateur:", error);

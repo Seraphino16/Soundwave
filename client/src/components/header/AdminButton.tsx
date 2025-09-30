@@ -1,41 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import { useUserContext } from "../../context/UserContext";
 
 const AdminButton: React.FC = () => {
-    const [isAdmin, setIsAdmin] = useState(false);
+    const { user, loading } = useUserContext();
 
-    useEffect(() => {
-        const checkAdminRole = () => {
-            const storedUser = localStorage.getItem("user");
-            if (storedUser) {
-                const parsedData = JSON.parse(storedUser);
-                const userData = parsedData.user;
-                
-                if (userData && userData.roles && userData.roles.includes('ADMIN')) {
-                    setIsAdmin(true);
-                } else {
-                    setIsAdmin(false);
-                }
-            } else {
-                setIsAdmin(false);
-            }
-        };
+    if (loading) {
+        return null;
+    }
 
-        checkAdminRole();
-
-        const handleStorageChange = () => {
-            checkAdminRole();
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        
-        const interval = setInterval(checkAdminRole, 1000);
-
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-            clearInterval(interval);
-        };
-    }, []);
+    const isAdmin = user?.roles?.includes('ADMIN') || false;
 
     if (!isAdmin) {
         return null;

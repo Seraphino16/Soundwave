@@ -4,8 +4,10 @@ import { FiEdit2, FiTrash2, FiToggleLeft, FiToggleRight, FiSearch, FiUsers, FiCh
 import { adminService, User, UserListResponse, CreateUserData } from "../services/adminService";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import Alert from "../components/utils/Alert";
+import { useRequireAdmin } from "../hooks/useRequireAdmin";
 
 const UserManagement: React.FC = () => {
+    const { loading: userLoading, isAdmin } = useRequireAdmin();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -46,8 +48,11 @@ const UserManagement: React.FC = () => {
     const itemsPerPage = 10;
 
     useEffect(() => {
-        fetchUsers();
-    }, [currentPage, search, roleFilter, statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+        // Only fetch users if authenticated and is admin
+        if (!userLoading && isAdmin) {
+            fetchUsers();
+        }
+    }, [currentPage, search, roleFilter, statusFilter, isAdmin, userLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchUsers = async () => {
         try {
@@ -226,15 +231,21 @@ const UserManagement: React.FC = () => {
         return new Date(dateString).toLocaleDateString('fr-FR');
     };
 
-    if (loading) {
+    if (userLoading || loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryBlue mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Chargement des utilisateurs...</p>
+                    <p className="mt-4 text-gray-600">
+                        {userLoading ? "Vérification des permissions..." : "Chargement des utilisateurs..."}
+                    </p>
                 </div>
             </div>
         );
+    }
+    
+    if (!isAdmin) {
+        return null;
     }
 
     return (

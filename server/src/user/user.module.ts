@@ -33,7 +33,7 @@ import { MailerService } from '../mailer/mailer.service';
     MailerModule,
     HttpModule,
     TokenModule,
-    UploadsModule,
+    forwardRef(() => UploadsModule),
     SpotifyModule,
     forwardRef(() => GoogleModule),
     UtilsModule,

@@ -403,6 +403,45 @@ export class UserController {
     }
   }
 
+  @Put(':userId/profile')
+  @ApiOperation({ summary: 'Mettre à jour le profil utilisateur' })
+  @ApiOkResponse({ description: 'Profil utilisateur mis à jour avec succès' })
+  @ApiNotFoundResponse({ description: 'Utilisateur non trouvé' })
+  async updateUserProfile(
+    @Param('userId') userId: number,
+    @Body() updateData: any,
+    @Req() req: any
+  ) {
+    try {
+      const token = req.cookies?.token;
+      if (!token) {
+        throw new BadRequestException("Token d'authentification manquant");
+      }
+
+      let decoded: any;
+      try {
+        decoded = this.tokenService.verifyToken(token);
+      } catch (tokenError) {
+        throw new BadRequestException('Token invalide');
+      }
+
+      if (!decoded || typeof decoded !== 'object' || !decoded.id) {
+        throw new BadRequestException('Token invalide');
+      }
+
+      if (decoded.id !== Number(userId)) {
+        throw new BadRequestException('Vous ne pouvez pas modifier ce profil');
+      }
+      
+      return await this.userService.updateUserProfile(userId, updateData);
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) throw error;
+      throw new InternalServerErrorException(
+        'Erreur lors de la mise à jour du profil',
+      );
+    }
+  }
+
   @UseGuards(JwtAuthGuard)
   @Patch('/:id/password')
   async changePassword(
