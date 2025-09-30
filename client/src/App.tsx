@@ -16,6 +16,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Events from './pages/Events';
 import Footer from "./components/footer/Footer";
 import Settings from "pages/Settings";
+import UserProfile from './pages/UserProfile';
 
 export default function App() {
   return (
@@ -38,6 +39,8 @@ export default function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/events" element={<Events />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/profile/:userId" element={<UserProfile />} />
           </Routes>
         </div>
         <Footer />

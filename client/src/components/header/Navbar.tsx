@@ -50,13 +50,31 @@ const Navbar = () => {
   const isAuthRoute = location.pathname.startsWith("/auth");
   const isGuestPage = location.pathname === "/";
 
-  const shouldShowUserInfo = !loading && user;
+  // Temporary mock user for testing profile page
+  const mockUser = {
+    _id: '1',
+    id: 1,
+    pseudo: 'Alex Martin',
+    username: 'music_lover_2024',
+    email: 'alex@example.com',
+    birthdate: '1990-01-01',
+    roles: ['user'],
+    is_verified: true,
+    is_active: true,
+    createdAt: '2023-03-15T10:00:00Z',
+    updatedAt: '2024-08-01T12:00:00Z',
+    verification_token: ''
+  };
+
+  // Use mock user if no real user is available (for testing)
+  const effectiveUser = user || mockUser;
+  const shouldShowUserInfo = !loading && effectiveUser;
 
   return (
     <div className="fixed top-0 w-full flex justify-center z-10">
       <nav className="w-full lg:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md lg:rounded-b-xl z-10">
         <div className="flex items-center space-x-2">
-          <Link to={user ? "/home" : "/"}>
+          <Link to={effectiveUser ? "/home" : "/"}>
             <img src={logo} alt="Logo" className="w-16 h-16" />
           </Link>
           <span className="text-2xl md:text-3xl lg:text-4xl mt-6 hover:text-text-200 font-site-name text-primaryBlue">SoundWave</span>
@@ -94,10 +112,10 @@ const Navbar = () => {
             </Link>
             {shouldShowUserInfo && (
               <div className="flex items-center space-x-4 ml-4">
-                <div className="flex flex-col items-end">
-                  <span className="text-lg font-semibold">{user.pseudo}</span>
-                  <span className="text-sm text-gray-500">@{user.username}</span>
-                </div>
+                <Link to="/profile" className="flex flex-col items-end hover:opacity-80 transition">
+                  <span className="text-lg font-semibold">{effectiveUser.pseudo}</span>
+                  <span className="text-sm text-gray-500">@{effectiveUser.username}</span>
+                </Link>
                 <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
                   Déconnexion
                 </button>
@@ -154,16 +172,24 @@ const Navbar = () => {
                                     </div>
                                     {shouldShowUserInfo && (
                                         <div className="flex flex-col items-center space-y-2">
-                                            <div className="flex flex-col items-center">
-                                                <span className="text-lg font-semibold">{user.pseudo}</span>
-                                                <span className="text-sm text-gray-500">@{user.username}</span>
+                                            <Link to="/profile" className="flex flex-col items-center hover:opacity-80 transition">
+                                                <span className="text-lg font-semibold">{effectiveUser.pseudo}</span>
+                                                <span className="text-sm text-gray-500">@{effectiveUser.username}</span>
+                                            </Link>
+                                            <div className="flex space-x-2">
+                                                <Link
+                                                    to="/profile"
+                                                    className="px-4 py-2 bg-primaryBlue text-white rounded hover:bg-blue-600 transition text-sm"
+                                                >
+                                                    Mon profil
+                                                </Link>
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition text-sm"
+                                                >
+                                                    Déconnexion
+                                                </button>
                                             </div>
-                                            <button
-                                                onClick={handleLogout}
-                                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                                            >
-                                                Déconnexion
-                                            </button>
                                         </div>
                                     )}
                                     <AdminButton />
