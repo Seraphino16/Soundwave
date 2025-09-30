@@ -180,8 +180,8 @@ const Settings: React.FC = () => {
                       onClick={() => handleTabChange(item.id)}
                       className={`hover:cursor-pointer w-full flex items-center px-6 py-4 text-left transition-all duration-200 relative group ${
                         activeTab === item.id
-                          ? "bg-sky-400 text-white shadow-lg transform scale-[1.02]"
-                          : "text-slate-500 hover:text-white hover:bg-slate-700"
+                          ? "bg-primaryBlue text-white shadow-lg transform scale-[1.02]"
+                          : "text-slate-500 hover:text-white hover:bg-primaryBlue"
                       }`}
                     >
                       {activeTab === item.id && <div className="absolute left-0 top-0 h-full w-1 bg-blue-400 rounded-r-full"></div>}
