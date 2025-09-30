@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
     fetchArtistById,
     fetchAlbumsByArtistId,
@@ -10,6 +10,7 @@ import WavesDetails from "components/waves/WavesDetails";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BackButton from "components/buttons/BackButton";
 
 interface Artist {
     id: string;
@@ -29,7 +30,6 @@ interface Album {
 
 const ArtistDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const [artist, setArtist] = useState<Artist | null>(null);
     const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(true);
@@ -91,12 +91,7 @@ const ArtistDetail: React.FC = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
             <div className="bg-white shadow-xl rounded-lg p-10 w-full max-w-5xl relative">
-                <button
-                    onClick={() => navigate("/artists")}
-                    className="absolute top-6 left-6 text-primaryBlue font-semibold hover:underline"
-                >
-                    ← Retour
-                </button>
+                <BackButton to="/artists" className="absolute top-6 left-6" />
 
                 <div className="mb-10 w-full max-w-3xl mx-auto">
                     <h1 className="text-4xl font-bold text-primaryBlue text-center mb-10">
