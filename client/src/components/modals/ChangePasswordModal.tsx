@@ -138,7 +138,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
             className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-        <div className="bg-blue-600 px-6 py-4">
+        <div className="bg-primaryBlue px-6 py-4">
           <div className="flex items-center">
             <div className="text-white text-2xl mr-3">🔒</div>
             <h2 className="text-xl font-bold text-white">Changer le mot de passe</h2>
@@ -241,14 +241,14 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isChanging}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="hover:cursor-pointer flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={!isFormValid || isChanging}
-              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center"
+              className="hover:cursor-pointer flex-1 px-4 py-3 bg-primaryBlue text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center"
             >
               {isChanging ? (
                 <>

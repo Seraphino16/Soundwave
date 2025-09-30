@@ -239,7 +239,7 @@ const EditProfileTab: React.FC = () => {
   if (profileLoading && !userProfile) {
     return (
       <div className="p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primaryBlue"></div>
         <span className="ml-2 text-gray-600">Chargement...</span>
       </div>
     );
@@ -262,7 +262,7 @@ const EditProfileTab: React.FC = () => {
           <p className="text-red-800">Erreur lors du chargement du profil: {error}</p>
           <button
             onClick={() => fetchUserProfile(user.id)}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors hover:cursor-pointer"
+            className="mt-2 px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600 transition-colors hover:cursor-pointer"
           >
             Réessayer
           </button>
@@ -276,7 +276,7 @@ const EditProfileTab: React.FC = () => {
       <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 hidden sm:block">Profil</h2>
 
       <div className="space-y-4 sm:space-y-6">
-        <div className="bg-gray-100 rounded-lg border shadow-xl overflow-hidden">
+        <div className="bg-gray-100 rounded-lg shadow-xl overflow-hidden">
           <button
             onClick={() => bannerPictureRef.current?.click()}
             className="w-full h-32 sm:h-40 relative hover:opacity-90 transition-opacity cursor-pointer group"
@@ -285,7 +285,7 @@ const EditProfileTab: React.FC = () => {
             {previewImages.banner || userProfile?.banner_picture ? (
               <img src={previewImages.banner || userProfile?.banner_picture || ""} alt="Bannière de profil" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+              <div className="w-full h-full bg-gradient-to-r from-slate-300 to-slate-400 flex items-center justify-center">
                 <span className="text-white text-lg opacity-70">Cliquez pour ajouter une bannière</span>
               </div>
             )}
@@ -302,7 +302,7 @@ const EditProfileTab: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:space-x-6 p-4 sm:p-6">
             <button
               onClick={() => profilePictureRef.current?.click()}
-              className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex -mt-12 sm:-mt-16 relative border-4 border-white hover:scale-105 transition-transform duration-200 cursor-pointer group mx-auto sm:mx-0 flex-shrink-0"
+              className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex -mt-12 sm:-mt-16 relative border-4 border-white hover:scale-105 transition-transform duration-200 cursor-pointer group mx-auto sm:mx-0 flex-shrink-0"
               title="Cliquez pour modifier la photo de profil"
             >
               {previewImages.profile || userProfile?.profile_picture ? (
@@ -331,21 +331,21 @@ const EditProfileTab: React.FC = () => {
               <h3 className="text-lg sm:text-xl font-semibold text-gray-800">{userProfile?.pseudo || user.pseudo}</h3>
               <p className="text-gray-600 font-mono text-sm sm:text-base">@{userProfile?.username || user.username}</p>
               {userProfile?.bio && <div className="text-sm text-gray-500 pt-2 rounded italic sm:text-left">{userProfile.bio}</div>}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-3">
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-3">
                 <div className="text-center">
-                  <div className="text-sm sm:text-lg font-bold text-blue-600">{userProfile?.followers || 0}</div>
+                  <div className="text-sm sm:text-lg font-bold text-slate-600">{userProfile?.followers || 0}</div>
                   <div className="text-xs text-gray-500">Abonnés</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm sm:text-lg font-bold text-purple-600">{userProfile?.following || 0}</div>
+                  <div className="text-sm sm:text-lg font-bold text-slate-600">{userProfile?.following || 0}</div>
                   <div className="text-xs text-gray-500">Abonnements</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm sm:text-lg font-bold text-green-600">{userProfile?.totalPlaylists || 0}</div>
+                  <div className="text-sm sm:text-lg font-bold text-slate-600">{userProfile?.totalPlaylists || 0}</div>
                   <div className="text-xs text-gray-500">Playlists</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm sm:text-lg font-bold text-orange-600">{userProfile?.totalEvents || 0}</div>
+                  <div className="text-sm sm:text-lg font-bold text-slate-600">{userProfile?.totalEvents || 0}</div>
                   <div className="text-xs text-gray-500">Événements</div>
                 </div>
               </div>
@@ -354,12 +354,12 @@ const EditProfileTab: React.FC = () => {
         </div>
 
         {hasUnsavedChanges && (
-          <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg flex items-center justify-between">
-            <span className="text-yellow-800 text-sm">Vous avez des modifications non sauvegardées (images).</span>
+          <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex items-center justify-between">
+            <span className="text-amber-700 text-sm">Vous avez des modifications non sauvegardées (images).</span>
             <button
               type="button"
               onClick={resetPreview}
-              className="px-3 py-1.5 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm hover:cursor-pointer"
+              className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm hover:cursor-pointer"
             >
               Annuler les changements d'images
             </button>
@@ -375,7 +375,7 @@ const EditProfileTab: React.FC = () => {
                 name="pseudo"
                 value={formData.pseudo}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
                 placeholder="Votre pseudo"
               />
             </div>
@@ -387,7 +387,7 @@ const EditProfileTab: React.FC = () => {
                 value={formData.username}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent font-mono ${
-                  usernameError ? "border-red-300 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                  usernameError ? "border-red-300 focus:ring-red-400" : "border-gray-300 focus:ring-primaryBlue"
                 }`}
                 placeholder="votre_nom_utilisateur"
               />
@@ -403,7 +403,7 @@ const EditProfileTab: React.FC = () => {
               name="location"
               value={formData.location}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
               placeholder="Votre ville"
             />
           </div>
@@ -414,7 +414,7 @@ const EditProfileTab: React.FC = () => {
               name="bio"
               value={formData.bio}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
               rows={4}
               placeholder="Parlez-nous de vous..."
             ></textarea>
@@ -430,7 +430,7 @@ const EditProfileTab: React.FC = () => {
                 value={newMusicPreference}
                 onChange={(e) => setNewMusicPreference(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
                 placeholder="Ex: Rock, Jazz, Electronic..."
                 maxLength={30}
                 disabled={formData.musicStyle.length >= 5}
@@ -439,7 +439,7 @@ const EditProfileTab: React.FC = () => {
                 type="button"
                 onClick={addMusicPreference}
                 disabled={!newMusicPreference.trim() || formData.musicStyle.length >= 5 || formData.musicStyle.includes(newMusicPreference.trim())}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer w-full sm:w-auto"
+                className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer w-full sm:w-auto"
               >
                 Ajouter
               </button>
@@ -451,16 +451,16 @@ const EditProfileTab: React.FC = () => {
                 {formData.musicStyle.map((preference, index) => (
                   <div
                     key={index}
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-sky-400 text-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    className="inline-flex items-center gap-2 px-3 py-2 bg-primaryBlue text-white text-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                   >
                     <span className="font-medium">{preference}</span>
                     <button
                       type="button"
                       onClick={() => removeMusicPreference(index)}
-                      className="ml-1 w-4 h-4 flex items-center justify-center rounded-full bg-gray-300 transition-colors hover:cursor-pointer"
+                      className="ml-1 w-4 h-4 flex items-center justify-center rounded-full transition-colors hover:cursor-pointer"
                       title="Supprimer cette préférence"
                     >
-                      <span className="text-xs font-bold">×</span>
+                      <span className="text-xl font-bold">×</span>
                     </button>
                   </div>
                 ))}
@@ -472,19 +472,19 @@ const EditProfileTab: React.FC = () => {
             )}
 
             {formData.musicStyle.length >= 5 && (
-              <p className="text-sm text-orange-600">⚠️ Limite atteinte : vous avez ajouté le maximum de 5 Styles musicaux.</p>
+              <p className="text-sm text-amber-600">⚠️ Limite atteinte : vous avez ajouté le maximum de 5 Styles musicaux.</p>
             )}
           </div>
 
-          <div className="bg-purple-50 border border-purple-200 p-4 rounded-lg">
-            <p className="text-sm text-purple-800">
-              <strong>💡 Astuce :</strong> Vous pouvez gérer vos réseaux sociaux dans l'onglet "Comptes tiers" pour une meilleure organisation.
+                    <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg">
+            <p className="text-sm text-slate-600">
+💡 Vous pouvez gérer vos réseaux sociaux dans l'onglet "Comptes tiers" pour une meilleure organisation.
             </p>
           </div>
 
           {/* Informations du compte */}
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h3 className="text-sm font-medium text-blue-800 mb-3">Informations du compte</h3>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Informations du compte</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Email :</span>
@@ -501,10 +501,10 @@ const EditProfileTab: React.FC = () => {
                 <span
                   className={`px-2 py-1 rounded-full text-xs ${
                     userProfile?.accountType === "premium"
-                      ? "bg-gold-100 text-gold-800"
+                      ? "bg-amber-100 text-amber-700"
                       : userProfile?.accountType === "artist"
-                      ? "bg-purple-100 text-purple-800"
-                      : "bg-gray-100 text-gray-800"
+                      ? "bg-indigo-100 text-indigo-700"
+                      : "bg-gray-100 text-gray-700"
                   }`}
                 >
                   {userProfile?.accountType === "premium" ? "⭐ Premium" : userProfile?.accountType === "artist" ? "🎵 Artiste" : "🆓 Gratuit"}
@@ -514,7 +514,7 @@ const EditProfileTab: React.FC = () => {
                 <span className="text-gray-600">Compte vérifié :</span>
                 <span
                   className={`px-2 py-1 rounded-full text-xs ${
-                    userProfile?.is_verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                    userProfile?.is_verified ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
                   }`}
                 >
                   {userProfile?.is_verified ? "✓ Vérifié" : "⚠ Non vérifié"}
@@ -523,7 +523,7 @@ const EditProfileTab: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-gray-600">Statut :</span>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs ${userProfile?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                  className={`px-2 py-1 rounded-full text-xs ${userProfile?.is_active ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
                 >
                   {userProfile?.is_active ? "Actif" : "Inactif"}
                 </span>
@@ -541,15 +541,15 @@ const EditProfileTab: React.FC = () => {
             </div>
 
             {/* Changement de mot de passe */}
-            <div className="mt-4 p-4 border border-blue-200 bg-blue-50">
+            <div className="mt-4 p-4 border border-slate-200 bg-slate-50">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                  <h4 className="text-sm font-medium text-blue-800">Sécurité du compte</h4>
-                  <p className="text-xs text-blue-600">Modifier votre mot de passe</p>
+                  <h4 className="text-sm font-medium text-slate-700">Sécurité du compte</h4>
+                  <p className="text-xs text-slate-600">Modifier votre mot de passe</p>
                 </div>
                 <button
                   onClick={() => setIsPasswordModalOpen(true)}
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="px-4 py-2 bg-primaryBlue hover:cursor-pointer text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   🔒 Changer le mot de passe
                 </button>
@@ -557,15 +557,15 @@ const EditProfileTab: React.FC = () => {
             </div>
 
             {/* Suppression du compte */}
-            <div className="mt-4 p-4 border border-red-200 bg-red-50">
+            <div className="mt-4 p-4 border border-rose-200 bg-rose-50">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                  <h4 className="text-sm font-medium text-red-800">Zone de danger</h4>
-                  <p className="text-xs text-red-600">Action irréversible</p>
+                  <h4 className="text-sm font-medium text-rose-700">Zone de danger</h4>
+                  <p className="text-xs text-rose-600">Action irréversible</p>
                 </div>
                 <button
                   onClick={() => setIsDeleteModalOpen(true)}
-                  className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="px-4 py-2 bg-rose-500 hover:cursor-pointer text-white text-sm font-medium rounded-lg hover:bg-rose-600 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
                 >
                   🗑️ Supprimer le compte
                 </button>
@@ -575,26 +575,12 @@ const EditProfileTab: React.FC = () => {
 
           {/* Genres musicaux favoris */}
           {userProfile?.favoriteGenres && userProfile.favoriteGenres.length > 0 && (
-            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-              <h3 className="text-sm font-medium text-purple-800 mb-3">Genres musicaux favoris</h3>
+            <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+              <h3 className="text-sm font-medium text-indigo-700 mb-3">Genres musicaux favoris</h3>
               <div className="flex flex-wrap gap-2">
                 {userProfile.favoriteGenres.map((genre, index) => (
-                  <span key={index} className="px-3 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                  <span key={index} className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
                     {genre}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Styles musicaux */}
-          {userProfile?.musicStyle && userProfile.musicStyle.length > 0 && (
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <h3 className="text-sm font-medium text-green-800 mb-3">Styles musicaux</h3>
-              <div className="flex flex-wrap gap-2">
-                {userProfile.musicStyle.map((style, index) => (
-                  <span key={index} className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                    {style}
                   </span>
                 ))}
               </div>
@@ -603,21 +589,21 @@ const EditProfileTab: React.FC = () => {
 
           {/* Notification de mise à jour */}
           {updateStatus === "success" && (
-            <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-              <p className="text-green-800">✓ Profil mis à jour avec succès !</p>
+            <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-lg">
+              <p className="text-emerald-700">✓ Profil mis à jour avec succès !</p>
             </div>
           )}
 
           {updateStatus === "error" && (
-            <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
-              <p className="text-red-800">✗ Erreur lors de la mise à jour du profil</p>
+            <div className="bg-rose-50 border border-rose-200 p-4 rounded-lg">
+              <p className="text-rose-700">✗ Erreur lors de la mise à jour du profil</p>
             </div>
           )}
 
           <div className="flex justify-center sm:justify-start">
             <button
               type="submit"
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer w-full sm:w-auto font-medium"
+              className="px-6 py-3 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer w-full sm:w-auto font-medium"
               disabled={loading || !!usernameError || formData.username.length < 4}
             >
               {loading ? "Sauvegarde..." : "Sauvegarder les modifications"}

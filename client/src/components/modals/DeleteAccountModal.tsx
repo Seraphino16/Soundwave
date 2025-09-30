@@ -64,7 +64,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
             className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-        <div className="bg-red-600 px-6 py-4">
+        <div className="bg-red-500 px-6 py-4">
           <div className="flex items-center">
             <div className="text-white text-2xl mr-3">⚠️</div>
             <h2 className="text-xl font-bold text-white">Supprimer le compte</h2>
@@ -108,14 +108,14 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                 type="button"
                 onClick={onClose}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="hover:cursor-pointer flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 Retour
               </button>
               <button
                 type="submit"
                 disabled={!confirmChecked || isDeleting}
-                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center"
+                className="hover:cursor-pointer flex-1 px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center"
               >
                 {isDeleting ? (
                   <>
