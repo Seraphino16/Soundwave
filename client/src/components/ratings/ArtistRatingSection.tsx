@@ -129,6 +129,7 @@ const ArtistRatingSection: React.FC = () => {
     return (
         <div className="mt-16">
             <div className="flex flex-col md:flex-row justify-center items-start gap-12">
+                {/* Bloc : Votre note */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Votre note
@@ -154,9 +155,9 @@ const ArtistRatingSection: React.FC = () => {
                                     <p className="text-gray-600 flex items-center justify-center gap-1">
                                         Vous avez déjà noté cet artiste :{" "}
                                         <span className="text-yellow-500 flex items-center gap-1">
-                                            {selected}
+                                        {selected}
                                             <IoStarSharp className="text-yellow-500 text-base" />
-                                        </span>
+                                    </span>
                                     </p>
                                     <div className="flex gap-3 justify-center">
                                         <button
@@ -213,6 +214,7 @@ const ArtistRatingSection: React.FC = () => {
                     )}
                 </div>
 
+                {/* Bloc : Note moyenne */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Note moyenne
@@ -239,6 +241,7 @@ const ArtistRatingSection: React.FC = () => {
             </div>
         </div>
     );
+
 
 };
 
