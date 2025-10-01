@@ -9,7 +9,8 @@ import {
     Rating,
     RatingSummary,
 } from "../../services/ratingService";
-
+import {FiEdit2, FiTrash2, FiX} from "react-icons/fi";
+import { TfiSave as TfiSaveRaw } from "react-icons/tfi";
 import {
     IoStarOutline as IoStarOutlineRaw,
     IoStarSharp as IoStarSharpRaw,
@@ -19,6 +20,7 @@ import {
 const IoStarOutline = IoStarOutlineRaw as React.ElementType;
 const IoStarSharp = IoStarSharpRaw as React.ElementType;
 const IoStarHalfOutline = IoStarHalfOutlineRaw as React.ElementType;
+const TfiSave = TfiSaveRaw as React.ElementType;
 
 const ArtistRatingSection: React.FC = () => {
     const { id: artistId } = useParams<{ id: string }>();
@@ -127,7 +129,6 @@ const ArtistRatingSection: React.FC = () => {
     return (
         <div className="mt-16">
             <div className="flex flex-col md:flex-row justify-center items-start gap-12">
-                {/* Bloc votre note */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Votre note
@@ -156,16 +157,19 @@ const ArtistRatingSection: React.FC = () => {
                                     </p>
                                     <div className="flex gap-3 justify-center">
                                         <button
-                                            className="px-4 py-2 bg-yellow-400 text-white rounded"
                                             onClick={() => setIsEditing(true)}
+                                            className="p-2 rounded-full text-primaryBlue hover:bg-primaryBlue/10 transition"
+                                            aria-label="Modifier"
                                         >
-                                            Modifier
+                                            <FiEdit2 className="text-xl" />
                                         </button>
+
                                         <button
-                                            className="px-4 py-2 bg-red-500 text-white rounded"
                                             onClick={handleDeleteRating}
+                                            className="p-2 rounded-full text-primaryBlue hover:bg-primaryBlue/10 transition"
+                                            aria-label="Supprimer"
                                         >
-                                            Supprimer
+                                            <FiTrash2 className="text-xl" />
                                         </button>
                                     </div>
                                 </>
@@ -185,16 +189,19 @@ const ArtistRatingSection: React.FC = () => {
                                     </div>
                                     <div className="flex gap-3 justify-center mt-3">
                                         <button
-                                            className="px-4 py-2 bg-green-500 text-white rounded"
                                             onClick={handleUpdateRating}
+                                            className="p-2 rounded-full text-primaryBlue hover:bg-primaryBlue/10 transition"
+                                            aria-label="Sauvegarder"
                                         >
-                                            Sauvegarder
+                                            <TfiSave className="text-xl" />
                                         </button>
+
                                         <button
-                                            className="px-4 py-2 bg-gray-400 text-white rounded"
                                             onClick={() => setIsEditing(false)}
+                                            className="p-2 rounded-full text-primaryBlue hover:bg-primaryBlue/10 transition"
+                                            aria-label="Annuler"
                                         >
-                                            Annuler
+                                            <FiX className="text-xl" />
                                         </button>
                                     </div>
                                 </>
@@ -203,7 +210,6 @@ const ArtistRatingSection: React.FC = () => {
                     )}
                 </div>
 
-                {/* Bloc note moyenne */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Note moyenne
