@@ -84,7 +84,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       if (response.ok) {
-
+        // Déconnexion réussie, aucun traitement supplémentaire nécessaire
       } else {
         console.error("Erreur lors de la déconnexion côté serveur");
       }
