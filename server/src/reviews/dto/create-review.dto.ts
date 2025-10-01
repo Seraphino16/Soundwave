@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateWaveDto {
+export class CreateReviewDto {
   @IsNotEmpty()
   @IsString()
   artist_id: string;

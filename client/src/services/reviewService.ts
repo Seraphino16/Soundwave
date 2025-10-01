@@ -1,10 +1,10 @@
 /**
- * @description Service de gestion des Waves de SoundWave
+ * @description Service de gestion des Reviews de SoundWave
  */
 
 const API_URL = "http://localhost:5001";
 
-export interface Wave {
+export interface Review {
     id: string;
     artist_id: string;
     user_id: number;
@@ -14,41 +14,41 @@ export interface Wave {
     createdAt: string;
 }
 
-export type LocalWave = Wave & { isEditing?: boolean };
+export type LocalReview = Review & { isEditing?: boolean };
 
-const mapWave = (w: any): LocalWave => ({
-    id: w._id || w.id,
-    artist_id: w.artist_id,
-    user_id: w.user_id,
-    username: w.username,
-    profile_picture: w.profile_picture,
-    message: w.message,
-    createdAt: w.createdAt,
+const mapReview = (r: any): LocalReview => ({
+    id: r._id || r.id,
+    artist_id: r.artist_id,
+    user_id: r.user_id,
+    username: r.username,
+    profile_picture: r.profile_picture,
+    message: r.message,
+    createdAt: r.createdAt,
     isEditing: false,
 });
 
-export const getWavesByArtist = async (artistId: string): Promise<LocalWave[]> => {
+export const getReviewsByArtist = async (artistId: string): Promise<LocalReview[]> => {
     try {
-        const response = await fetch(`${API_URL}/waves/${artistId}`, {
+        const response = await fetch(`${API_URL}/reviews/${artistId}`, {
             credentials: "include",
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Échec du chargement des waves");
+            throw new Error(errorData.message || "Échec du chargement des reviews");
         }
 
         const data = await response.json();
-        return data.map(mapWave);
+        return data.map(mapReview);
     } catch (error) {
-        console.error("Erreur getWavesByArtist:", error);
+        console.error("Erreur getReviewsByArtist:", error);
         throw error;
     }
 };
 
-export const getMyWave = async (artistId: string): Promise<LocalWave | null> => {
+export const getMyReview = async (artistId: string): Promise<LocalReview | null> => {
     try {
-        const response = await fetch(`${API_URL}/waves/${artistId}/me`, {
+        const response = await fetch(`${API_URL}/reviews/${artistId}/me`, {
             credentials: "include",
         });
 
@@ -58,28 +58,27 @@ export const getMyWave = async (artistId: string): Promise<LocalWave | null> => 
             const text = await response.text();
             const errorData = text ? JSON.parse(text) : {};
             throw new Error(
-                errorData.message || "Échec du chargement de la wave de l'utilisateur"
+                errorData.message || "Échec du chargement de la review de l'utilisateur"
             );
         }
 
         const text = await response.text();
         if (!text) return null;
 
-        const w = JSON.parse(text);
-        return mapWave(w);
+        const r = JSON.parse(text);
+        return mapReview(r);
     } catch (error) {
-        console.error("Erreur getMyWave:", error);
+        console.error("Erreur getMyReview:", error);
         throw error;
     }
 };
 
-
-export const createWave = async (
+export const createReview = async (
     artist_id: string,
     message: string
-): Promise<LocalWave> => {
+): Promise<LocalReview> => {
     try {
-        const response = await fetch(`${API_URL}/waves`, {
+        const response = await fetch(`${API_URL}/reviews`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -90,24 +89,23 @@ export const createWave = async (
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Impossible de publier la wave");
+            throw new Error(errorData.message || "Impossible de publier la review");
         }
 
-        const w = await response.json();
-        return mapWave(w);
+        const r = await response.json();
+        return mapReview(r);
     } catch (error) {
-        console.error("Erreur createWave:", error);
+        console.error("Erreur createReview:", error);
         throw error;
     }
 };
 
-
-export const updateWave = async (
+export const updateReview = async (
     id: string,
     message: string
-): Promise<LocalWave> => {
+): Promise<LocalReview> => {
     try {
-        const response = await fetch(`${API_URL}/waves/${id}`, {
+        const response = await fetch(`${API_URL}/reviews/${id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -119,22 +117,21 @@ export const updateWave = async (
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(
-                errorData.message || "Impossible de mettre à jour la wave"
+                errorData.message || "Impossible de mettre à jour la review"
             );
         }
 
-        const w = await response.json();
-        return mapWave(w);
+        const r = await response.json();
+        return mapReview(r);
     } catch (error) {
-        console.error("Erreur updateWave:", error);
+        console.error("Erreur updateReview:", error);
         throw error;
     }
 };
 
-
-export const deleteWave = async (id: string): Promise<void> => {
+export const deleteReview = async (id: string): Promise<void> => {
     try {
-        const response = await fetch(`${API_URL}/waves/${id}`, {
+        const response = await fetch(`${API_URL}/reviews/${id}`, {
             method: "DELETE",
             credentials: "include",
         });
@@ -142,11 +139,11 @@ export const deleteWave = async (id: string): Promise<void> => {
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(
-                errorData.message || "Impossible de supprimer la wave"
+                errorData.message || "Impossible de supprimer la review"
             );
         }
     } catch (error) {
-        console.error("Erreur deleteWave:", error);
+        console.error("Erreur deleteReview:", error);
         throw error;
     }
 };

@@ -1,6 +1,6 @@
 import { Document, Schema } from 'mongoose';
 
-export interface Wave extends Document {
+export interface Review extends Document {
   id: string;
   artist_id: string;
   user_id: number;
@@ -10,7 +10,7 @@ export interface Wave extends Document {
   createdAt: Date;
 }
 
-export const WaveSchema = new Schema<Wave>(
+export const ReviewSchema = new Schema<Review>(
   {
     artist_id: { type: String, required: true },
     user_id: { type: Number, required: true },
@@ -24,4 +24,4 @@ export const WaveSchema = new Schema<Wave>(
   },
 );
 
-WaveSchema.index({ artist_id: 1, user_id: 1 }, { unique: true });
+ReviewSchema.index({ artist_id: 1, user_id: 1 }, { unique: true });

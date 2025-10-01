@@ -20,7 +20,7 @@ import { GoogleController } from './google/google.controller';
 import { GoogleModule } from './google/google.module';
 import { UtilsModule } from './utils/utils.module';
 import { RatingsModule } from './ratings/ratings.module';
-import { WavesModule } from './waves/waves.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -41,7 +41,7 @@ import { WavesModule } from './waves/waves.module';
     GoogleModule,
     UtilsModule,
     RatingsModule,
-    WavesModule,
+    ReviewsModule,
   ],
   controllers: [
     AppController,

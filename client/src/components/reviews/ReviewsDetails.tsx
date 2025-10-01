@@ -3,23 +3,23 @@ import { useParams } from "react-router-dom";
 import { FiMoreHorizontal } from "react-icons/fi";
 import { motion } from "framer-motion";
 import {
-    getWavesByArtist,
-    getMyWave,
-    createWave,
-    updateWave,
-    deleteWave,
-    LocalWave,
-} from "../../services/waveService";
+    getReviewsByArtist,
+    getMyReview,
+    createReview,
+    updateReview,
+    deleteReview,
+    LocalReview,
+} from "../../services/reviewService";
 
-const WavesDetails = () => {
+const ReviewsDetails = () => {
     const { id: artistId } = useParams<{ id: string }>();
-    const [waves, setWaves] = useState<LocalWave[]>([]);
+    const [reviews, setReviews] = useState<LocalReview[]>([]);
     const [message, setMessage] = useState("");
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
     const [currentUser, setCurrentUser] = useState<string | null>(null);
-    const [hasPosted, setHasPosted] = useState<boolean>(false);
-    const [myWave, setMyWave] = useState<LocalWave | null>(null);
+    const [hasReviewed, setHasReviewed] = useState<boolean>(false);
+    const [myReview, setMyReview] = useState<LocalReview | null>(null);
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -43,105 +43,105 @@ const WavesDetails = () => {
 
         const fetchData = async () => {
             try {
-                const wavesData = await getWavesByArtist(artistId);
-                setWaves(wavesData.map((w) => ({ ...w, isEditing: false })));
+                const reviewsData = await getReviewsByArtist(artistId);
+                setReviews(reviewsData.map((r) => ({ ...r, isEditing: false })));
 
                 if (currentUser) {
-                    const userWave = await getMyWave(artistId);
-                    if (userWave) {
-                        setMyWave({ ...userWave, isEditing: false });
-                        setHasPosted(true);
+                    const userReview = await getMyReview(artistId);
+                    if (userReview) {
+                        setMyReview({ ...userReview, isEditing: false });
+                        setHasReviewed(true);
                     } else {
-                        setMyWave(null);
-                        setHasPosted(false);
+                        setMyReview(null);
+                        setHasReviewed(false);
                     }
                 }
             } catch (error) {
-                console.error("Erreur lors du chargement des waves :", error);
+                console.error("Erreur lors du chargement des reviews :", error);
             }
         };
 
         fetchData();
     }, [artistId, currentUser]);
 
-    const handlePostWave = async () => {
-        if (!message.trim() || !currentUser || hasPosted || !artistId) return;
+    const handlePostReview = async () => {
+        if (!message.trim() || !currentUser || hasReviewed || !artistId) return;
 
         try {
-            const newWave = await createWave(artistId, message);
-            setWaves([{ ...newWave, isEditing: false }, ...waves]);
+            const newReview = await createReview(artistId, message);
+            setReviews([{ ...newReview, isEditing: false }, ...reviews]);
             setMessage("");
-            setMyWave({ ...newWave, isEditing: false });
-            setHasPosted(true);
+            setMyReview({ ...newReview, isEditing: false });
+            setHasReviewed(true);
         } catch (error) {
-            console.error("Erreur lors de la création de la wave :", error);
+            console.error("Erreur lors de la création de la review :", error);
         }
     };
 
-    const handleDeleteWave = async (id: string) => {
+    const handleDeleteReview = async (id: string) => {
         try {
-            await deleteWave(id);
-            setWaves(waves.filter((wave) => wave.id !== id));
-            setHasPosted(false);
-            setMyWave(null);
+            await deleteReview(id);
+            setReviews(reviews.filter((review) => review.id !== id));
+            setHasReviewed(false);
+            setMyReview(null);
         } catch (error) {
-            console.error("Erreur lors de la suppression de la wave :", error);
+            console.error("Erreur lors de la suppression de la review :", error);
         }
     };
 
-    const handleEditWave = (id: string) => {
-        if (myWave && myWave.id === id) {
-            setMyWave({ ...myWave, isEditing: true });
+    const handleEditReview = (id: string) => {
+        if (myReview && myReview.id === id) {
+            setMyReview({ ...myReview, isEditing: true });
         } else {
-            setWaves(
-                waves.map((wave) =>
-                    wave.id === id ? { ...wave, isEditing: true } : wave
+            setReviews(
+                reviews.map((review) =>
+                    review.id === id ? { ...review, isEditing: true } : review
                 )
             );
         }
         setOpenDropdown(null);
     };
 
-    const handleUpdateWave = async (id: string, newMessage: string) => {
+    const handleUpdateReview = async (id: string, newMessage: string) => {
         try {
-            const updated = await updateWave(id, newMessage);
+            const updated = await updateReview(id, newMessage);
 
-            if (myWave && myWave.id === id) {
-                setMyWave({ ...updated, isEditing: false });
+            if (myReview && myReview.id === id) {
+                setMyReview({ ...updated, isEditing: false });
             }
 
-            setWaves(
-                waves.map((wave) =>
-                    wave.id === id ? { ...updated, isEditing: false } : wave
+            setReviews(
+                reviews.map((review) =>
+                    review.id === id ? { ...updated, isEditing: false } : review
                 )
             );
         } catch (error) {
-            console.error("Erreur lors de la mise à jour de la wave :", error);
+            console.error("Erreur lors de la mise à jour de la review :", error);
         }
     };
 
-    const handleShareWave = (id: string) => {
-        alert(`Wave ${id} partagé !`);
+    const handleShareReview = (id: string) => {
+        alert(`Review ${id} partagée !`);
         setOpenDropdown(null);
     };
 
-    const displayedWaves = [
-        ...(myWave ? [myWave] : []),
-        ...waves.filter((w) => !myWave || w.id !== myWave.id),
+    const displayedReviews = [
+        ...(myReview ? [myReview] : []),
+        ...reviews.filter((r) => !myReview || r.id !== myReview.id),
     ];
 
     return (
         <div className="max-w-6xl mx-auto py-12 px-4 md:px-8">
             <h2 className="text-2xl font-semibold text-primaryBlue mb-8 text-center">
-                Waves
+                Reviews
             </h2>
 
             <div className="flex flex-col items-center gap-10 px-4">
-                {!hasPosted && (
+                {!hasReviewed && (
                     <div className="w-full sm:max-w-md md:max-w-xl lg:max-w-2xl bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-300">
                         <textarea
                             className="w-full p-5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200 resize-none overflow-hidden"
-                            placeholder="Exprimez-vous..."
+                            placeholder="Laissez une review..."
                             value={message}
                             onChange={(e) => {
                                 setMessage(e.target.value);
@@ -152,7 +152,7 @@ const WavesDetails = () => {
                         />
                         <button
                             className="mt-5 w-full bg-primaryBlue text-white py-4 rounded-lg hover:bg-[#B0C7E6] transition font-semibold"
-                            onClick={handlePostWave}
+                            onClick={handlePostReview}
                         >
                             Publier
                         </button>
@@ -160,33 +160,33 @@ const WavesDetails = () => {
                 )}
 
                 <div className="w-full sm:max-w-md md:max-w-xl lg:max-w-2xl space-y-8">
-                    {displayedWaves.map((wave) => (
+                    {displayedReviews.map((review) => (
                         <div
-                            key={wave.id}
+                            key={review.id}
                             className={`p-6 rounded-xl shadow-md border border-gray-200 relative grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 ${
-                                myWave && wave.id === myWave.id ? "bg-gray-100" : "bg-white"
+                                myReview && review.id === myReview.id ? "bg-gray-100" : "bg-white"
                             }`}
                         >
                             <img
-                                src={wave.profile_picture || "https://via.placeholder.com/50"}
+                                src={review.profile_picture || "https://via.placeholder.com/50"}
                                 alt="User Avatar"
                                 className="w-14 h-14 rounded-full row-span-2"
                             />
 
                             <div>
                                 <p className="font-semibold text-primaryBlue text-lg">
-                                    {wave.username}
+                                    {review.username}
                                 </p>
                                 <p className="text-gray-500 text-sm">
-                                    {new Date(wave.createdAt).toLocaleString()}
+                                    {new Date(review.createdAt).toLocaleString()}
                                 </p>
                             </div>
 
                             <div className="col-span-2">
-                                {wave.isEditing ? (
+                                {review.isEditing ? (
                                     <textarea
                                         className="w-full mt-3 p-3 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200 resize-none overflow-hidden"
-                                        value={wave.message}
+                                        value={review.message}
                                         onChange={(e) => {
                                             const updatedMessage = e.target.value;
 
@@ -194,14 +194,14 @@ const WavesDetails = () => {
                                             textarea.style.height = "auto";
                                             textarea.style.height = `${textarea.scrollHeight}px`;
 
-                                            if (myWave && myWave.id === wave.id) {
-                                                setMyWave({ ...myWave, message: updatedMessage });
+                                            if (myReview && myReview.id === review.id) {
+                                                setMyReview({ ...myReview, message: updatedMessage });
                                             } else {
-                                                setWaves(
-                                                    waves.map((w) =>
-                                                        w.id === wave.id
-                                                            ? { ...w, message: updatedMessage }
-                                                            : w
+                                                setReviews(
+                                                    reviews.map((r) =>
+                                                        r.id === review.id
+                                                            ? { ...r, message: updatedMessage }
+                                                            : r
                                                     )
                                                 );
                                             }
@@ -209,34 +209,34 @@ const WavesDetails = () => {
                                     />
                                 ) : (
                                     <p className="mt-3 text-text-200 text-base">
-                                        {wave.message}
+                                        {review.message}
                                     </p>
                                 )}
 
-                                {wave.isEditing && (
+                                {review.isEditing && (
                                     <button
                                         className="text-green-500 hover:underline font-medium mt-2"
-                                        onClick={() => handleUpdateWave(wave.id, wave.message)}
+                                        onClick={() => handleUpdateReview(review.id, review.message)}
                                     >
                                         Sauvegarder
                                     </button>
                                 )}
                             </div>
 
-                            {currentUser === wave.username && (
+                            {currentUser === review.username && (
                                 <div className="absolute top-4 right-4">
                                     <button
                                         className="text-gray-500 hover:text-primaryBlue"
                                         onClick={() =>
                                             setOpenDropdown(
-                                                openDropdown === wave.id ? null : wave.id
+                                                openDropdown === review.id ? null : review.id
                                             )
                                         }
                                     >
                                         <FiMoreHorizontal size={24} />
                                     </button>
 
-                                    {openDropdown === wave.id && (
+                                    {openDropdown === review.id && (
                                         <motion.div
                                             initial={{ opacity: 0, y: -5 }}
                                             animate={{ opacity: 1, y: 0 }}
@@ -245,19 +245,19 @@ const WavesDetails = () => {
                                         >
                                             <button
                                                 className="block w-full text-left px-4 py-2 text-yellow-500 hover:bg-gray-100"
-                                                onClick={() => handleEditWave(wave.id)}
+                                                onClick={() => handleEditReview(review.id)}
                                             >
                                                 Modifier
                                             </button>
                                             <button
                                                 className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
-                                                onClick={() => handleDeleteWave(wave.id)}
+                                                onClick={() => handleDeleteReview(review.id)}
                                             >
                                                 Supprimer
                                             </button>
                                             <button
                                                 className="block w-full text-left px-4 py-2 text-green-500 hover:bg-gray-100"
-                                                onClick={() => handleShareWave(wave.id)}
+                                                onClick={() => handleShareReview(review.id)}
                                             >
                                                 Partager
                                             </button>
@@ -271,8 +271,6 @@ const WavesDetails = () => {
             </div>
         </div>
     );
-
-
 };
 
-export default WavesDetails;
+export default ReviewsDetails;

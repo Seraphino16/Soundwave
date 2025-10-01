@@ -9,33 +9,33 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
-import { WavesService } from './waves.service';
-import { CreateWaveDto } from './dto/create-wave.dto';
+import { ReviewsService } from './reviews.service';
+import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 
-@Controller('waves')
-export class WavesController {
-  constructor(private readonly wavesService: WavesService) {}
+@Controller('reviews')
+export class ReviewsController {
+  constructor(private readonly reviewsService: ReviewsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() dto: CreateWaveDto, @Req() req) {
+  async create(@Body() dto: CreateReviewDto, @Req() req) {
     const userId = req.user.id;
     const username = req.user.username;
     const profile_picture = req.user.profile_picture || 'https://via.placeholder.com/50';
-    return this.wavesService.create(dto, userId, username, profile_picture);
+    return this.reviewsService.create(dto, userId, username, profile_picture);
   }
 
   @Get(':artistId')
   async findAllByArtist(@Param('artistId') artistId: string) {
-    return this.wavesService.findAllByArtist(artistId);
+    return this.reviewsService.findAllByArtist(artistId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':artistId/me')
-  async findUserWave(@Param('artistId') artistId: string, @Req() req) {
+  async findUserReview(@Param('artistId') artistId: string, @Req() req) {
     const userId = req.user.id;
-    return this.wavesService.findUserWave(artistId, userId);
+    return this.reviewsService.findUserReview(artistId, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,12 +45,12 @@ export class WavesController {
     @Body('message') message: string,
     @Req() req,
   ) {
-    return this.wavesService.update(id, message, req.user.id);
+    return this.reviewsService.update(id, message, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req) {
-    return this.wavesService.remove(id, req.user.id);
+    return this.reviewsService.remove(id, req.user.id);
   }
 }

@@ -6,7 +6,7 @@ import {
 } from "../services/spotifyService";
 import AlbumCard from "../components/cards/AlbumCard";
 import ArtistRatingSection from "components/forms/StarRatingForm";
-import WavesDetails from "components/waves/WavesDetails";
+import ReviewsDetails from "components/reviews/ReviewsDetails";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -165,7 +165,7 @@ const ArtistDetail: React.FC = () => {
                 )}
 
                 <ArtistRatingSection />
-                <WavesDetails />
+                <ReviewsDetails />
             </div>
 
             <ToastContainer />
