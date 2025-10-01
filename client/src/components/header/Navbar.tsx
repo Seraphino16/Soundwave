@@ -104,9 +104,9 @@ const Navbar = () => {
 
         {!isAuthRoute && !isGuestPage && (
           <div className="hidden lg:flex space-x-6 mx-2 items-center">
-            <a href="#" className="hover:opacity-80 transition-opacity">
+            <button className="hover:opacity-80 transition-opacity">
               <MessagesIcon />
-            </a>
+            </button>
             <Link to="/settings" className="hover:opacity-80 transition-opacity">
               <ProfileIcon />
             </Link>
@@ -160,15 +160,15 @@ const Navbar = () => {
                                         </>
                                     )}
                                     <div className="flex space-x-6 mt-4">
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                        <button className="hover:opacity-80 transition-opacity">
                                             <MessagesIcon />
-                                        </a>
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                        </button>
+                                        <Link to="/profile" className="hover:opacity-80 transition-opacity">
                                             <ProfileIcon />
-                                        </a>
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
+                                        </Link>
+                                        <Link to="/settings" className="hover:opacity-80 transition-opacity">
                                             <SettingsIcon />
-                                        </a>
+                                        </Link>
                                     </div>
                                     {shouldShowUserInfo && (
                                         <div className="flex flex-col items-center space-y-2">

@@ -308,7 +308,7 @@ const EditProfileTab: React.FC = () => {
               {previewImages.profile || userProfile?.profile_picture ? (
                 <img
                   src={previewImages.profile || userProfile?.profile_picture || ""}
-                  alt="Photo de profil"
+                  alt="Profil utilisateur"
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (

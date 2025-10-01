@@ -476,4 +476,29 @@ export class UserController {
   ) {
     return this.userService.updateUserSettings(user_id, dto);
   }
+
+  @Get('/search')
+  @ApiOperation({ summary: 'Rechercher des utilisateurs' })
+  @ApiOkResponse({ description: 'Liste des utilisateurs trouvés' })
+  async searchUsers(
+    @Query('q') query: string,
+    @Query('limit') limit?: number,
+  ) {
+    try {
+      return await this.userService.searchUsers(query, limit || 10);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/popular')
+  @ApiOperation({ summary: 'Obtenir les utilisateurs populaires' })
+  @ApiOkResponse({ description: 'Liste des utilisateurs populaires' })
+  async getPopularUsers(@Query('limit') limit?: number) {
+    try {
+      return await this.userService.getPopularUsers(limit || 10);
+    } catch (error) {
+      throw error;
+    }
+  }
 }

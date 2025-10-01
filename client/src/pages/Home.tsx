@@ -8,7 +8,7 @@ import { useUserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import Meta from "../components/utils/Meta";
 import SearchBar from "../components/searchBar/SearchBar";
-import Waves from "../components/waves/Waves";
+import FeedWaves from "../components/waves/FeedWaves";
 
 const Home: React.FC = () => {
     const { user, loading, checkAuth } = useUserContext();
@@ -57,7 +57,7 @@ const Home: React.FC = () => {
                 </div>
 
                 <div className="flex-1 max-w-2xl mx-auto p-4">
-                    <Waves />
+                    <FeedWaves />
                 </div>
             </div>
         </>

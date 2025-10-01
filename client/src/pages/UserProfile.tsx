@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import { useUserProfileContext } from '../context/UserProfileContext';
@@ -19,26 +19,37 @@ const UserProfilePage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'waves' | 'reviews'>('waves');
     const [isFollowing, setIsFollowing] = useState(false);
     
-    const numericUserId = userId ? parseInt(userId) : undefined;
-    const isOwnProfile = !userId || (user && numericUserId === user.id);
+    const isOwnProfile = !userId || (user && parseInt(userId) === user.id);
 
     useEffect(() => {
         loadProfileData();
-    }, [userId, user]);
+    }, [userId, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const loadProfileData = async () => {
         try {
             setLoading(true);
             
-            // Si c'est le profil de l'utilisateur connecté, utiliser le contexte
-            if (isOwnProfile && user) {
-                await fetchUserProfile(user.id);
+            // Déterminer l'ID utilisateur à charger
+            let targetUserId: number;
+            
+            if (userId) {
+                // Si on a un userId dans l'URL, l'utiliser
+                targetUserId = parseInt(userId);
+            } else if (user) {
+                // Sinon, utiliser l'utilisateur connecté
+                targetUserId = user.id;
+            } else {
+                // Pas d'utilisateur connecté et pas d'ID dans l'URL
+                return;
             }
+            
+            // Charger le profil utilisateur
+            await fetchUserProfile(targetUserId);
             
             // Charger les waves et reviews (mock pour le moment)
             const [wavesData, reviewsData] = await Promise.all([
-                userProfileService.getUserWaves(numericUserId, 1, 8),
-                userProfileService.getUserReviews(numericUserId, 1, 6)
+                userProfileService.getUserWaves(targetUserId, 1, 8),
+                userProfileService.getUserReviews(targetUserId, 1, 6)
             ]);
 
             setWaves(wavesData.waves);
@@ -61,8 +72,8 @@ const UserProfilePage: React.FC = () => {
         }
     };
 
-    // Fonction utilitaire pour adapter les données du contexte
-    const getDisplayProfile = () => {
+    // Memoize the display profile to avoid unnecessary recalculations
+    const displayProfile = useMemo(() => {
         if (!userProfile) return null;
         
         return {
@@ -85,9 +96,7 @@ const UserProfilePage: React.FC = () => {
                 joinedDate: userProfile.createdAt
             }
         };
-    };
-
-    const displayProfile = getDisplayProfile();
+    }, [userProfile, waves.length, reviews.length]);
 
     const formatJoinDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -115,7 +124,7 @@ const UserProfilePage: React.FC = () => {
                     <p className="text-gray-600 text-lg mb-4">Profil introuvable</p>
                     <button
                         onClick={() => window.history.back()}
-                        className="px-6 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600 transition"
+                        className="px-6 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition duration-200 font-semibold shadow-md"
                     >
                         Retour
                     </button>
@@ -221,10 +230,10 @@ const UserProfilePage: React.FC = () => {
                                     ) : (
                                         <button
                                             onClick={handleFollowToggle}
-                                            className={`flex items-center space-x-2 px-6 py-2 rounded-lg font-medium transition ${
+                                            className={`flex items-center space-x-2 px-6 py-2 rounded-lg font-semibold transition duration-200 ${
                                                 isFollowing
-                                                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                                    : 'bg-primaryBlue text-white hover:bg-blue-600'
+                                                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 border border-gray-300'
+                                                    : 'bg-primaryBlue text-white hover:bg-[#B0C7E6] shadow-md'
                                             }`}
                                         >
                                             {isFollowing ? (

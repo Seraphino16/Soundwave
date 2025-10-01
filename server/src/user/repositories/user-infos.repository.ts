@@ -46,4 +46,8 @@ export class UserInfosRepository {
   async findByUserId(userId: number): Promise<UserInfos | null> {
     return this.userModel.findOne({ user_id: userId }).exec();
   }
+
+  async findByUserIds(userIds: number[]): Promise<UserInfos[]> {
+    return this.userModel.find({ user_id: { $in: userIds } }).exec();
+  }
 }
