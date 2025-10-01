@@ -484,21 +484,13 @@ export class UserController {
     @Query('q') query: string,
     @Query('limit') limit?: number,
   ) {
-    try {
-      return await this.userService.searchUsers(query, limit || 10);
-    } catch (error) {
-      throw error;
-    }
+    return await this.userService.searchUsers(query, limit || 10);
   }
 
   @Get('/popular')
   @ApiOperation({ summary: 'Obtenir les utilisateurs populaires' })
   @ApiOkResponse({ description: 'Liste des utilisateurs populaires' })
   async getPopularUsers(@Query('limit') limit?: number) {
-    try {
-      return await this.userService.getPopularUsers(limit || 10);
-    } catch (error) {
-      throw error;
-    }
+    return await this.userService.getPopularUsers(limit || 10);
   }
 }
