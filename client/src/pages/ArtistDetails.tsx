@@ -5,7 +5,7 @@ import {
     fetchAlbumsByArtistId,
 } from "../services/spotifyService";
 import AlbumCard from "../components/cards/AlbumCard";
-import ArtistRatingSection from "components/forms/StarRatingForm";
+import ArtistRatingSection from "components/ratings/ArtistRatingSection";
 import ReviewsDetails from "components/reviews/ReviewsDetails";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
