@@ -151,9 +151,12 @@ const ArtistRatingSection: React.FC = () => {
                         <div className="space-y-4">
                             {!isEditing ? (
                                 <>
-                                    <p className="text-gray-600">
+                                    <p className="text-gray-600 flex items-center justify-center gap-1">
                                         Vous avez déjà noté cet artiste :{" "}
-                                        <span className="text-yellow-500">{selected} ★</span>
+                                        <span className="text-yellow-500 flex items-center gap-1">
+                                            {selected}
+                                            <IoStarSharp className="text-yellow-500 text-base" />
+                                        </span>
                                     </p>
                                     <div className="flex gap-3 justify-center">
                                         <button
