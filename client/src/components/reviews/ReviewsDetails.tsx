@@ -139,17 +139,17 @@ const ReviewsDetails = () => {
             <div className="flex flex-col items-center gap-10 px-4">
                 {!hasReviewed && (
                     <div className="w-full sm:max-w-md md:max-w-xl lg:max-w-2xl bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-300">
-                        <textarea
-                            className="w-full p-5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200 resize-none overflow-hidden"
-                            placeholder="Laissez une review..."
-                            value={message}
-                            onChange={(e) => {
-                                setMessage(e.target.value);
-                                const textarea = e.target as HTMLTextAreaElement;
-                                textarea.style.height = "auto";
-                                textarea.style.height = `${textarea.scrollHeight}px`;
-                            }}
-                        />
+                    <textarea
+                        className="w-full p-5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200 resize-none overflow-hidden"
+                        placeholder="Laissez une review..."
+                        value={message}
+                        onChange={(e) => {
+                            setMessage(e.target.value);
+                            const textarea = e.target as HTMLTextAreaElement;
+                            textarea.style.height = "auto";
+                            textarea.style.height = `${textarea.scrollHeight}px`;
+                        }}
+                    />
                         <button
                             className="mt-5 w-full bg-primaryBlue text-white py-4 rounded-lg hover:bg-[#B0C7E6] transition font-semibold"
                             onClick={handlePostReview}
@@ -208,7 +208,7 @@ const ReviewsDetails = () => {
                                         }}
                                     />
                                 ) : (
-                                    <p className="mt-3 text-text-200 text-base">
+                                    <p className="mt-3 text-text-200 text-base whitespace-pre-line">
                                         {review.message}
                                     </p>
                                 )}
