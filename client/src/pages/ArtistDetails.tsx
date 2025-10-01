@@ -89,34 +89,33 @@ const ArtistDetail: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <div className="bg-white shadow-xl rounded-lg p-10 w-full max-w-5xl relative">
-                <BackButton to="/artists" className="absolute top-6 left-6" />
+        <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
+            <div className="bg-white shadow-xl rounded-lg p-6 sm:p-10 w-full max-w-6xl relative">
+                <BackButton to="/artists" className="absolute top-4 sm:top-6 left-4 sm:left-6" />
 
-                <div className="mb-10 w-full max-w-3xl mx-auto">
-                    <h1 className="text-4xl font-bold text-primaryBlue text-center mb-10">
+                <div className="mb-10 w-full max-w-4xl mx-auto">
+                    <h1 className="mt-10 sm:mt-0 text-3xl sm:text-4xl font-bold text-primaryBlue text-center mb-8 sm:mb-10">
                         {artist.name}
                     </h1>
 
-                    <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-20">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
                         <img
                             src={artist.image || "/default-avatar.png"}
                             alt={artist.name}
-                            className="w-56 h-56 object-cover rounded-full shadow-md border"
+                            className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-full shadow-md border"
                         />
 
-                        <div className="text-center md:text-left">
-                            <div className="text-lg text-gray-700 space-y-2">
+                        <div className="text-center md:text-left w-full md:w-auto">
+                            <div className="text-base sm:text-lg text-gray-700 space-y-2">
                                 <p>
-                                    <strong>Followers:</strong>{" "}
+                                    <strong>Followers :</strong>{" "}
                                     {artist.followers.toLocaleString()}
                                 </p>
                                 <p>
-                                    <strong>Popularité:</strong>{" "}
-                                    {artist.popularity}/100
+                                    <strong>Popularité :</strong> {artist.popularity}/100
                                 </p>
                                 <p>
-                                    <strong>Genres:</strong>{" "}
+                                    <strong>Genres :</strong>{" "}
                                     {artist.genres.length > 0
                                         ? artist.genres.join(", ")
                                         : "Non spécifié"}
@@ -125,7 +124,7 @@ const ArtistDetail: React.FC = () => {
 
                             <button
                                 onClick={handleToggleFavorite}
-                                className="mt-4 flex items-center gap-2 px-4 py-2 rounded-lg shadow-md bg-primaryBlue text-white hover:bg-[#B0C7E6] transition"
+                                className="mt-4 flex items-center gap-2 px-4 py-2 rounded-lg shadow-md bg-primaryBlue text-white hover:bg-[#B0C7E6] transition mx-auto md:mx-0"
                             >
                                 {isFavorite ? (
                                     <>
@@ -144,15 +143,15 @@ const ArtistDetail: React.FC = () => {
                 </div>
 
                 {albums.length > 0 && (
-                    <section className="mt-12">
-                        <h2 className="text-3xl font-bold text-primaryBlue text-center mb-6">
+                    <section className="mt-10 sm:mt-12">
+                        <h2 className="text-2xl sm:text-3xl font-bold text-primaryBlue text-center mb-6">
                             Albums
                         </h2>
 
                         <div className="overflow-x-auto scrollbar-transparent">
-                            <div className="flex gap-24 px-1 pb-2 min-w-max">
+                            <div className="flex gap-28 sm:gap-12 md:gap-16 lg:gap-24 px-2 pb-2 min-w-max">
                                 {albums.map((album) => (
-                                    <div key={album.id} className="flex-shrink-0 w-48">
+                                    <div key={album.id} className="flex-shrink-0 w-40 sm:w-44 md:w-48">
                                         <AlbumCard
                                             id={album.id}
                                             title={album.title}
@@ -165,16 +164,16 @@ const ArtistDetail: React.FC = () => {
                     </section>
                 )}
 
-
-                <div className="my-10 border-t border-gray-300 opacity-30" />
+                <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <ArtistRatingSection />
-                <div className="my-10 border-t border-gray-300 opacity-30" />
+                <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <ReviewsDetails />
             </div>
 
             <ToastContainer />
         </div>
     );
+
 };
 
 export default ArtistDetail;
