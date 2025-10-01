@@ -131,7 +131,7 @@ const ReviewsDetails = () => {
     ];
 
     return (
-        <div className="max-w-6xl mx-auto py-12 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto pt-4 pb-10 px-4 md:px-8">
             <div className="flex flex-col items-center gap-10 px-4">
                 {!hasReviewed && (
                     <div className="w-full sm:max-w-md md:max-w-xl lg:max-w-2xl bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-300">

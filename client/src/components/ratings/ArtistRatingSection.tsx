@@ -127,9 +127,8 @@ const ArtistRatingSection: React.FC = () => {
     const roundedAverage = Math.round(average * 10) / 10;
 
     return (
-        <div className="mt-16">
+        <div className="mt-10">
             <div className="flex flex-col md:flex-row justify-center items-start gap-12">
-                {/* Bloc : Votre note */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Votre note
@@ -214,7 +213,6 @@ const ArtistRatingSection: React.FC = () => {
                     )}
                 </div>
 
-                {/* Bloc : Note moyenne */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Note moyenne
