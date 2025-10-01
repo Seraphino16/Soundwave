@@ -47,7 +47,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         },
       });
 
-      if (!res.ok) {        setUserState(null);
+      if (!res.ok) {
+        console.error(`Erreur lors de la récupération de l'utilisateur: statut HTTP ${res.status}`);
+        setUserState(null);
         return;
       }
 
