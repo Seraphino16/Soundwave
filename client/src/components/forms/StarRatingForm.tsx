@@ -116,10 +116,6 @@ const ArtistRatingSection: React.FC = () => {
 
     return (
         <div className="mt-16">
-            <h2 className="text-2xl font-bold text-primaryBlue mb-6 text-center">
-                Noter cet artiste
-            </h2>
-
             <div className="flex flex-col md:flex-row gap-12 justify-center items-start">
                 <div className="w-full md:w-1/2 text-center md:text-left">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
