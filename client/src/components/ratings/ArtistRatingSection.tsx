@@ -10,6 +10,16 @@ import {
     RatingSummary,
 } from "../../services/ratingService";
 
+import {
+    IoStarOutline as IoStarOutlineRaw,
+    IoStarSharp as IoStarSharpRaw,
+    IoStarHalfOutline as IoStarHalfOutlineRaw,
+} from "react-icons/io5";
+
+const IoStarOutline = IoStarOutlineRaw as React.ElementType;
+const IoStarSharp = IoStarSharpRaw as React.ElementType;
+const IoStarHalfOutline = IoStarHalfOutlineRaw as React.ElementType;
+
 const ArtistRatingSection: React.FC = () => {
     const { id: artistId } = useParams<{ id: string }>();
     const [selected, setSelected] = useState<number>(0);
@@ -116,14 +126,15 @@ const ArtistRatingSection: React.FC = () => {
 
     return (
         <div className="mt-16">
-            <div className="flex flex-col md:flex-row gap-12 justify-center items-start">
-                <div className="w-full md:w-1/2 text-center md:text-left">
+            <div className="flex flex-col md:flex-row justify-center items-start gap-12">
+                {/* Bloc votre note */}
+                <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                        Votre note :
+                        Votre note
                     </h3>
 
                     {!hasRated ? (
-                        <div className="flex justify-center md:justify-start space-x-2 text-3xl">
+                        <div className="flex justify-center space-x-2 text-2xl text-yellow-400">
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <button
                                     key={star}
@@ -131,13 +142,7 @@ const ArtistRatingSection: React.FC = () => {
                                     onClick={() => handleRatingClick(star)}
                                     className="focus:outline-none"
                                 >
-                  <span
-                      className={
-                          star <= selected ? "text-yellow-400" : "text-gray-300"
-                      }
-                  >
-                    ★
-                  </span>
+                                    {star <= selected ? <IoStarSharp /> : <IoStarOutline />}
                                 </button>
                             ))}
                         </div>
@@ -149,7 +154,7 @@ const ArtistRatingSection: React.FC = () => {
                                         Vous avez déjà noté cet artiste :{" "}
                                         <span className="text-yellow-500">{selected} ★</span>
                                     </p>
-                                    <div className="flex gap-3 justify-center md:justify-start">
+                                    <div className="flex gap-3 justify-center">
                                         <button
                                             className="px-4 py-2 bg-yellow-400 text-white rounded"
                                             onClick={() => setIsEditing(true)}
@@ -166,7 +171,7 @@ const ArtistRatingSection: React.FC = () => {
                                 </>
                             ) : (
                                 <>
-                                    <div className="flex justify-center md:justify-start space-x-2 text-3xl">
+                                    <div className="flex justify-center space-x-2 text-2xl text-yellow-400">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <button
                                                 key={star}
@@ -174,19 +179,11 @@ const ArtistRatingSection: React.FC = () => {
                                                 onClick={() => setSelected(star)}
                                                 className="focus:outline-none"
                                             >
-                        <span
-                            className={
-                                star <= selected
-                                    ? "text-yellow-400"
-                                    : "text-gray-300"
-                            }
-                        >
-                          ★
-                        </span>
+                                                {star <= selected ? <IoStarSharp /> : <IoStarOutline />}
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="flex gap-3 justify-center md:justify-start mt-3">
+                                    <div className="flex gap-3 justify-center mt-3">
                                         <button
                                             className="px-4 py-2 bg-green-500 text-white rounded"
                                             onClick={handleUpdateRating}
@@ -206,25 +203,34 @@ const ArtistRatingSection: React.FC = () => {
                     )}
                 </div>
 
-                <div className="w-full md:w-1/2 text-center md:text-left">
+                {/* Bloc note moyenne */}
+                <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                        Note moyenne :
+                        Note moyenne
                     </h3>
 
-                    <div className="text-3xl text-yellow-400 flex justify-center md:justify-start space-x-1">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <span key={i}>{i <= Math.round(average) ? "★" : "☆"}</span>
-                        ))}
+                    <div className="flex justify-center items-center gap-4 mt-2">
+                        <div className="flex space-x-1 text-2xl text-yellow-400">
+                            {[1, 2, 3, 4, 5].map((i) => {
+                                if (i <= Math.floor(average)) {
+                                    return <IoStarSharp key={i} />;
+                                } else if (i === Math.ceil(average) && !Number.isInteger(average)) {
+                                    return <IoStarHalfOutline key={i} />;
+                                } else {
+                                    return <IoStarOutline key={i} />;
+                                }
+                            })}
+                        </div>
+                        <p className="text-lg font-semibold text-gray-600">
+                            {roundedAverage} / 5 ({ratings.length} note
+                            {ratings.length > 1 ? "s" : ""})
+                        </p>
                     </div>
-
-                    <p className="mt-2 text-lg font-semibold text-gray-600">
-                        {roundedAverage} / 5 ({ratings.length} note
-                        {ratings.length > 1 ? "s" : ""})
-                    </p>
                 </div>
             </div>
         </div>
     );
+
 };
 
 export default ArtistRatingSection;
