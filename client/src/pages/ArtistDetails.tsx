@@ -144,25 +144,28 @@ const ArtistDetail: React.FC = () => {
                 </div>
 
                 {albums.length > 0 && (
-                    <>
-                        <h2 className="text-2xl font-semibold text-primaryBlue mt-8 mb-4">
+                    <section className="mt-12">
+                        <h2 className="text-3xl font-bold text-primaryBlue text-center mb-6">
                             Albums
                         </h2>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {albums.map((album) => (
-                                <AlbumCard
-                                    key={album.id}
-                                    id={album.id}
-                                    title={album.title}
-                                    coverImage={
-                                        album.coverImage || "/default-cover.png"
-                                    }
-                                />
-                            ))}
+                        <div className="overflow-x-auto scrollbar-transparent">
+                            <div className="flex gap-24 px-1 pb-2 min-w-max">
+                                {albums.map((album) => (
+                                    <div key={album.id} className="flex-shrink-0 w-48">
+                                        <AlbumCard
+                                            id={album.id}
+                                            title={album.title}
+                                            coverImage={album.coverImage || "/default-cover.png"}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </>
+                    </section>
                 )}
+
+
                 <div className="my-10 border-t border-gray-300 opacity-30" />
                 <ArtistRatingSection />
                 <div className="my-10 border-t border-gray-300 opacity-30" />
