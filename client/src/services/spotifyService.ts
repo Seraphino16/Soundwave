@@ -50,6 +50,19 @@ export const fetchArtistById = async (id: string) => {
     }
 };
 
+export const fetchAlbumsByArtistId = async (artistId: string) => {
+    try {
+        const response = await fetch(`http://localhost:5001/artist/${artistId}/albums`);
+        if (!response.ok) throw new Error("Erreur lors de la récupération des albums de l'artiste");
+
+        const data = await response.json();
+        return { albums: data.albums ?? [] };
+    } catch (error) {
+        console.error("Erreur frontend fetchAlbumsByArtistId:", error);
+        return { albums: [] };
+    }
+};
+
 export const searchAlbums = async (filters: { name?: string; year?: string; }) => {
     const query = new URLSearchParams();
 

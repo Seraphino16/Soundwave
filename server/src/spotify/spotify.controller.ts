@@ -25,6 +25,11 @@ export class SpotifyController {
     return await this.spotifyService.getArtistById(id);
   }
 
+  @Get('artist/:id/albums')
+  async getAlbumsByArtist(@Param('id') id: string) {
+    return await this.spotifyService.getAlbumsByArtistId(id);
+  }
+
   @Get('albums/search')
   async searchAlbums(
     @Query('name') name?: string,

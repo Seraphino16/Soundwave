@@ -240,6 +240,38 @@ export class SpotifyService {
     }
   }
 
+  // Récupérer les albums d'un artisteA
+  async getAlbumsByArtistId(artistId: string) {
+    try {
+      const accessToken = await this.getAccessToken();
+
+      const response = await axios.get(
+        `${this.spotifyApiUrl}/artists/${artistId}/albums`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            include_groups: 'album',
+            market: 'FR',
+            limit: 50,
+          },
+        }
+      );
+
+      const albums = response.data.items.map((album: any) => ({
+        id: album.id,
+        title: album.name,
+        coverImage: album.images?.[0]?.url || null,
+      }));
+
+      return { albums };
+    } catch (error) {
+      console.error("Erreur lors de la récupération des albums de l'artiste:", error);
+      throw new Error("Impossible de récupérer les albums de l'artiste");
+    }
+  }
+
   // Recherche par type
   private async searchSpotify(
     type: 'album' | 'artist',
