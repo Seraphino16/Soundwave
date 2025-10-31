@@ -6,6 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BackButton from "components/buttons/BackButton";
 import RatingSection from "components/ratings/RatingSection";
+import ReviewsDetails from "components/reviews/ReviewsDetails";
 
 interface Album {
     id: string;
@@ -133,12 +134,11 @@ const AlbumDetail: React.FC = () => {
                     </div>
                 </div>
 
-                {/* ✅ Intégration du système de notes */}
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <RatingSection targetType="album" targetId={album.id} />
-                <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
 
-                {/* 👉 Tu peux ajouter <ReviewsDetails /> ici aussi si tu veux */}
+                <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
+                <ReviewsDetails targetType="album" />
             </div>
 
             <ToastContainer />

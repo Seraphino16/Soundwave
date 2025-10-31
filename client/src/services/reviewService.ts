@@ -1,12 +1,15 @@
 /**
- * @description Service de gestion des Reviews de SoundWave
+ * @description Service unifié de gestion des Reviews de SoundWave
  */
 
 const API_URL = "http://localhost:5001";
 
+export type ReviewTargetType = 'artist' | 'album';
+
 export interface Review {
     id: string;
-    artist_id: string;
+    target_type: ReviewTargetType;
+    target_id: string;
     user_id: number;
     username: string;
     profile_picture: string;
@@ -18,7 +21,8 @@ export type LocalReview = Review & { isEditing?: boolean };
 
 const mapReview = (r: any): LocalReview => ({
     id: r._id || r.id,
-    artist_id: r.artist_id,
+    target_type: r.target_type,
+    target_id: r.target_id,
     user_id: r.user_id,
     username: r.username,
     profile_picture: r.profile_picture,
@@ -27,9 +31,15 @@ const mapReview = (r: any): LocalReview => ({
     isEditing: false,
 });
 
-export const getReviewsByArtist = async (artistId: string): Promise<LocalReview[]> => {
+/**
+ * Récupérer toutes les reviews pour un artiste ou un album
+ */
+export const getReviewsByTarget = async (
+    targetType: ReviewTargetType,
+    targetId: string
+): Promise<LocalReview[]> => {
     try {
-        const response = await fetch(`${API_URL}/reviews/${artistId}`, {
+        const response = await fetch(`${API_URL}/reviews/${targetType}/${targetId}`, {
             credentials: "include",
         });
 
@@ -41,14 +51,20 @@ export const getReviewsByArtist = async (artistId: string): Promise<LocalReview[
         const data = await response.json();
         return data.map(mapReview);
     } catch (error) {
-        console.error("Erreur getReviewsByArtist:", error);
+        console.error("Erreur getReviewsByTarget:", error);
         throw error;
     }
 };
 
-export const getMyReview = async (artistId: string): Promise<LocalReview | null> => {
+/**
+ * Récupérer la review de l'utilisateur connecté
+ */
+export const getMyReview = async (
+    targetType: ReviewTargetType,
+    targetId: string
+): Promise<LocalReview | null> => {
     try {
-        const response = await fetch(`${API_URL}/reviews/${artistId}/me`, {
+        const response = await fetch(`${API_URL}/reviews/${targetType}/${targetId}/me`, {
             credentials: "include",
         });
 
@@ -73,8 +89,12 @@ export const getMyReview = async (artistId: string): Promise<LocalReview | null>
     }
 };
 
+/**
+ * Créer une review
+ */
 export const createReview = async (
-    artist_id: string,
+    targetType: ReviewTargetType,
+    targetId: string,
     message: string
 ): Promise<LocalReview> => {
     try {
@@ -84,7 +104,11 @@ export const createReview = async (
                 "Content-Type": "application/json",
             },
             credentials: "include",
-            body: JSON.stringify({ artist_id, message }),
+            body: JSON.stringify({
+                target_type: targetType,
+                target_id: targetId,
+                message,
+            }),
         });
 
         if (!response.ok) {
@@ -100,6 +124,9 @@ export const createReview = async (
     }
 };
 
+/**
+ * Modifier une review
+ */
 export const updateReview = async (
     id: string,
     message: string
@@ -129,6 +156,9 @@ export const updateReview = async (
     }
 };
 
+/**
+ * Supprimer une review
+ */
 export const deleteReview = async (id: string): Promise<void> => {
     try {
         const response = await fetch(`${API_URL}/reviews/${id}`, {

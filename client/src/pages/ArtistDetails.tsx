@@ -90,7 +90,10 @@ const ArtistDetail: React.FC = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
             <div className="bg-white shadow-xl rounded-lg p-6 sm:p-10 w-full max-w-6xl relative">
-                <BackButton to="/artists" className="absolute top-4 sm:top-6 left-4 sm:left-6" />
+                <BackButton
+                    to="/artists"
+                    className="absolute top-4 sm:top-6 left-4 sm:left-6"
+                />
 
                 <div className="mb-10 w-full max-w-4xl mx-auto">
                     <h1 className="mt-10 sm:mt-0 text-3xl sm:text-4xl font-bold text-primaryBlue text-center mb-8 sm:mb-10">
@@ -150,7 +153,10 @@ const ArtistDetail: React.FC = () => {
                         <div className="overflow-x-auto scrollbar-transparent">
                             <div className="flex gap-28 sm:gap-12 md:gap-16 lg:gap-24 px-2 pb-2 min-w-max">
                                 {albums.map((album) => (
-                                    <div key={album.id} className="flex-shrink-0 w-40 sm:w-44 md:w-48">
+                                    <div
+                                        key={album.id}
+                                        className="flex-shrink-0 w-40 sm:w-44 md:w-48"
+                                    >
                                         <AlbumCard
                                             id={album.id}
                                             title={album.title}
@@ -169,7 +175,7 @@ const ArtistDetail: React.FC = () => {
 
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
 
-                <ReviewsDetails />
+                <ReviewsDetails targetType="artist" />
             </div>
 
             <ToastContainer />

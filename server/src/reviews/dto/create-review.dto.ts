@@ -1,9 +1,14 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsIn } from 'class-validator';
 
 export class CreateReviewDto {
   @IsNotEmpty()
   @IsString()
-  artist_id: string;
+  @IsIn(['artist', 'album'])
+  target_type: 'artist' | 'album';
+
+  @IsNotEmpty()
+  @IsString()
+  target_id: string;
 
   @IsNotEmpty()
   @IsString()
