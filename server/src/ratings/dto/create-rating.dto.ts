@@ -1,9 +1,14 @@
-import { IsString, IsNotEmpty, IsInt, Min, Max } from 'class-validator';
+import { IsString, IsNotEmpty, IsIn, IsInt, Min, Max } from 'class-validator';
 
 export class CreateRatingDto {
   @IsString()
   @IsNotEmpty()
-  artist_id: string;
+  @IsIn(['artist', 'album'])
+  target_type: 'artist' | 'album';
+
+  @IsString()
+  @IsNotEmpty()
+  target_id: string;
 
   @IsInt()
   @Min(1)

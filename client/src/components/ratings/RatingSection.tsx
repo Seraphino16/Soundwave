@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import {
     getRatings,
     getRatingSummary,
@@ -8,8 +7,9 @@ import {
     deleteRating,
     Rating,
     RatingSummary,
+    RatingTargetType,
 } from "../../services/ratingService";
-import {FiEdit2, FiTrash2, FiX} from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiX } from "react-icons/fi";
 import { TfiSave as TfiSaveRaw } from "react-icons/tfi";
 import {
     IoStarOutline as IoStarOutlineRaw,
@@ -22,8 +22,12 @@ const IoStarSharp = IoStarSharpRaw as React.ElementType;
 const IoStarHalfOutline = IoStarHalfOutlineRaw as React.ElementType;
 const TfiSave = TfiSaveRaw as React.ElementType;
 
-const ArtistRatingSection: React.FC = () => {
-    const { id: artistId } = useParams<{ id: string }>();
+interface RatingSectionProps {
+    targetType: RatingTargetType;
+    targetId: string;
+}
+
+const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) => {
     const [selected, setSelected] = useState<number>(0);
     const [ratings, setRatings] = useState<Rating[]>([]);
     const [average, setAverage] = useState<number>(0);
@@ -50,14 +54,13 @@ const ArtistRatingSection: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (!artistId) return;
-
+        if (!targetId) return;
         const fetchData = async () => {
             try {
-                const ratingsData: Rating[] = await getRatings(artistId);
+                const ratingsData: Rating[] = await getRatings(targetType, targetId);
                 setRatings(ratingsData);
 
-                const summary: RatingSummary = await getRatingSummary(artistId);
+                const summary: RatingSummary = await getRatingSummary(targetType, targetId);
                 setAverage(summary.average || 0);
 
                 if (currentUser) {
@@ -74,14 +77,14 @@ const ArtistRatingSection: React.FC = () => {
         };
 
         fetchData();
-    }, [artistId, currentUser]);
+    }, [targetId, targetType, currentUser]);
 
     const handleRatingClick = async (value: number) => {
-        if (!artistId || hasRated) return;
+        if (!targetId || hasRated) return;
         setSelected(value);
 
         try {
-            await addOrUpdateRating(artistId, value);
+            await addOrUpdateRating(targetType, targetId, value);
             refreshRatings();
             alert(`Merci pour votre note de ${value} étoile(s) !`);
             setHasRated(true);
@@ -117,10 +120,9 @@ const ArtistRatingSection: React.FC = () => {
     };
 
     const refreshRatings = async () => {
-        if (!artistId) return;
-        const ratingsData: Rating[] = await getRatings(artistId);
+        const ratingsData: Rating[] = await getRatings(targetType, targetId);
         setRatings(ratingsData);
-        const summary: RatingSummary = await getRatingSummary(artistId);
+        const summary: RatingSummary = await getRatingSummary(targetType, targetId);
         setAverage(summary.average || 0);
     };
 
@@ -129,6 +131,7 @@ const ArtistRatingSection: React.FC = () => {
     return (
         <div className="mt-10">
             <div className="flex flex-col md:flex-row justify-center items-start gap-12">
+                {/* ===== Votre note ===== */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Votre note
@@ -152,11 +155,11 @@ const ArtistRatingSection: React.FC = () => {
                             {!isEditing ? (
                                 <>
                                     <p className="text-gray-600 flex items-center justify-center gap-1">
-                                        Vous avez déjà noté cet artiste :{" "}
+                                        Vous avez noté ce {targetType === "artist" ? "artiste" : "album"} :{" "}
                                         <span className="text-yellow-500 flex items-center gap-1">
-                                        {selected}
+                                            {selected}
                                             <IoStarSharp className="text-yellow-500 text-base" />
-                                    </span>
+                                        </span>
                                     </p>
                                     <div className="flex gap-3 justify-center">
                                         <button
@@ -213,6 +216,7 @@ const ArtistRatingSection: React.FC = () => {
                     )}
                 </div>
 
+                {/* ===== Note moyenne ===== */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Note moyenne
@@ -239,8 +243,6 @@ const ArtistRatingSection: React.FC = () => {
             </div>
         </div>
     );
-
-
 };
 
-export default ArtistRatingSection;
+export default RatingSection;

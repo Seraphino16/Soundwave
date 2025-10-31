@@ -5,7 +5,7 @@ import {
     fetchAlbumsByArtistId,
 } from "../services/spotifyService";
 import AlbumCard from "../components/cards/AlbumCard";
-import ArtistRatingSection from "components/ratings/ArtistRatingSection";
+import RatingSection from "components/ratings/RatingSection";
 import ReviewsDetails from "components/reviews/ReviewsDetails";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -33,7 +33,6 @@ const ArtistDetail: React.FC = () => {
     const [artist, setArtist] = useState<Artist | null>(null);
     const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(true);
-
     const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
@@ -165,15 +164,17 @@ const ArtistDetail: React.FC = () => {
                 )}
 
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
-                <ArtistRatingSection />
+
+                <RatingSection targetType="artist" targetId={artist.id} />
+
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
+
                 <ReviewsDetails />
             </div>
 
             <ToastContainer />
         </div>
     );
-
 };
 
 export default ArtistDetail;
