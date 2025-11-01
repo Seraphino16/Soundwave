@@ -121,16 +121,6 @@ const AlbumDetail: React.FC = () => {
                                 </p>
                             )}
 
-
-                            <a
-                                href={album.spotifyUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="block mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-                            >
-                                Écouter sur Spotify
-                            </a>
-
                             <button
                                 onClick={handleToggleFavorite}
                                 className="mt-4 flex items-center gap-2 px-4 py-2 rounded-lg shadow-md bg-primaryBlue text-white hover:bg-[#B0C7E6] transition mx-auto md:mx-0"
