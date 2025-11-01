@@ -20,6 +20,13 @@ interface Album {
         name: string;
         spotifyUrl: string;
     }[];
+    tracks?: {
+        id: string;
+        title: string;
+        durationMs: number;
+        spotifyUrl: string;
+        previewUrl: string | null;
+    }[];
 }
 
 const AlbumDetail: React.FC = () => {
@@ -59,6 +66,13 @@ const AlbumDetail: React.FC = () => {
         }
 
         setIsFavorite(!isFavorite);
+    };
+
+    const formatDuration = (ms: number): string => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, "0")}`;
     };
 
     if (loading) {
@@ -141,12 +155,37 @@ const AlbumDetail: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <h2 className="text-2xl sm:text-3xl font-bold text-primaryBlue text-center mb-6">
                     Liste des pistes
                 </h2>
 
+                {album.tracks && album.tracks.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm sm:text-base text-gray-700 mb-10">
+                            <thead>
+                            <tr className="border-b border-gray-200">
+                                <th className="py-2 px-3">Titre</th>
+                                <th className="py-2 px-3 text-right">Durée</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {album.tracks.map((track) => (
+                                <tr key={track.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                    <td className="py-2 px-3">{track.title}</td>
+                                    <td className="py-2 px-3 text-right">{formatDuration(track.durationMs)}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p className="text-center text-gray-500 mb-10">
+                        Aucune piste disponible.
+                    </p>
+                )}
+
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
+
                 <RatingSection targetType="album" targetId={album.id} />
 
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
