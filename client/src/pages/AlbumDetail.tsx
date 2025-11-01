@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom"; // ✅ Ajout de Link ici
+import { useParams, Link } from "react-router-dom";
 import { fetchAlbumById } from "../services/spotifyService";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -109,14 +109,14 @@ const AlbumDetail: React.FC = () => {
                                     <strong>Artiste{album.artists.length > 1 ? "s" : ""} :</strong>{" "}
                                     {album.artists.map((artist, index, arr) => (
                                         <span key={artist.id}>
-                                        <Link
-                                            to={`/artists/${artist.id}`}
-                                            className="text-primaryBlue hover:underline"
-                                        >
-                                          {artist.name}
-                                        </Link>
-                                              {index < arr.length - 1 && ", "}
-                                      </span>
+                                            <Link
+                                                to={`/artists/${artist.id}`}
+                                                className="text-primaryBlue hover:underline"
+                                            >
+                                                {artist.name}
+                                            </Link>
+                                            {index < arr.length - 1 && ", "}
+                                        </span>
                                     ))}
                                 </p>
                             )}
@@ -142,7 +142,13 @@ const AlbumDetail: React.FC = () => {
                 </div>
 
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
+                <h2 className="text-2xl sm:text-3xl font-bold text-primaryBlue text-center mb-6">
+                    Liste des pistes
+                </h2>
+
+                <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <RatingSection targetType="album" targetId={album.id} />
+
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <ReviewsDetails targetType="album" />
             </div>
