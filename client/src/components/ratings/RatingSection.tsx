@@ -16,6 +16,7 @@ import {
     IoStarSharp as IoStarSharpRaw,
     IoStarHalfOutline as IoStarHalfOutlineRaw,
 } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 const IoStarOutline = IoStarOutlineRaw as React.ElementType;
 const IoStarSharp = IoStarSharpRaw as React.ElementType;
@@ -37,7 +38,7 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
     const [isEditing, setIsEditing] = useState<boolean>(false);
 
     useEffect(() => {
-        const fetchCurrentUser = async () => {
+        const fetchAllData = async () => {
             try {
                 const res = await fetch("http://localhost:5001/users/me", {
                     credentials: "include",
@@ -45,39 +46,54 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
                 if (!res.ok) return;
                 const user = await res.json();
                 setCurrentUser(user.username);
-            } catch (error) {
-                console.error("Impossible de récupérer l'utilisateur connecté :", error);
-            }
-        };
 
-        fetchCurrentUser();
-    }, []);
-
-    useEffect(() => {
-        if (!targetId) return;
-        const fetchData = async () => {
-            try {
                 const ratingsData: Rating[] = await getRatings(targetType, targetId);
                 setRatings(ratingsData);
 
                 const summary: RatingSummary = await getRatingSummary(targetType, targetId);
                 setAverage(summary.average || 0);
 
-                if (currentUser) {
-                    const myRating = ratingsData.find((r) => r.username === currentUser);
-                    if (myRating) {
-                        setHasRated(true);
-                        setSelected(myRating.score);
-                        setMyRatingId(myRating.id);
-                    }
+                const myRating = ratingsData.find((r) => r.username === user.username);
+                if (myRating) {
+                    setHasRated(true);
+                    setSelected(myRating.score);
+                    setMyRatingId(myRating.id);
+                } else {
+                    setHasRated(false);
+                    setSelected(0);
+                    setMyRatingId(null);
                 }
             } catch (error) {
-                console.error("Erreur lors du chargement des notes :", error);
+                console.error("Erreur lors du chargement initial :", error);
             }
         };
 
-        fetchData();
-    }, [targetId, targetType, currentUser]);
+        fetchAllData();
+    }, [targetId, targetType]);
+
+    const refreshRatings = async () => {
+        try {
+            const ratingsData: Rating[] = await getRatings(targetType, targetId);
+            setRatings(ratingsData);
+            const summary: RatingSummary = await getRatingSummary(targetType, targetId);
+            setAverage(summary.average || 0);
+
+            if (currentUser) {
+                const myRating = ratingsData.find((r) => r.username === currentUser);
+                if (myRating) {
+                    setHasRated(true);
+                    setSelected(myRating.score);
+                    setMyRatingId(myRating.id);
+                } else {
+                    setHasRated(false);
+                    setSelected(0);
+                    setMyRatingId(null);
+                }
+            }
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour des notes :", error);
+        }
+    };
 
     const handleRatingClick = async (value: number) => {
         if (!targetId || hasRated) return;
@@ -85,9 +101,11 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
 
         try {
             await addOrUpdateRating(targetType, targetId, value);
-            refreshRatings();
-            alert(`Merci pour votre note de ${value} étoile(s) !`);
-            setHasRated(true);
+            toast.success(`Merci pour votre note de ${value} étoile(s) ⭐`, {
+                position: "bottom-right",
+                autoClose: 2500,
+            });
+            await refreshRatings();
         } catch (error) {
             console.error("Erreur en envoyant la note :", error);
         }
@@ -97,9 +115,12 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
         if (!myRatingId) return;
         try {
             await updateRating(myRatingId, selected);
-            refreshRatings();
+            toast.success("Votre note a été mise à jour ✅", {
+                position: "bottom-right",
+                autoClose: 2500,
+            });
             setIsEditing(false);
-            alert("Votre note a été mise à jour ✅");
+            await refreshRatings();
         } catch (error) {
             console.error("Erreur lors de la mise à jour :", error);
         }
@@ -109,21 +130,14 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
         if (!myRatingId) return;
         try {
             await deleteRating(myRatingId);
-            refreshRatings();
-            setHasRated(false);
-            setSelected(0);
-            setMyRatingId(null);
-            alert("Votre note a été supprimée ❌");
+            toast.info("Votre note a été supprimée ❌", {
+                position: "bottom-right",
+                autoClose: 2500,
+            });
+            await refreshRatings();
         } catch (error) {
             console.error("Erreur lors de la suppression :", error);
         }
-    };
-
-    const refreshRatings = async () => {
-        const ratingsData: Rating[] = await getRatings(targetType, targetId);
-        setRatings(ratingsData);
-        const summary: RatingSummary = await getRatingSummary(targetType, targetId);
-        setAverage(summary.average || 0);
     };
 
     const roundedAverage = Math.round(average * 10) / 10;
@@ -169,7 +183,6 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
                                         >
                                             <FiEdit2 className="text-xl" />
                                         </button>
-
                                         <button
                                             onClick={handleDeleteRating}
                                             className="p-2 rounded-full text-primaryBlue hover:bg-primaryBlue/10 transition"
@@ -201,7 +214,6 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
                                         >
                                             <TfiSave className="text-xl" />
                                         </button>
-
                                         <button
                                             onClick={() => setIsEditing(false)}
                                             className="p-2 rounded-full text-primaryBlue hover:bg-primaryBlue/10 transition"
