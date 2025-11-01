@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom"; // ✅ Ajout de Link ici
 import { fetchAlbumById } from "../services/spotifyService";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -15,7 +15,11 @@ interface Album {
     releaseDate: string;
     totalTracks: number;
     spotifyUrl: string;
-    artistName?: string;
+    artists?: {
+        id: string;
+        name: string;
+        spotifyUrl: string;
+    }[];
 }
 
 const AlbumDetail: React.FC = () => {
@@ -99,11 +103,24 @@ const AlbumDetail: React.FC = () => {
                             <p>
                                 <strong>Nombre de titres :</strong> {album.totalTracks}
                             </p>
-                            {album.artistName && (
+
+                            {album.artists && album.artists.length > 0 && (
                                 <p>
-                                    <strong>Artiste :</strong> {album.artistName}
+                                    <strong>Artiste{album.artists.length > 1 ? "s" : ""} :</strong>{" "}
+                                    {album.artists.map((artist, index, arr) => (
+                                        <span key={artist.id}>
+                                        <Link
+                                            to={`/artists/${artist.id}`}
+                                            className="text-primaryBlue hover:underline"
+                                        >
+                                          {artist.name}
+                                        </Link>
+                                              {index < arr.length - 1 && ", "}
+                                      </span>
+                                    ))}
                                 </p>
                             )}
+
 
                             <a
                                 href={album.spotifyUrl}
@@ -136,7 +153,6 @@ const AlbumDetail: React.FC = () => {
 
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <RatingSection targetType="album" targetId={album.id} />
-
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <ReviewsDetails targetType="album" />
             </div>
