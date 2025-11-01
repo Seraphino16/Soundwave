@@ -34,6 +34,7 @@ const AlbumDetail: React.FC = () => {
     const [album, setAlbum] = useState<Album | null>(null);
     const [loading, setLoading] = useState(true);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteTracks, setFavoriteTracks] = useState<string[]>([]);
 
     useEffect(() => {
         const loadAlbum = async () => {
@@ -68,6 +69,23 @@ const AlbumDetail: React.FC = () => {
         setIsFavorite(!isFavorite);
     };
 
+    const toggleTrackFavorite = (trackId: string, trackTitle: string) => {
+        const isFav = favoriteTracks.includes(trackId);
+        if (isFav) {
+            setFavoriteTracks((prev) => prev.filter((id) => id !== trackId));
+            toast.info(`"${trackTitle}" a été retiré de votre liste`, {
+                position: "bottom-right",
+                autoClose: 2500,
+            });
+        } else {
+            setFavoriteTracks((prev) => [...prev, trackId]);
+            toast.success(`"${trackTitle}" a été ajouté à votre liste !`, {
+                position: "bottom-right",
+                autoClose: 2500,
+            });
+        }
+    };
+
     const formatDuration = (ms: number): string => {
         const totalSeconds = Math.floor(ms / 1000);
         const minutes = Math.floor(totalSeconds / 60);
@@ -86,9 +104,7 @@ const AlbumDetail: React.FC = () => {
     if (!album) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <p className="text-xl font-semibold text-red-600">
-                    Album introuvable
-                </p>
+                <p className="text-xl font-semibold text-red-600">Album introuvable</p>
             </div>
         );
     }
@@ -96,8 +112,12 @@ const AlbumDetail: React.FC = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
             <div className="bg-white shadow-xl rounded-lg p-6 sm:p-10 w-full max-w-6xl relative">
-                <BackButton to="/albums" className="absolute top-4 sm:top-6 left-4 sm:left-6" />
+                <BackButton
+                    to="/albums"
+                    className="absolute top-4 sm:top-6 left-4 sm:left-6"
+                />
 
+                {/* === En-tête album === */}
                 <div className="mb-10 w-full max-w-4xl mx-auto">
                     <h1 className="mt-10 sm:mt-0 text-3xl sm:text-4xl font-bold text-primaryBlue text-center mb-8 sm:mb-10">
                         {album.title}
@@ -120,41 +140,42 @@ const AlbumDetail: React.FC = () => {
 
                             {album.artists && album.artists.length > 0 && (
                                 <p>
-                                    <strong>Artiste{album.artists.length > 1 ? "s" : ""} :</strong>{" "}
+                                    <strong>
+                                        Artiste{album.artists.length > 1 ? "s" : ""} :
+                                    </strong>{" "}
                                     {album.artists.map((artist, index, arr) => (
                                         <span key={artist.id}>
-                                            <Link
-                                                to={`/artists/${artist.id}`}
-                                                className="text-primaryBlue hover:underline"
-                                            >
-                                                {artist.name}
-                                            </Link>
+                      <Link
+                          to={`/artists/${artist.id}`}
+                          className="text-primaryBlue hover:underline"
+                      >
+                        {artist.name}
+                      </Link>
                                             {index < arr.length - 1 && ", "}
-                                        </span>
+                    </span>
                                     ))}
                                 </p>
                             )}
 
+                            {/* === Bouton icône favoris album === */}
                             <button
                                 onClick={handleToggleFavorite}
-                                className="mt-4 flex items-center gap-2 px-4 py-2 rounded-lg shadow-md bg-primaryBlue text-white hover:bg-[#B0C7E6] transition mx-auto md:mx-0"
+                                aria-label={
+                                    isFavorite ? "Retirer de ma liste" : "Ajouter à ma liste"
+                                }
+                                className="mt-4 p-2 rounded-full shadow-md bg-primaryBlue text-white hover:bg-[#B0C7E6] transition mx-auto md:mx-0"
                             >
                                 {isFavorite ? (
-                                    <>
-                                        <FaHeart className="text-red-500" />
-                                        Retirer de ma liste
-                                    </>
+                                    <FaHeart className="text-red-500 text-xl" />
                                 ) : (
-                                    <>
-                                        <FaRegHeart />
-                                        Ajouter à ma liste
-                                    </>
+                                    <FaRegHeart className="text-xl" />
                                 )}
                             </button>
                         </div>
                     </div>
                 </div>
 
+                {/* === Liste des pistes === */}
                 <h2 className="text-2xl sm:text-3xl font-bold text-primaryBlue text-center mb-6">
                     Liste des pistes
                 </h2>
@@ -166,13 +187,38 @@ const AlbumDetail: React.FC = () => {
                             <tr className="border-b border-gray-200">
                                 <th className="py-2 px-3">Titre</th>
                                 <th className="py-2 px-3 text-right">Durée</th>
+                                <th className="py-2 px-3 text-right">Action</th>
                             </tr>
                             </thead>
                             <tbody>
                             {album.tracks.map((track) => (
-                                <tr key={track.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                <tr
+                                    key={track.id}
+                                    className="border-b border-gray-100 hover:bg-gray-50"
+                                >
                                     <td className="py-2 px-3">{track.title}</td>
-                                    <td className="py-2 px-3 text-right">{formatDuration(track.durationMs)}</td>
+                                    <td className="py-2 px-3 text-right">
+                                        {formatDuration(track.durationMs)}
+                                    </td>
+                                    <td className="py-2 px-3 text-right">
+                                        <button
+                                            onClick={() =>
+                                                toggleTrackFavorite(track.id, track.title)
+                                            }
+                                            aria-label={
+                                                favoriteTracks.includes(track.id)
+                                                    ? "Retirer de ma liste"
+                                                    : "Ajouter à ma liste"
+                                            }
+                                            className="p-2 rounded-full bg-primaryBlue text-white hover:bg-[#B0C7E6] transition"
+                                        >
+                                            {favoriteTracks.includes(track.id) ? (
+                                                <FaHeart className="text-red-500 text-lg" />
+                                            ) : (
+                                                <FaRegHeart className="text-lg" />
+                                            )}
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>
@@ -184,8 +230,8 @@ const AlbumDetail: React.FC = () => {
                     </p>
                 )}
 
+                {/* === Rating & Reviews === */}
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
-
                 <RatingSection targetType="album" targetId={album.id} />
 
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
