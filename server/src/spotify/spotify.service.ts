@@ -176,7 +176,7 @@ export class SpotifyService {
       }
   }
 
-    // Récupérer tous les artistes récents
+  // Récupérer tous les artistes récents
   async getAllNewArtists() {
     try {
       const accessToken = await this.getAccessToken();

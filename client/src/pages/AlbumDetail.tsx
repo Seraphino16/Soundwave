@@ -2,14 +2,13 @@ import React, { useEffect, useState, ComponentType } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchAlbumById } from "../services/spotifyService";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import * as Bi from "react-icons/bi"; // ✅ import global pour typage sûr
+import * as Bi from "react-icons/bi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BackButton from "components/buttons/BackButton";
 import RatingSection from "components/ratings/RatingSection";
 import ReviewsDetails from "components/reviews/ReviewsDetails";
 
-// ✅ Correction des types des icônes pour TypeScript
 const BiLike = Bi.BiLike as ComponentType<{ className?: string }>;
 const BiSolidLike = Bi.BiSolidLike as ComponentType<{ className?: string }>;
 const BiDislike = Bi.BiDislike as ComponentType<{ className?: string }>;
@@ -177,12 +176,18 @@ const AlbumDetail: React.FC = () => {
                             <button
                                 onClick={handleToggleFavorite}
                                 aria-label={isFavorite ? "Retirer de ma liste" : "Ajouter à ma liste"}
-                                className="mt-4 p-2 rounded-full shadow-md bg-primaryBlue text-white hover:bg-[#B0C7E6] transition mx-auto md:mx-0"
+                                className="mt-4 flex items-center gap-2 px-4 py-2 rounded-full shadow-md bg-primaryBlue text-white hover:bg-[#B0C7E6] transition mx-auto md:mx-0"
                             >
                                 {isFavorite ? (
-                                    <FaHeart className="text-red-500 text-xl" />
+                                    <>
+                                        <FaHeart className="text-red-500 text-xl" />
+                                        <span>Retirer de ma liste</span>
+                                    </>
                                 ) : (
-                                    <FaRegHeart className="text-xl" />
+                                    <>
+                                        <FaRegHeart className="text-xl" />
+                                        <span>Ajouter à ma liste</span>
+                                    </>
                                 )}
                             </button>
                         </div>
@@ -190,10 +195,6 @@ const AlbumDetail: React.FC = () => {
                 </div>
 
                 {/* === Liste des pistes === */}
-                <h2 className="text-2xl sm:text-3xl font-bold text-primaryBlue text-center mb-6">
-                    Liste des pistes
-                </h2>
-
                 {album.tracks && album.tracks.length > 0 ? (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm sm:text-base text-gray-700 mb-10">
