@@ -101,3 +101,18 @@ export const searchArtists = async (filters: { name?: string; genre?: string }) 
         return { artists: [] };
     }
 };
+
+export const fetchAlbumsWithTracksByArtistId = async (artistId: string) => {
+    try {
+        const response = await fetch(`http://localhost:5001/artist/${artistId}/albums-with-tracks`);
+        if (!response.ok) throw new Error("Erreur lors de la récupération des albums avec pistes");
+
+        const data = await response.json();
+        return {
+            albums: data.albums ?? [],
+        };
+    } catch (error) {
+        console.error("Erreur frontend fetchAlbumsWithTracksByArtistId:", error);
+        return { albums: [] };
+    }
+};
