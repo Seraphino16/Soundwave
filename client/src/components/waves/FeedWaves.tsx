@@ -28,7 +28,6 @@ const FeedWaves: React.FC = () => {
     const handleLike = async (waveId: number) => {
         try {
             await feedWavesService.toggleLike(waveId);
-            // Optionellement recharger les waves ou mettre à jour localement
         } catch (error) {
             console.error("Erreur lors du like:", error);
         }
@@ -72,14 +71,16 @@ const FeedWaves: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            {waves.map((wave) => (
-                <FeedWaveCard
-                    key={wave.id}
-                    wave={wave}
-                    onLike={handleLike}
-                    onComment={handleComment}
-                />
-            ))}
+            {waves
+                .filter(wave => wave.user)
+                .map((wave) => (
+                    <FeedWaveCard
+                        key={wave.id}
+                        wave={wave}
+                        onLike={handleLike}
+                        onComment={handleComment}
+                    />
+                ))}
         </div>
     );
 };

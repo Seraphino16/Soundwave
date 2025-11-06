@@ -2,8 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import { useUserProfileContext } from '../context/UserProfileContext';
-import { userProfileService, Wave, Review } from '../services/userProfileService';
-import WaveCard from '../components/profilePage/WaveCard';
+import { userProfileService, Review } from '../services/userProfileService';
+import { FeedWave } from '../services/feedWavesService';
+import FeedWaveCard from '../components/waves/FeedWaveCard';
 import ReviewCard from '../components/profilePage/ReviewCard';
 import ProfileStats from '../components/profilePage/ProfileStats';
 import { FiMapPin, FiCalendar } from 'react-icons/fi';
@@ -13,7 +14,7 @@ const UserProfilePage: React.FC = () => {
     const { user } = useUserContext();
     const { userProfile, loading: profileLoading, fetchUserProfile } = useUserProfileContext();
     
-    const [waves, setWaves] = useState<Wave[]>([]);
+    const [waves, setWaves] = useState<FeedWave[]>([]);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'waves' | 'reviews'>('waves');
@@ -23,30 +24,24 @@ const UserProfilePage: React.FC = () => {
 
     useEffect(() => {
         loadProfileData();
-    }, [userId, user]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [userId, user]);
 
     const loadProfileData = async () => {
         try {
             setLoading(true);
             
-            // Déterminer l'ID utilisateur à charger
             let targetUserId: number;
             
             if (userId) {
-                // Si on a un userId dans l'URL, l'utiliser
                 targetUserId = parseInt(userId);
             } else if (user) {
-                // Sinon, utiliser l'utilisateur connecté
                 targetUserId = user.id;
             } else {
-                // Pas d'utilisateur connecté et pas d'ID dans l'URL
                 return;
             }
             
-            // Charger le profil utilisateur
             await fetchUserProfile(targetUserId);
             
-            // Charger les waves et reviews (mock pour le moment)
             const [wavesData, reviewsData] = await Promise.all([
                 userProfileService.getUserWaves(targetUserId, 1, 8),
                 userProfileService.getUserReviews(targetUserId, 1, 6)
@@ -72,7 +67,16 @@ const UserProfilePage: React.FC = () => {
         }
     };
 
-    // Memoize the display profile to avoid unnecessary recalculations
+    const handleLike = (waveId: number) => {
+        console.log('Like wave:', waveId);
+        // TODO: Implémenter la logique de like
+    };
+
+    const handleComment = (waveId: number) => {
+        console.log('Comment on wave:', waveId);
+        // TODO: Implémenter la logique de commentaire
+    };
+
     const displayProfile = useMemo(() => {
         if (!userProfile) return null;
         
@@ -297,13 +301,16 @@ const UserProfilePage: React.FC = () => {
                             <div className="space-y-6">
                                 {waves.length > 0 ? (
                                     <div className="grid gap-6">
-                                        {waves.map(wave => (
-                                            <WaveCard
-                                                key={wave.id}
-                                                wave={wave}
-                                                onClick={() => {/* Handle wave click */}}
-                                            />
-                                        ))}
+                                        {waves
+                                            .filter(wave => wave.user)
+                                            .map(wave => (
+                                                <FeedWaveCard
+                                                    key={wave.id}
+                                                    wave={wave}
+                                                    onLike={handleLike}
+                                                    onComment={handleComment}
+                                                />
+                                            ))}
                                     </div>
                                 ) : (
                                     <div className="bg-white rounded-lg shadow-md p-8 text-center">

@@ -21,6 +21,7 @@ import { GoogleModule } from './google/google.module';
 import { UtilsModule } from './utils/utils.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { WavesModule } from './waves/waves.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     UtilsModule,
     RatingsModule,
     ReviewsModule,
+    WavesModule,
   ],
   controllers: [
     AppController,

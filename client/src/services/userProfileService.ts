@@ -1,19 +1,5 @@
-// Service for user profile data and operations
-export interface Wave {
-    id: number;
-    title: string;
-    description: string;
-    artist: string;
-    album: string;
-    genre: string;
-    rating: number;
-    createdAt: string;
-    imageUrl?: string;
-    songUrl?: string;
-    tags: string[];
-    likes: number;
-    comments: number;
-}
+import { API_URL } from '../config/api';
+import { FeedWave } from './feedWavesService';
 
 export interface Review {
     id: number;
@@ -51,66 +37,7 @@ export interface UserProfile {
     stats: UserProfileStats;
 }
 
-// Mock data for demonstration
-const mockWaves: Wave[] = [
-    {
-        id: 1,
-        title: "Découverte de la semaine",
-        description: "Cette chanson m'a complètement transporté ! Les arrangements sont incroyables et la voix si émouvante. Un vrai coup de cœur musical.",
-        artist: "Bon Iver",
-        album: "For Emma, Forever Ago",
-        genre: "Indie Folk",
-        rating: 5,
-        createdAt: "2024-07-28T10:30:00Z",
-        imageUrl: "https://i.scdn.co/image/ab67616d0000b27389d2970ad135571a0243ca31",
-        tags: ["indie", "folk", "emotional", "acoustic"],
-        likes: 24,
-        comments: 8
-    },
-    {
-        id: 2,
-        title: "Nostalgie des années 80",
-        description: "Retour en enfance avec ce titre culte. La production est parfaite et ça me rappelle les soirées d'été.",
-        artist: "The Weeknd",
-        album: "After Hours",
-        genre: "Pop/R&B",
-        rating: 4,
-        createdAt: "2024-07-25T15:45:00Z",
-        imageUrl: "https://i.scdn.co/image/ab67616d0000b273ef6ac8b01d24ce36f92b7883",
-        tags: ["80s", "synthwave", "nostalgia"],
-        likes: 18,
-        comments: 5
-    },
-    {
-        id: 3,
-        title: "Energy du matin",
-        description: "Perfect pour commencer la journée ! Ce beat me donne envie de bouger et la mélodie reste en tête toute la journée.",
-        artist: "Daft Punk",
-        album: "Random Access Memories",
-        genre: "Electronic",
-        rating: 5,
-        createdAt: "2024-07-22T08:15:00Z",
-        imageUrl: "https://i.scdn.co/image/ab67616d0000b273de3c04b5a7e5b44d8520c868",
-        tags: ["electronic", "dance", "energy", "morning"],
-        likes: 31,
-        comments: 12
-    },
-    {
-        id: 4,
-        title: "Jazz session nocturne",
-        description: "Ambiance feutrée pour une soirée tranquille. Les improvisations sont magistrales et l'atmosphère parfaite.",
-        artist: "Miles Davis",
-        album: "Kind of Blue",
-        genre: "Jazz",
-        rating: 5,
-        createdAt: "2024-07-20T22:00:00Z",
-        imageUrl: "https://i.scdn.co/image/ab67616d0000b273e4e12e4b3c2c2948492b0273",
-        tags: ["jazz", "night", "chill", "classic"],
-        likes: 15,
-        comments: 4
-    }
-];
-
+// Mock data for reviews
 const mockReviews: Review[] = [
     {
         id: 1,
@@ -159,7 +86,7 @@ const mockUserProfile: UserProfile = {
     bannerImage: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&h=400&fit=crop",
     isVerified: true,
     stats: {
-        totalWaves: mockWaves.length,
+        totalWaves: 0,
         totalReviews: mockReviews.length,
         totalLikes: 156,
         totalFollowers: 1247,
@@ -173,26 +100,32 @@ const mockUserProfile: UserProfile = {
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const userProfileService = {
-    // Get user profile by ID (or current user if no ID provided)
     getUserProfile: async (_userId?: number): Promise<UserProfile> => {
         await delay(600);
         return mockUserProfile;
     },
 
-    // Get user's waves
-    getUserWaves: async (_userId?: number, page = 1, limit = 10): Promise<{waves: Wave[], total: number}> => {
-        await delay(400);
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        const paginatedWaves = mockWaves.slice(startIndex, endIndex);
-        
-        return {
-            waves: paginatedWaves,
-            total: mockWaves.length
-        };
+    getUserWaves: async (userId: number, page = 1, limit = 10): Promise<{waves: FeedWave[], total: number}> => {
+        try {
+            const response = await fetch(`${API_URL}/waves/user/${userId}?page=${page}&limit=${limit}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur API: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Erreur lors du chargement des waves utilisateur:', error);
+            return { waves: [], total: 0 };
+        }
     },
 
-    // Get user's reviews
     getUserReviews: async (_userId?: number, page = 1, limit = 5): Promise<{reviews: Review[], total: number}> => {
         await delay(350);
         const startIndex = (page - 1) * limit;
@@ -205,15 +138,13 @@ export const userProfileService = {
         };
     },
 
-    // Update user profile
     updateUserProfile: async (profileData: Partial<UserProfile>): Promise<UserProfile> => {
         await delay(800);
         return { ...mockUserProfile, ...profileData };
     },
 
-    // Follow/unfollow user
     toggleFollow: async (_userId: number): Promise<boolean> => {
         await delay(300);
-        return true; // Returns new follow status
+        return true;
     }
 };

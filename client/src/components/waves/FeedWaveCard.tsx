@@ -1,7 +1,11 @@
+/**
+ * @description Card pour afficher une wave dans le feed
+ * @author SoundWave
+ */
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FeedWave } from '../../services/feedWavesService';
-import { FiMusic, FiCalendar } from 'react-icons/fi';
 
 interface FeedWaveCardProps {
     wave: FeedWave;
@@ -12,24 +16,34 @@ interface FeedWaveCardProps {
 const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment }) => {
     const [isLiked, setIsLiked] = useState(false);
 
+    if (!wave || !wave.user) {
+        console.error('Wave or wave.user undefined:', wave);
+        return null;
+    }
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    };
+        const now = new Date();
+        const diffTime = Math.abs(now.getTime() - date.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    const renderStars = (rating: number) => {
-        return Array.from({ length: 5 }, (_, i) => (
-            <span
-                key={i}
-                className={`text-lg ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
-            >
-                ★
-            </span>
-        ));
+        if (diffDays === 0) {
+            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+            if (diffHours === 0) {
+                const diffMinutes = Math.floor(diffTime / (1000 * 60));
+                return `Il y a ${diffMinutes} min`;
+            }
+            return `Il y a ${diffHours}h`;
+        } else if (diffDays === 1) {
+            return 'Hier';
+        } else if (diffDays < 7) {
+            return `Il y a ${diffDays}j`;
+        } else {
+            return date.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short'
+            });
+        }
     };
 
     const handleLike = (e: React.MouseEvent) => {
@@ -47,115 +61,73 @@ const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment }) 
 
     return (
         <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-100">
-            {/* Header avec informations utilisateur */}
-            <div className="p-4 pb-0">
+            <div className="p-4">
                 <Link 
                     to={`/profile/${wave.user.id}`}
-                    className="flex items-center space-x-3 mb-4 hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                    className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
                 >
                     <img
                         src={wave.user.profile_picture || '/user-icon.png'}
                         alt={wave.user.pseudo}
-                        className="w-12 h-12 rounded-full object-cover"
+                        className="w-12 h-12 rounded-full object-cover ring-2 ring-primaryBlue/20"
+                        onError={(e) => {
+                            e.currentTarget.src = '/user-icon.png';
+                        }}
                     />
                     <div className="flex-1">
                         <div className="flex items-center space-x-1">
                             <span className="font-semibold text-gray-900">{wave.user.pseudo}</span>
                             {wave.user.is_verified && (
-                                <span className="text-blue-500 text-sm">✓</span>
+                                <span className="text-blue-500 text-sm" title="Compte vérifié">✓</span>
                             )}
                         </div>
-                        <p className="text-sm text-gray-600">@{wave.user.username}</p>
-                    </div>
-                    <div className="text-xs text-gray-500 flex items-center space-x-1">
-                        <FiCalendar className="h-3 w-3" />
-                        <span>{formatDate(wave.createdAt)}</span>
+                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                            <span>@{wave.user.username}</span>
+                            <span>•</span>
+                            <div className="flex items-center space-x-1">
+                                <span className="text-xs">📅</span>
+                                <span>{formatDate(wave.createdAt)}</span>
+                            </div>
+                        </div>
                     </div>
                 </Link>
-            </div>
 
-            <div className="p-4 pt-0">
-                {/* Informations musique */}
-                <div className="flex items-start space-x-3 mb-3">
-                    {wave.imageUrl && (
-                        <img
-                            src={wave.imageUrl}
-                            alt={wave.album}
-                            className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                        />
-                    )}
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-1">
-                            <FiMusic className="text-primaryBlue h-4 w-4 flex-shrink-0" />
-                            <span className="text-sm font-medium text-gray-900 truncate">
-                                {wave.artist} - {wave.album}
-                            </span>
-                        </div>
-                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
-                            {wave.genre}
-                        </span>
-                    </div>
+                <div className="mt-3">
+                    <p className="text-gray-800 text-base whitespace-pre-wrap break-words">
+                        {wave.content}
+                    </p>
                 </div>
 
-                {/* Titre et description de la wave */}
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
-                    {wave.title}
-                </h3>
-
-                <p className="text-gray-600 text-sm mb-3 line-clamp-3">
-                    {wave.description}
-                </p>
-
-                {/* Rating */}
-                <div className="flex items-center space-x-2 mb-3">
-                    <div className="flex items-center space-x-1">
-                        {renderStars(wave.rating)}
-                    </div>
-                    <span className="text-sm text-gray-600">
-                        {wave.rating}/5
-                    </span>
-                </div>
-
-                {/* Tags */}
-                {wave.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
-                        {wave.tags.slice(0, 3).map((tag, index) => (
-                            <span
-                                key={index}
-                                className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
-                            >
-                                #{tag}
-                            </span>
-                        ))}
-                        {wave.tags.length > 3 && (
-                            <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-                                +{wave.tags.length - 3}
-                            </span>
-                        )}
-                    </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div className="flex items-center space-x-4">
+                <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-100">
+                    <div className="flex items-center space-x-6">
                         <button 
                             onClick={handleLike}
-                            className={`flex items-center space-x-1 transition-colors ${
+                            className={`flex items-center space-x-2 transition-colors group ${
                                 isLiked 
                                     ? 'text-red-500' 
                                     : 'text-gray-500 hover:text-red-500'
                             }`}
+                            title={isLiked ? "Contrairement à" : "Aimer"}
                         >
-                            <span className={`text-lg ${isLiked ? 'text-red-500' : ''}`}>♥</span>
-                            <span className="text-sm">{wave.likes + (isLiked ? 1 : 0)}</span>
+                            <span className="text-lg">{isLiked ? '❤️' : '🤍'}</span>
+                            <span className="text-sm font-medium">
+                                {wave.likeCount + (isLiked ? 1 : 0)}
+                            </span>
                         </button>
+
                         <button 
                             onClick={handleComment}
-                            className="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors"
+                            className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group"
+                            title="Commenter"
                         >
                             <span className="text-lg">💬</span>
-                            <span className="text-sm">{wave.comments}</span>
+                            <span className="text-sm font-medium">{wave.commentCount}</span>
                         </button>
+
+                        <div className="flex items-center space-x-2 text-gray-400">
+                            <span className="text-lg">🔄</span>
+                            <span className="text-sm font-medium">{wave.shareCount}</span>
+                        </div>
                     </div>
                 </div>
             </div>

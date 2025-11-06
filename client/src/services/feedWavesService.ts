@@ -15,17 +15,14 @@ export interface WaveUser {
 
 export interface FeedWave {
     id: number;
-    title: string;
-    description: string;
-    artist: string;
-    album: string;
-    genre: string;
-    rating: number;
-    imageUrl?: string;
-    tags: string[];
-    likes: number;
-    comments: number;
+    userId: number;
+    content: string;
+    likeCount: number;
+    commentCount: number;
+    shareCount: number;
+    visibility: boolean;
     createdAt: string;
+    updatedAt: string;
     user: WaveUser;
 }
 
@@ -46,104 +43,90 @@ class FeedWavesService {
     private baseUrl = API_URL;
 
     /**
-     * Récupérer les waves du feed principal
+     * @description Gets the waves from the main feed
      */
     async getFeedWaves(page: number = 1, limit: number = 10): Promise<{ waves: FeedWave[], total: number }> {
-        try {
-            // Essayer d'utiliser la vraie API
-            const response = await fetch(`${this.baseUrl}/waves/feed?page=${page}&limit=${limit}`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+        const response = await fetch(`${this.baseUrl}/waves/feed?page=${page}&limit=${limit}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-            if (response.ok) {
-                const data = await response.json();
-                return data;
-            } else {
-                throw new Error(`API Error: ${response.status}`);
-            }
-        } catch (error) {
-            console.warn('API des waves non disponible, utilisation des données mockées:', error);
-            return this.getMockWaves();
+        if (!response.ok) {
+            throw new Error(`Erreur API: ${response.status}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * @description Gets the waves from a specific user
+     */
+    async getUserWaves(userId: number, page: number = 1, limit: number = 10): Promise<{ waves: FeedWave[], total: number }> {
+        const response = await fetch(`${this.baseUrl}/waves/user/${userId}?page=${page}&limit=${limit}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur API: ${response.status}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * @description Creates a new wave
+     */
+    async createWave(content: string): Promise<FeedWave> {
+        const response = await fetch(`${this.baseUrl}/waves`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur API: ${response.status}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * @description Deletes a wave
+     */
+    async deleteWave(waveId: number): Promise<void> {
+        const response = await fetch(`${this.baseUrl}/waves/${waveId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur API: ${response.status}`);
         }
     }
 
     /**
-     * Données mockées pour tester la fonctionnalité
-     */
-    private getMockWaves(): { waves: FeedWave[], total: number } {
-        const mockWaves: FeedWave[] = [
-            {
-                id: 1,
-                title: "Ma découverte drill du moment",
-                description: "Gros son qui frappe fort ! Cette track me met dans l'ambiance pour toute la journée. Le flow est incroyable.",
-                artist: "Central Cee",
-                album: "Wild West",
-                genre: "Drill",
-                rating: 5,
-                imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop",
-                tags: ["drill", "gros son", "ouais"],
-                likes: 42,
-                comments: 8,
-                createdAt: "2025-09-30T10:30:00Z",
-                user: {
-                    id: 11,
-                    pseudo: "stephe",
-                    username: "stephe",
-                    profile_picture: "http://localhost:5001/uploads/users/11/11_pfp.webp?v=1759241853990",
-                    is_verified: true
-                }
-            }
-        ];
-
-        return {
-            waves: mockWaves,
-            total: mockWaves.length
-        };
-    }
-
-    /**
-     * Liker/Unliker une wave
+     * @description Likes/dislikes a wave
      */
     async toggleLike(waveId: number): Promise<boolean> {
-        try {
-            const response = await fetch(`${this.baseUrl}/waves/${waveId}/like`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+        const response = await fetch(`${this.baseUrl}/waves/${waveId}/like`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-            return response.ok;
-        } catch (error) {
-            console.error('Erreur lors du like/unlike de la wave:', error);
-            return false;
-        }
-    }
-
-    /**
-     * Ajouter un commentaire à une wave
-     */
-    async addComment(waveId: number, content: string): Promise<boolean> {
-        try {
-            const response = await fetch(`${this.baseUrl}/waves/${waveId}/comments`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content }),
-            });
-
-            return response.ok;
-        } catch (error) {
-            console.error('Erreur lors de l\'ajout du commentaire:', error);
-            return false;
-        }
+        return response.ok;
     }
 }
 
@@ -153,7 +136,7 @@ class ReviewsService {
     private baseUrl = 'http://localhost:5001';
 
     /**
-     * Récupérer les reviews du feed principal
+     * @description Gets reviews for the main feed
      */
     async getFeedReviews(_page: number = 1, _limit: number = 10): Promise<{ reviews: FeedReview[], total: number }> {
         const mockReviews: FeedReview[] = [
@@ -205,7 +188,7 @@ class ReviewsService {
     }
 
     /**
-     * Liker/Unliker une review
+     * @description Like/dislike a review
      */
     async toggleLike(reviewId: number): Promise<boolean> {
         try {

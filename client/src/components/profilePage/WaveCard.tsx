@@ -1,6 +1,20 @@
 import React from 'react';
-import { Wave } from '../../services/userProfileService';
 import { FiMusic, FiCalendar } from 'react-icons/fi';
+
+interface Wave {
+    id: string;
+    title: string;
+    description: string;
+    artist: string;
+    album: string;
+    genre: string;
+    rating: number;
+    likes: number;
+    comments: number;
+    tags: string[];
+    imageUrl?: string;
+    createdAt: string;
+}
 
 interface WaveCardProps {
     wave: Wave;
@@ -83,7 +97,7 @@ const WaveCard: React.FC<WaveCardProps> = ({ wave, onClick }) => {
                 {/* Tags */}
                 {wave.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-3">
-                        {wave.tags.slice(0, 3).map((tag, index) => (
+                        {wave.tags.slice(0, 3).map((tag: string, index: number) => (
                             <span
                                 key={index}
                                 className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
