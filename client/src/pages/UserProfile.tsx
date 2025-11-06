@@ -3,8 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
 import { useUserProfileContext } from '../context/UserProfileContext';
 import { userProfileService, Review } from '../services/userProfileService';
-import { FeedWave } from '../services/feedWavesService';
+import { FeedWave, feedWavesService } from '../services/feedWavesService';
 import FeedWaveCard from '../components/waves/FeedWaveCard';
+import CreateWaveForm from '../components/waves/CreateWaveForm';
 import ReviewCard from '../components/profilePage/ReviewCard';
 import ProfileStats from '../components/profilePage/ProfileStats';
 import { FiMapPin, FiCalendar } from 'react-icons/fi';
@@ -75,6 +76,16 @@ const UserProfilePage: React.FC = () => {
     const handleComment = (waveId: number) => {
         console.log('Comment on wave:', waveId);
         // TODO: Implémenter la logique de commentaire
+    };
+
+    const handleCreateWave = async (content: string) => {
+        try {
+            await feedWavesService.createWave(content);
+            await loadProfileData();
+        } catch (error) {
+            console.error('Error creating wave:', error);
+            throw error;
+        }
     };
 
     const displayProfile = useMemo(() => {
@@ -299,6 +310,14 @@ const UserProfilePage: React.FC = () => {
                         {/* Waves Tab */}
                         {activeTab === 'waves' && (
                             <div className="space-y-6">
+                                {/* Create Wave Form - Only shown on own profile */}
+                                {isOwnProfile && (
+                                    <CreateWaveForm 
+                                        onSubmit={handleCreateWave}
+                                        placeholder="Partagez ce que vous écoutez en ce moment... 🎵"
+                                    />
+                                )}
+
                                 {waves.length > 0 ? (
                                     <div className="grid gap-6">
                                         {waves
