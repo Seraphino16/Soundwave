@@ -37,6 +37,17 @@ const FeedWaves: React.FC = () => {
         // TODO: Implement comment modal
     };
 
+    const handleDelete = async (waveId: number) => {
+        try {
+            await feedWavesService.deleteWave(waveId);
+            // Retirer la wave de la liste
+            setWaves(prev => prev.filter(w => w.id !== waveId));
+        } catch (error) {
+            console.error("Erreur lors de la suppression:", error);
+            alert("Erreur lors de la suppression de la wave");
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center py-12">
@@ -79,6 +90,7 @@ const FeedWaves: React.FC = () => {
                         wave={wave}
                         onLike={handleLike}
                         onComment={handleComment}
+                        onDelete={handleDelete}
                     />
                 ))}
         </div>

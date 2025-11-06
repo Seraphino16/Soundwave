@@ -3,18 +3,40 @@
  * @author SoundWave
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FeedWave } from '../../services/feedWavesService';
+import { useUserContext } from '../../context/UserContext';
 
 interface FeedWaveCardProps {
     wave: FeedWave;
     onLike?: (waveId: number) => void;
     onComment?: (waveId: number) => void;
+    onDelete?: (waveId: number) => void;
 }
 
-const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment }) => {
+const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment, onDelete }) => {
     const [isLiked, setIsLiked] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const { user } = useUserContext();
+
+    // Fermer le menu si on clique en dehors
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setShowMenu(false);
+            }
+        };
+
+        if (showMenu) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showMenu]);
 
     if (!wave || !wave.user) {
         console.error('Wave or wave.user undefined:', wave);
@@ -59,13 +81,23 @@ const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment }) 
         onComment?.(wave.id);
     };
 
+    const handleDelete = () => {
+        if (window.confirm('Êtes-vous sûr de vouloir supprimer cette wave ?')) {
+            onDelete?.(wave.id);
+            setShowMenu(false);
+        }
+    };
+
+    const isOwnWave = user?.id === wave.user.id;
+
     return (
         <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-100">
             <div className="p-4">
-                <Link 
-                    to={`/profile/${wave.user.id}`}
-                    className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
-                >
+                <div className="flex items-start justify-between">
+                    <Link 
+                        to={`/profile/${wave.user.id}`}
+                        className="flex items-center space-x-3 hover:opacity-80 transition-opacity flex-1"
+                    >
                     <img
                         src={wave.user.profile_picture || '/user-icon.png'}
                         alt={wave.user.pseudo}
@@ -91,6 +123,32 @@ const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment }) 
                         </div>
                     </div>
                 </Link>
+
+                {/* Menu trois points (seulement pour ses propres waves) */}
+                {isOwnWave && (
+                    <div className="relative" ref={menuRef}>
+                        <button
+                            onClick={() => setShowMenu(!showMenu)}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            title="Plus d'options"
+                        >
+                            <span className="text-gray-500 text-xl">⋮</span>
+                        </button>
+
+                        {showMenu && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                                <button
+                                    onClick={handleDelete}
+                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                                >
+                                    <span>🗑️</span>
+                                    <span>Supprimer</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
 
                 <div className="mt-3">
                     <p className="text-gray-800 text-base whitespace-pre-wrap break-words">

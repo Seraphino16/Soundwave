@@ -88,6 +88,16 @@ const UserProfilePage: React.FC = () => {
         }
     };
 
+    const handleDelete = async (waveId: number) => {
+        try {
+            await feedWavesService.deleteWave(waveId);
+            setWaves(prev => prev.filter(w => w.id !== waveId));
+        } catch (error) {
+            console.error("Erreur lors de la suppression:", error);
+            alert("Erreur lors de la suppression de la wave");
+        }
+    };
+
     const displayProfile = useMemo(() => {
         if (!userProfile) return null;
         
@@ -328,6 +338,7 @@ const UserProfilePage: React.FC = () => {
                                                     wave={wave}
                                                     onLike={handleLike}
                                                     onComment={handleComment}
+                                                    onDelete={handleDelete}
                                                 />
                                             ))}
                                     </div>
