@@ -17,10 +17,21 @@ export class WavesService {
   ) {}
 
   /**
+   * @description Générer un nouvel ID unique pour chaque wave
+   */
+  private async setId(): Promise<number> {
+    const lastWave = await this.waveModel.findOne().sort({ id: -1 }).exec();
+    return lastWave ? lastWave.id + 1 : 1;
+  }
+
+  /**
    * @description Créer une nouvelle wave
    */
   async create(userId: number, createWaveDto: CreateWaveDto): Promise<Wave> {
+    const id = await this.setId();
+    
     const wave = new this.waveModel({
+      id,
       userId,
       content: createWaveDto.content,
       likeCount: 0,
@@ -137,8 +148,7 @@ export class WavesService {
    */
   async findOne(id: number): Promise<Wave> {
     const wave = await this.waveModel
-      .findById(id)
-      .populate('userId', 'pseudo username email profile_picture is_verified')
+      .findOne({ id })
       .exec();
 
     if (!wave) {
@@ -158,7 +168,7 @@ export class WavesService {
       throw new BadRequestException('Vous ne pouvez supprimer que vos propres waves');
     }
 
-    await this.waveModel.findByIdAndDelete(id);
+    await this.waveModel.findOneAndDelete({ id });
   }
 
   /**

@@ -20,6 +20,11 @@ export interface Wave extends Document {
 }
 
 export const WaveSchema = new Schema({
+  id: {
+    type: Number,
+    required: true,
+    unique: true,
+  },
   userId: { type: Number, required: true, ref: 'User' },
   content: { type: String, required: true },
   likeCount: { type: Number, default: 0 },
