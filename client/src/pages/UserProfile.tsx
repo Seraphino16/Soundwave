@@ -9,30 +9,65 @@ import CreateWaveForm from '../components/waves/CreateWaveForm';
 import ReviewCard from '../components/profilePage/ReviewCard';
 import ProfileStats from '../components/profilePage/ProfileStats';
 import { FiMapPin, FiCalendar } from 'react-icons/fi';
+import { fetchAlbumById, fetchArtistById } from "../services/spotifyService";
 
 const UserProfilePage: React.FC = () => {
     const { userId } = useParams<{ userId?: string }>();
     const { user } = useUserContext();
     const { userProfile, loading: profileLoading, fetchUserProfile } = useUserProfileContext();
-    
+
     const [waves, setWaves] = useState<FeedWave[]>([]);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'waves' | 'reviews'>('waves');
     const [isFollowing, setIsFollowing] = useState(false);
-    
+
     const isOwnProfile = !userId || (user && parseInt(userId) === user.id);
 
     useEffect(() => {
         loadProfileData();
     }, [userId, user]);
 
+    const enrichReviewsWithSpotifyData = async (reviews: Review[]): Promise<Review[]> => {
+        return Promise.all(
+            reviews.map(async (review) => {
+                try {
+                    if (review.target_type === 'album') {
+                        const album = await fetchAlbumById(review.target_id);
+                        return {
+                            ...review,
+                            targetData: {
+                                name: album.title,
+                                artistName: album.artists?.[0]?.name || '',
+                                cover: album.coverImage || null,
+                            },
+                        };
+                    }
+                    else if (review.target_type === 'artist') {
+                        const artist = await fetchArtistById(review.target_id);
+                        return {
+                            ...review,
+                            targetData: {
+                                name: artist.name,
+                                cover: artist.image || null,
+                            },
+                        };
+                    }
+                    return review;
+                } catch (err) {
+                    console.error('Erreur enrichissement review:', err);
+                    return review;
+                }
+            })
+        );
+    };
+
     const loadProfileData = async () => {
         try {
             setLoading(true);
-            
+
             let targetUserId: number;
-            
+
             if (userId) {
                 targetUserId = parseInt(userId);
             } else if (user) {
@@ -40,16 +75,20 @@ const UserProfilePage: React.FC = () => {
             } else {
                 return;
             }
-            
+
             await fetchUserProfile(targetUserId);
-            
+
             const [wavesData, reviewsData] = await Promise.all([
                 userProfileService.getUserWaves(targetUserId, 1, 8),
-                userProfileService.getUserReviews(targetUserId, 1, 6)
+                isOwnProfile
+                    ? userProfileService.getUserReviews()
+                    : Promise.resolve([]),
             ]);
 
+            const enrichedReviews = await enrichReviewsWithSpotifyData(reviewsData);
+
             setWaves(wavesData.waves);
-            setReviews(reviewsData.reviews);
+            setReviews(enrichedReviews);
         } catch (error) {
             console.error('Error loading profile data:', error);
         } finally {
@@ -59,7 +98,6 @@ const UserProfilePage: React.FC = () => {
 
     const handleFollowToggle = async () => {
         if (!userProfile || isOwnProfile) return;
-        
         try {
             await userProfileService.toggleFollow(userProfile.id);
             setIsFollowing(!isFollowing);
@@ -68,15 +106,8 @@ const UserProfilePage: React.FC = () => {
         }
     };
 
-    const handleLike = (waveId: number) => {
-        console.log('Like wave:', waveId);
-        // TODO: Implémenter la logique de like
-    };
-
-    const handleComment = (waveId: number) => {
-        console.log('Comment on wave:', waveId);
-        // TODO: Implémenter la logique de commentaire
-    };
+    const handleLike = (waveId: number) => console.log('Like wave:', waveId);
+    const handleComment = (waveId: number) => console.log('Comment wave:', waveId);
 
     const handleCreateWave = async (content: string) => {
         try {
@@ -100,7 +131,6 @@ const UserProfilePage: React.FC = () => {
 
     const displayProfile = useMemo(() => {
         if (!userProfile) return null;
-        
         return {
             id: userProfile.id,
             username: userProfile.username,
@@ -118,17 +148,14 @@ const UserProfilePage: React.FC = () => {
                 totalFollowers: userProfile.followers || 0,
                 totalFollowing: userProfile.following || 0,
                 averageRating: 4.5,
-                joinedDate: userProfile.createdAt
-            }
+                joinedDate: userProfile.createdAt,
+            },
         };
     }, [userProfile, waves.length, reviews.length]);
 
     const formatJoinDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            month: 'long',
-            year: 'numeric'
-        });
+        return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
     };
 
     if (loading || profileLoading) {
@@ -163,11 +190,7 @@ const UserProfilePage: React.FC = () => {
             {/* Banner */}
             <div className="relative h-64 md:h-80 overflow-hidden">
                 {displayProfile.bannerImage ? (
-                    <img
-                        src={displayProfile.bannerImage}
-                        alt="Banner"
-                        className="w-full h-full object-cover"
-                    />
+                    <img src={displayProfile.bannerImage} alt="Banner" className="w-full h-full object-cover" />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-r from-primaryBlue to-purple-600"></div>
                 )}
@@ -181,7 +204,7 @@ const UserProfilePage: React.FC = () => {
                         {/* Profile Image */}
                         <div className="relative">
                             <img
-                                src={displayProfile.profileImage || '/user-icon.png'}
+                                src={displayProfile.profileImage}
                                 alt={displayProfile.pseudo}
                                 className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg object-cover"
                             />
@@ -200,13 +223,10 @@ const UserProfilePage: React.FC = () => {
                                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                                             {displayProfile.pseudo}
                                         </h1>
-                                        {displayProfile.isVerified && (
-                                            <span className="text-blue-500 text-xl">✓</span>
-                                        )}
+                                        {displayProfile.isVerified && <span className="text-blue-500 text-xl">✓</span>}
                                     </div>
                                     <p className="text-gray-600 mb-2">@{displayProfile.username}</p>
-                                    
-                                    {/* Profile details */}
+
                                     <div className="flex flex-wrap items-center space-x-4 text-sm text-gray-500 mb-3">
                                         {displayProfile.location && (
                                             <div className="flex items-center space-x-1">
@@ -217,13 +237,13 @@ const UserProfilePage: React.FC = () => {
                                         {displayProfile.website && (
                                             <div className="flex items-center space-x-1">
                                                 <span className="text-sm">🔗</span>
-                                                <a 
+                                                <a
                                                     href={displayProfile.website}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-primaryBlue hover:underline"
                                                 >
-                                                    {displayProfile.website.replace('https://', '').replace('http://', '')}
+                                                    {displayProfile.website.replace(/^https?:\/\//, '')}
                                                 </a>
                                             </div>
                                         )}
@@ -234,24 +254,20 @@ const UserProfilePage: React.FC = () => {
                                     </div>
 
                                     {displayProfile.bio && (
-                                        <p className="text-gray-700 max-w-2xl leading-relaxed">
-                                            {displayProfile.bio}
-                                        </p>
+                                        <p className="text-gray-700 max-w-2xl leading-relaxed">{displayProfile.bio}</p>
                                     )}
                                 </div>
 
                                 {/* Action Buttons */}
                                 <div className="flex space-x-3">
                                     {isOwnProfile ? (
-                                        <>
-                                            <Link 
-                                                to="/settings" 
-                                                className="flex items-center justify-center w-10 h-10 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                                                title="Paramètres"
-                                            >
-                                                <span className="text-lg">⚙️</span>
-                                            </Link>
-                                        </>
+                                        <Link
+                                            to="/settings"
+                                            className="flex items-center justify-center w-10 h-10 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                                            title="Paramètres"
+                                        >
+                                            <span className="text-lg">⚙️</span>
+                                        </Link>
                                     ) : (
                                         <button
                                             onClick={handleFollowToggle}
@@ -284,12 +300,11 @@ const UserProfilePage: React.FC = () => {
             {/* Content */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pb-12">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Sidebar - Stats */}
                     <div className="lg:col-span-1">
                         <ProfileStats stats={displayProfile.stats} />
                     </div>
 
-                    {/* Main Content - Waves and Reviews */}
+                    {/* Waves / Reviews */}
                     <div className="lg:col-span-2">
                         {/* Tabs */}
                         <div className="bg-white rounded-lg shadow-md mb-6">
@@ -317,12 +332,40 @@ const UserProfilePage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Waves Tab */}
+                        {/* Reviews */}
+                        {activeTab === 'reviews' && (
+                            <div className="space-y-6">
+                                {reviews.length > 0 ? (
+                                    <div className="grid gap-6">
+                                        {reviews.map((review) => (
+                                            <ReviewCard
+                                                key={review._id}
+                                                review={review}
+                                                onClick={() => {/* Handle review click */}}
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="bg-white rounded-lg shadow-md p-8 text-center">
+                                        <span className="text-4xl mb-4 block">📝</span>
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                            {isOwnProfile ? "Vous n'avez pas encore écrit de reviews" : "Aucune review disponible"}
+                                        </h3>
+                                        <p className="text-gray-600">
+                                            {isOwnProfile
+                                                ? 'Donnez votre avis sur vos albums ou artistes préférés !'
+                                                : "Cet utilisateur n'a pas encore écrit de reviews."}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Waves */}
                         {activeTab === 'waves' && (
                             <div className="space-y-6">
-                                {/* Create Wave Form - Only shown on own profile */}
                                 {isOwnProfile && (
-                                    <CreateWaveForm 
+                                    <CreateWaveForm
                                         onSubmit={handleCreateWave}
                                         placeholder="Partagez ce que vous écoutez en ce moment... 🎵"
                                     />
@@ -331,8 +374,8 @@ const UserProfilePage: React.FC = () => {
                                 {waves.length > 0 ? (
                                     <div className="grid gap-6">
                                         {waves
-                                            .filter(wave => wave.user)
-                                            .map(wave => (
+                                            .filter((wave) => wave.user)
+                                            .map((wave) => (
                                                 <FeedWaveCard
                                                     key={wave.id}
                                                     wave={wave}
@@ -346,37 +389,12 @@ const UserProfilePage: React.FC = () => {
                                     <div className="bg-white rounded-lg shadow-md p-8 text-center">
                                         <span className="text-4xl mb-4 block">🎵</span>
                                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                            {isOwnProfile ? 'Vous n\'avez pas encore créé de waves' : 'Aucune wave disponible'}
+                                            {isOwnProfile ? "Vous n'avez pas encore créé de waves" : 'Aucune wave disponible'}
                                         </h3>
                                         <p className="text-gray-600">
-                                            {isOwnProfile ? 'Commencez à partager votre musique préférée !' : 'Cet utilisateur n\'a pas encore partagé de waves.'}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Reviews Tab */}
-                        {activeTab === 'reviews' && (
-                            <div className="space-y-6">
-                                {reviews.length > 0 ? (
-                                    <div className="grid gap-6">
-                                        {reviews.map(review => (
-                                            <ReviewCard
-                                                key={review.id}
-                                                review={review}
-                                                onClick={() => {/* Handle review click */}}
-                                            />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="bg-white rounded-lg shadow-md p-8 text-center">
-                                        <span className="text-4xl mb-4 block">📝</span>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                            {isOwnProfile ? 'Vous n\'avez pas encore écrit de reviews' : 'Aucune review disponible'}
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            {isOwnProfile ? 'Donnez votre avis sur vos albums préférés !' : 'Cet utilisateur n\'a pas encore écrit de reviews.'}
+                                            {isOwnProfile
+                                                ? 'Commencez à partager votre musique préférée !'
+                                                : "Cet utilisateur n'a pas encore partagé de waves."}
                                         </p>
                                     </div>
                                 )}
