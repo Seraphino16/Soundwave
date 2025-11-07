@@ -8,6 +8,7 @@ import {
   Req,
   Patch,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -20,22 +21,33 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() dto: CreateReviewDto, @Req() req) {
+    this.validateTargetType(dto.target_type);
+
     const userId = req.user.id;
     const username = req.user.username;
     const profile_picture = req.user.profile_picture || 'https://via.placeholder.com/50';
+
     return this.reviewsService.create(dto, userId, username, profile_picture);
   }
 
-  @Get(':artistId')
-  async findAllByArtist(@Param('artistId') artistId: string) {
-    return this.reviewsService.findAllByArtist(artistId);
+  @Get(':targetType/:targetId')
+  async findAllByTarget(
+    @Param('targetType') targetType: string,
+    @Param('targetId') targetId: string,
+  ) {
+    this.validateTargetType(targetType);
+    return this.reviewsService.findAllByTarget(targetType, targetId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':artistId/me')
-  async findUserReview(@Param('artistId') artistId: string, @Req() req) {
-    const userId = req.user.id;
-    return this.reviewsService.findUserReview(artistId, userId);
+  @Get(':targetType/:targetId/me')
+  async findUserReview(
+    @Param('targetType') targetType: string,
+    @Param('targetId') targetId: string,
+    @Req() req,
+  ) {
+    this.validateTargetType(targetType);
+    return this.reviewsService.findUserReview(targetType, targetId, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -52,5 +64,12 @@ export class ReviewsController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req) {
     return this.reviewsService.remove(id, req.user.id);
+  }
+
+  private validateTargetType(type: string) {
+    const allowed = ['artist', 'album'];
+    if (!allowed.includes(type)) {
+      throw new BadRequestException(`Type de cible invalide. Utilisez "artist" ou "album".`);
+    }
   }
 }

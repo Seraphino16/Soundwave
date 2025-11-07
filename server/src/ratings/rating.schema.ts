@@ -2,7 +2,8 @@ import { Document, Schema } from 'mongoose';
 
 export interface Rating extends Document {
   id: string;
-  artist_id: string;
+  target_type: 'artist' | 'album';
+  target_id: string;
   user_id: number;
   username: string;
   score: number;
@@ -11,7 +12,13 @@ export interface Rating extends Document {
 
 export const RatingSchema = new Schema<Rating>(
   {
-    artist_id: {
+    target_type: {
+      type: String,
+      enum: ['artist', 'album'],
+      required: true,
+      index: true,
+    },
+    target_id: {
       type: String,
       required: true,
       index: true,
@@ -39,4 +46,7 @@ export const RatingSchema = new Schema<Rating>(
   { timestamps: true },
 );
 
-RatingSchema.index({ artist_id: 1, user_id: 1 }, { unique: true });
+RatingSchema.index(
+  { target_type: 1, target_id: 1, user_id: 1 },
+  { unique: true }
+);

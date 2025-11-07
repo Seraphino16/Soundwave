@@ -30,6 +30,11 @@ export class SpotifyController {
     return await this.spotifyService.getAlbumsByArtistId(id);
   }
 
+  @Get('artist/:id/albums-with-tracks')
+  async getAlbumsWithTracks(@Param('id') id: string) {
+    return await this.spotifyService.getAlbumsWithTracksByArtistId(id);
+  }
+
   @Get('albums/search')
   async searchAlbums(
     @Query('name') name?: string,
@@ -39,7 +44,10 @@ export class SpotifyController {
   }
 
   @Get('artists/search')
-  searchArtists(@Query('name') name?: string, @Query('genre') genre?: string) {
+  searchArtists(
+    @Query('name') name?: string,
+    @Query('genre') genre?: string,
+  ) {
     return this.spotifyService.searchArtists({ name, genre });
   }
 }

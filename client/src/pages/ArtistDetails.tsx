@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
     fetchArtistById,
-    fetchAlbumsByArtistId,
+    fetchAlbumsWithTracksByArtistId
 } from "../services/spotifyService";
 import AlbumCard from "../components/cards/AlbumCard";
-import ArtistRatingSection from "components/ratings/ArtistRatingSection";
+import RatingSection from "components/ratings/RatingSection";
 import ReviewsDetails from "components/reviews/ReviewsDetails";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -22,10 +22,28 @@ interface Artist {
     spotifyUrl: string;
 }
 
+interface Track {
+    id: string;
+    title: string;
+    durationMs: number;
+    trackNumber: number;
+    spotifyUrl: string | null;
+    previewUrl: string | null;
+}
+
 interface Album {
     id: string;
     title: string;
     coverImage: string | null;
+    releaseDate: string;
+    totalTracks: number;
+    spotifyUrl: string;
+    artists?: {
+        id: string;
+        name: string;
+        spotifyUrl: string;
+    }[];
+    tracks: Track[];
 }
 
 const ArtistDetail: React.FC = () => {
@@ -33,14 +51,15 @@ const ArtistDetail: React.FC = () => {
     const [artist, setArtist] = useState<Artist | null>(null);
     const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(true);
-
     const [isFavorite, setIsFavorite] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showSearch, setShowSearch] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
             try {
                 const artistData = await fetchArtistById(id!);
-                const albumData = await fetchAlbumsByArtistId(id!);
+                const albumData = await fetchAlbumsWithTracksByArtistId(id!);
                 setArtist(artistData);
                 setAlbums(albumData.albums);
             } catch (error) {
@@ -70,6 +89,14 @@ const ArtistDetail: React.FC = () => {
         }
     };
 
+    const filteredAlbums = searchTerm
+        ? albums.filter(album =>
+            album.tracks?.some(track =>
+                track.title.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        )
+        : albums;
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -91,7 +118,10 @@ const ArtistDetail: React.FC = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
             <div className="bg-white shadow-xl rounded-lg p-6 sm:p-10 w-full max-w-6xl relative">
-                <BackButton to="/artists" className="absolute top-4 sm:top-6 left-4 sm:left-6" />
+                <BackButton
+                    to="/artists"
+                    className="absolute top-4 sm:top-6 left-4 sm:left-6"
+                />
 
                 <div className="mb-10 w-full max-w-4xl mx-auto">
                     <h1 className="mt-10 sm:mt-0 text-3xl sm:text-4xl font-bold text-primaryBlue text-center mb-8 sm:mb-10">
@@ -107,19 +137,9 @@ const ArtistDetail: React.FC = () => {
 
                         <div className="text-center md:text-left w-full md:w-auto">
                             <div className="text-base sm:text-lg text-gray-700 space-y-2">
-                                <p>
-                                    <strong>Followers :</strong>{" "}
-                                    {artist.followers.toLocaleString()}
-                                </p>
-                                <p>
-                                    <strong>Popularité :</strong> {artist.popularity}/100
-                                </p>
-                                <p>
-                                    <strong>Genres :</strong>{" "}
-                                    {artist.genres.length > 0
-                                        ? artist.genres.join(", ")
-                                        : "Non spécifié"}
-                                </p>
+                                <p><strong>Followers :</strong> {artist.followers.toLocaleString()}</p>
+                                <p><strong>Popularité :</strong> {artist.popularity}/100</p>
+                                <p><strong>Genres :</strong> {artist.genres.length > 0 ? artist.genres.join(", ") : "Non spécifié"}</p>
                             </div>
 
                             <button
@@ -142,16 +162,61 @@ const ArtistDetail: React.FC = () => {
                     </div>
                 </div>
 
-                {albums.length > 0 && (
-                    <section className="mt-10 sm:mt-12">
-                        <h2 className="text-2xl sm:text-3xl font-bold text-primaryBlue text-center mb-6">
-                            Albums
-                        </h2>
+                {filteredAlbums.length > 0 ? (
+                    <section className="mt-6 sm:mt-8">
+                        <div className="w-full mb-6 relative">
+                            {/* Titre centré */}
+                            <h2 className="text-2xl sm:text-3xl font-bold text-primaryBlue text-center mb-4">
+                                Albums
+                            </h2>
 
+                            {/* Bouton "Rechercher" aligné à droite */}
+                            {!showSearch && (
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={() => setShowSearch(true)}
+                                        className="px-4 py-2 text-lg text-primaryBlue font-semibold rounded-md hover:underline transition"
+                                        aria-label="Afficher la recherche"
+                                    >
+                                        Rechercher
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Barre de recherche + bouton "Fermer" alignés à droite */}
+                            {showSearch && (
+                                <div className="flex justify-end mt-2">
+                                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                                        <input
+                                            type="text"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            placeholder="Rechercher une piste..."
+                                            className="w-full sm:w-72 p-3 border rounded-lg focus:outline-none focus:ring focus:border-primaryBlue"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                setShowSearch(false);
+                                                setSearchTerm("");
+                                            }}
+                                            className="px-4 py-2 text-lg text-primaryBlue font-semibold rounded-md hover:underline transition"
+                                            aria-label="Fermer la recherche"
+                                        >
+                                            Fermer
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Liste des albums */}
                         <div className="overflow-x-auto scrollbar-transparent">
                             <div className="flex gap-28 sm:gap-12 md:gap-16 lg:gap-24 px-2 pb-2 min-w-max">
-                                {albums.map((album) => (
-                                    <div key={album.id} className="flex-shrink-0 w-40 sm:w-44 md:w-48">
+                                {filteredAlbums.map((album) => (
+                                    <div
+                                        key={album.id}
+                                        className="flex-shrink-0 w-40 sm:w-44 md:w-48"
+                                    >
                                         <AlbumCard
                                             id={album.id}
                                             title={album.title}
@@ -162,18 +227,24 @@ const ArtistDetail: React.FC = () => {
                             </div>
                         </div>
                     </section>
+                ) : (
+                    <p className="text-center text-gray-500 italic">
+                        Aucun album trouvé pour cette piste.
+                    </p>
                 )}
 
+
+
+                {/* === Notes et Avis === */}
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
-                <ArtistRatingSection />
+                <RatingSection targetType="artist" targetId={artist.id} />
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
-                <ReviewsDetails />
+                <ReviewsDetails targetType="artist" />
             </div>
 
             <ToastContainer />
         </div>
     );
-
 };
 
 export default ArtistDetail;

@@ -3,6 +3,7 @@ import {
   ConflictException,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -14,9 +15,12 @@ export class RatingsService {
   constructor(@InjectModel('Rating') private ratingModel: Model<Rating>) {}
 
   async create(dto: CreateRatingDto, userId: number, username: string) {
+    this.validateTargetType(dto.target_type);
+
     try {
       const rating = new this.ratingModel({
-        artist_id: dto.artist_id,
+        target_type: dto.target_type,
+        target_id: dto.target_id,
         user_id: userId,
         username,
         score: dto.score,
@@ -25,22 +29,28 @@ export class RatingsService {
       return await rating.save();
     } catch (err) {
       if (err.code === 11000) {
-        throw new ConflictException('Vous avez déjà noté cet artiste');
+        throw new ConflictException(
+          `Vous avez déjà noté ce ${dto.target_type === 'artist' ? 'artiste' : 'album'}`,
+        );
       }
       throw err;
     }
   }
 
-  async findAllByArtist(artistId: string) {
+  async findAllByTarget(targetType: 'artist' | 'album', targetId: string) {
+    this.validateTargetType(targetType);
+
     return this.ratingModel
-      .find({ artist_id: artistId })
+      .find({ target_type: targetType, target_id: targetId })
       .sort({ createdAt: -1 })
       .exec();
   }
 
-  async getSummary(artistId: string) {
+  async getSummary(targetType: 'artist' | 'album', targetId: string) {
+    this.validateTargetType(targetType);
+
     const result = await this.ratingModel.aggregate([
-      { $match: { artist_id: artistId } },
+      { $match: { target_type: targetType, target_id: targetId } },
       {
         $group: {
           _id: null,
@@ -59,6 +69,7 @@ export class RatingsService {
 
   async update(id: string, score: number, userId: number) {
     const rating = await this.ratingModel.findById(id).exec();
+
     if (!rating) {
       throw new NotFoundException('Note non trouvée');
     }
@@ -72,6 +83,7 @@ export class RatingsService {
 
   async remove(id: string, userId: number) {
     const rating = await this.ratingModel.findById(id).exec();
+
     if (!rating) {
       throw new NotFoundException('Note non trouvée');
     }
@@ -80,5 +92,12 @@ export class RatingsService {
     }
 
     return rating.deleteOne();
+  }
+
+  private validateTargetType(type: string) {
+    const allowed = ['artist', 'album'];
+    if (!allowed.includes(type)) {
+      throw new BadRequestException(`Type de cible invalide. Doit être l'un de : ${allowed.join(', ')}`);
+    }
   }
 }

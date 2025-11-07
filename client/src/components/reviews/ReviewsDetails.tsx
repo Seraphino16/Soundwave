@@ -3,16 +3,22 @@ import { useParams } from "react-router-dom";
 import { FiMoreHorizontal } from "react-icons/fi";
 import { motion } from "framer-motion";
 import {
-    getReviewsByArtist,
+    getReviewsByTarget,
     getMyReview,
     createReview,
     updateReview,
     deleteReview,
     LocalReview,
+    ReviewTargetType,
 } from "../../services/reviewService";
 
-const ReviewsDetails = () => {
-    const { id: artistId } = useParams<{ id: string }>();
+interface ReviewsDetailsProps {
+    targetType: ReviewTargetType; // 'artist' | 'album'
+}
+
+const ReviewsDetails: React.FC<ReviewsDetailsProps> = ({ targetType }) => {
+    const { id: targetId } = useParams<{ id: string }>();
+
     const [reviews, setReviews] = useState<LocalReview[]>([]);
     const [message, setMessage] = useState("");
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -39,15 +45,15 @@ const ReviewsDetails = () => {
     }, []);
 
     useEffect(() => {
-        if (!artistId) return;
+        if (!targetId) return;
 
         const fetchData = async () => {
             try {
-                const reviewsData = await getReviewsByArtist(artistId);
+                const reviewsData = await getReviewsByTarget(targetType, targetId);
                 setReviews(reviewsData.map((r) => ({ ...r, isEditing: false })));
 
                 if (currentUser) {
-                    const userReview = await getMyReview(artistId);
+                    const userReview = await getMyReview(targetType, targetId);
                     if (userReview) {
                         setMyReview({ ...userReview, isEditing: false });
                         setHasReviewed(true);
@@ -62,13 +68,13 @@ const ReviewsDetails = () => {
         };
 
         fetchData();
-    }, [artistId, currentUser]);
+    }, [targetId, currentUser, targetType]);
 
     const handlePostReview = async () => {
-        if (!message.trim() || !currentUser || hasReviewed || !artistId) return;
+        if (!message.trim() || !currentUser || hasReviewed || !targetId) return;
 
         try {
-            const newReview = await createReview(artistId, message);
+            const newReview = await createReview(targetType, targetId, message);
             setReviews([{ ...newReview, isEditing: false }, ...reviews]);
             setMessage("");
             setMyReview({ ...newReview, isEditing: false });
@@ -135,17 +141,17 @@ const ReviewsDetails = () => {
             <div className="flex flex-col items-center gap-10 px-4">
                 {!hasReviewed && (
                     <div className="w-full sm:max-w-md md:max-w-xl lg:max-w-2xl bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-300">
-                    <textarea
-                        className="w-full p-5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200 resize-none overflow-hidden"
-                        placeholder="Laissez une review..."
-                        value={message}
-                        onChange={(e) => {
-                            setMessage(e.target.value);
-                            const textarea = e.target as HTMLTextAreaElement;
-                            textarea.style.height = "auto";
-                            textarea.style.height = `${textarea.scrollHeight}px`;
-                        }}
-                    />
+            <textarea
+                className="w-full p-5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryBlue text-text-200 resize-none overflow-hidden"
+                placeholder="Laissez une review..."
+                value={message}
+                onChange={(e) => {
+                    setMessage(e.target.value);
+                    const textarea = e.target as HTMLTextAreaElement;
+                    textarea.style.height = "auto";
+                    textarea.style.height = `${textarea.scrollHeight}px`;
+                }}
+            />
                         <button
                             className="mt-5 w-full bg-primaryBlue text-white py-4 rounded-lg hover:bg-[#B0C7E6] transition font-semibold"
                             onClick={handlePostReview}
@@ -185,7 +191,6 @@ const ReviewsDetails = () => {
                                         value={review.message}
                                         onChange={(e) => {
                                             const updatedMessage = e.target.value;
-
                                             const textarea = e.target as HTMLTextAreaElement;
                                             textarea.style.height = "auto";
                                             textarea.style.height = `${textarea.scrollHeight}px`;

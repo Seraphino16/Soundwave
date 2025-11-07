@@ -1,8 +1,10 @@
 /**
- * @description Service de gestion des notes (Ratings) de SoundWave
+ * @description Service unifié de gestion des notes (Ratings) de SoundWave
  */
 
 const API_URL = "http://localhost:5001";
+
+export type RatingTargetType = 'artist' | 'album';
 
 export interface Rating {
     id: string;
@@ -16,10 +18,15 @@ export interface RatingSummary {
     count: number;
 }
 
-
-export const getRatings = async (artistId: string): Promise<Rating[]> => {
+/**
+ * Obtenir toutes les notes pour un artiste ou un album
+ */
+export const getRatings = async (
+    targetType: RatingTargetType,
+    targetId: string
+): Promise<Rating[]> => {
     try {
-        const response = await fetch(`${API_URL}/ratings/${artistId}`, {
+        const response = await fetch(`${API_URL}/ratings/${targetType}/${targetId}`, {
             credentials: "include",
         });
 
@@ -42,19 +49,22 @@ export const getRatings = async (artistId: string): Promise<Rating[]> => {
     }
 };
 
-
+/**
+ * Obtenir le résumé (moyenne, nombre de notes)
+ */
 export const getRatingSummary = async (
-    artistId: string,
+    targetType: RatingTargetType,
+    targetId: string
 ): Promise<RatingSummary> => {
     try {
-        const response = await fetch(`${API_URL}/ratings/${artistId}/summary`, {
+        const response = await fetch(`${API_URL}/ratings/${targetType}/${targetId}/summary`, {
             credentials: "include",
         });
 
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(
-                errorData.message || "Échec du chargement du résumé des notes",
+                errorData.message || "Échec du chargement du résumé des notes"
             );
         }
 
@@ -65,10 +75,13 @@ export const getRatingSummary = async (
     }
 };
 
-
+/**
+ * Ajouter ou mettre à jour une note pour un artiste ou un album
+ */
 export const addOrUpdateRating = async (
-    artistId: string,
-    score: number,
+    targetType: RatingTargetType,
+    targetId: string,
+    score: number
 ): Promise<Rating> => {
     try {
         const response = await fetch(`${API_URL}/ratings`, {
@@ -78,16 +91,15 @@ export const addOrUpdateRating = async (
             },
             credentials: "include",
             body: JSON.stringify({
-                artist_id: artistId,
+                target_type: targetType,
+                target_id: targetId,
                 score,
             }),
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(
-                errorData.message || "Impossible d'enregistrer la note",
-            );
+            throw new Error(errorData.message || "Impossible d'enregistrer la note");
         }
 
         return response.json();
@@ -97,10 +109,12 @@ export const addOrUpdateRating = async (
     }
 };
 
-
+/**
+ * Modifier une note existante (par ID)
+ */
 export const updateRating = async (
     ratingId: string,
-    score: number,
+    score: number
 ): Promise<Rating> => {
     try {
         const response = await fetch(`${API_URL}/ratings/${ratingId}`, {
@@ -124,6 +138,9 @@ export const updateRating = async (
     }
 };
 
+/**
+ * Supprimer une note (par ID)
+ */
 export const deleteRating = async (ratingId: string): Promise<void> => {
     try {
         const response = await fetch(`${API_URL}/ratings/${ratingId}`, {
