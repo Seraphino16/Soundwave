@@ -92,12 +92,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onClick }) => {
 
                 {/* === Footer actions === */}
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    {/* Like button */}
-                    <button className="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors">
-                        <span className="text-lg">♥</span>
-                        <span className="text-sm">{review.likes ?? 0}</span>
-                    </button>
-
+                    <div className="flex items-center space-x-1"></div>
                     {/* Type label */}
                     <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full capitalize">
                         {review.target_type}
