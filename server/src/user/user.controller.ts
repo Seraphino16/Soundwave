@@ -270,43 +270,30 @@ export class UserController {
   @Get('me')
   async getMe(@Req() req) {
     try {
-      console.log('Cookies reçus:', req.cookies);
       const token = req.cookies?.token;
 
       if (!token) {
-        console.log('Aucun token trouvé dans les cookies');
         throw new BadRequestException("Token d'authentification manquant");
       }
-
-      console.log('Token trouvé:', token);
 
       let decoded: any;
       try {
         decoded = this.tokenService.verifyToken(token);
-        console.log('Token décodé:', decoded);
       } catch (tokenError) {
         console.error('Erreur de vérification du token:', tokenError);
         throw new BadRequestException('Token invalide');
       }
 
       if (!decoded || typeof decoded !== 'object' || !decoded.id) {
-        console.log('Structure du token invalide:', decoded);
         throw new BadRequestException('Token invalide');
       }
 
-      console.log('Recherche utilisateur avec ID:', decoded.id);
       const user = await this.userService.findUserById(decoded.id);
 
       if (!user) {
-        console.log('Utilisateur non trouvé pour ID:', decoded.id);
         throw new BadRequestException('Utilisateur non trouvé');
       }
 
-      console.log('Utilisateur trouvé:', {
-        id: user.id,
-        pseudo: user.pseudo,
-        username: user.username,
-      });
       return user;
     } catch (error) {
       console.error('Erreur complète dans getMe:', error);
@@ -448,7 +435,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   async deleteUser(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
-    console.log('User in deleteUser:', user);
     if (user.id !== Number(id)) {
       return UserErrors.permissionDeletedAccountDenied();
     }
