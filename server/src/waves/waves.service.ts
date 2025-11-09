@@ -42,7 +42,6 @@ export class WavesService {
       .limit(limit)
       .exec();
 
-    console.log('🌊 Waves brutes depuis MongoDB:', JSON.stringify(waves, null, 2));
 
     const total = await this.waveModel.countDocuments({ visibility: true });
 
