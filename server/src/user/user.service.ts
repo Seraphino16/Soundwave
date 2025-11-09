@@ -574,4 +574,41 @@ export class UserService {
     }
     return updated;
   }
+
+  async searchUsers(query: string, limit: number = 10) {
+    if (!query || query.trim().length < 2) {
+      throw new BadRequestException('La recherche doit contenir au moins 2 caractères');
+    }
+    
+    const users = await this.userRepository.searchUsers(query.trim(), limit);
+    return this.enrichUsersWithProfile(users);
+  }
+
+  async getPopularUsers(limit: number = 10) {
+    const users = await this.userRepository.findPopularUsers(limit);
+    return this.enrichUsersWithProfile(users);
+  }
+
+  /**
+   * Enrichit les utilisateurs avec leurs informations de profil.
+   * @param users Liste des utilisateurs à enrichir
+   */
+  private async enrichUsersWithProfile(users: User[]): Promise<any[]> {
+    // Récupérer les infos de profil pour tous les utilisateurs
+    const userIds = users.map(user => user.id);
+    const userInfos = await this.userInfosRepository.findByUserIds(userIds);
+
+    // Créer une map pour un accès rapide aux infos
+    const userInfosMap = new Map(userInfos.map(info => [info.user_id, info]));
+    return users.map(user => {
+      const infos = userInfosMap.get(user.id);
+      return {
+        id: user.id,
+        username: user.username,
+        pseudo: user.pseudo,
+        profile_picture: infos?.profile_picture || null,
+        is_verified: user.is_verified
+      };
+    });
+  }
 }

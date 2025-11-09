@@ -4,6 +4,7 @@
  */
 
 import React, { createContext, useState, useContext, ReactNode, useCallback } from "react";
+import { API_CONFIG } from "../config/api";
 
 interface UserProfile {
   _id: string;
@@ -67,8 +68,11 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
   const fetchUserProfile = useCallback(async (userId: number) => {
     setLoading(true);
     setError(null);
+    
     try {
-      const res = await fetch(`http://localhost:5001/users/${userId}/profile`, {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USERS.PROFILE(userId)}`;
+      
+      const res = await fetch(url, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -76,19 +80,25 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        console.log("Erreur lors de la récupération du profil:", errorData.message);
-        setError(errorData.message || "Erreur lors de la récupération du profil");
+        let errorMessage = "Erreur lors de la récupération du profil";
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (parseError) {
+          if (res.status === 404) {
+            errorMessage = "Profil introuvable";
+          }
+        }
+        setError(errorMessage);
         setUserProfile(null);
         return;
       }
 
       const profileData = await res.json();
-      console.log("Profil utilisateur récupéré:", profileData);
       setUserProfile(profileData);
     } catch (error) {
       console.error("Erreur lors de la récupération du profil utilisateur:", error);
-      setError("Erreur de connexion");
+      setError("Erreur de connexion - Le serveur backend est-il démarré ?");
       setUserProfile(null);
     } finally {
       setLoading(false);
@@ -106,14 +116,13 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       if (pendingFiles.profile) {
         const fd = new FormData();
         fd.append('file', pendingFiles.profile);
-        const res = await fetch(`http://localhost:5001/uploads/profile-picture/${userProfile.id}`, {
+        const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPLOADS.PROFILE_PICTURE(userProfile.id)}`, {
           method: 'POST',
           credentials: 'include',
           body: fd,
         });
         if (!res.ok) {
           const errorData = await res.json();
-          console.log("Erreur lors de l'upload de la photo de profil:", errorData.message);
           setError(errorData.message || "Erreur lors de l'upload de la photo de profil");
           return false;
         }
@@ -126,14 +135,13 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       if (pendingFiles.banner) {
         const fd = new FormData();
         fd.append('file', pendingFiles.banner);
-        const res = await fetch(`http://localhost:5001/uploads/banner-picture/${userProfile.id}`, {
+        const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPLOADS.BANNER_PICTURE(userProfile.id)}`, {
           method: 'POST',
           credentials: 'include',
           body: fd,
         });
         if (!res.ok) {
           const errorData = await res.json();
-          console.log("Erreur lors de l'upload de la bannière:", errorData.message);
           setError(errorData.message || "Erreur lors de l'upload de la bannière");
           return false;
         }
@@ -143,7 +151,7 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
         }
       }
 
-      const res = await fetch(`http://localhost:5001/users/${userProfile.id}/profile`, {
+      const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USERS.PROFILE(userProfile.id)}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -154,13 +162,11 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
 
       if (!res.ok) {
         const errorData = await res.json();
-        console.log("Erreur lors de la mise à jour du profil:", errorData.message);
         setError(errorData.message || "Erreur lors de la mise à jour du profil");
         return false;
       }
 
       const updatedProfile = await res.json();
-      console.log("Profil mis à jour:", updatedProfile);
       setUserProfile(updatedProfile);
       if (previewImages.profile) URL.revokeObjectURL(previewImages.profile);
       if (previewImages.banner) URL.revokeObjectURL(previewImages.banner);

@@ -1,0 +1,155 @@
+/**
+ * @description Service de recherche d'utilisateurs
+ * @author SoundWave
+ */
+
+import { API_URL } from '../config/api';
+
+export interface SearchUser {
+    _id: string;
+    id: number;
+    pseudo: string;
+    username: string;
+    profile_picture?: string;
+    bio?: string;
+    is_verified: boolean;
+    followers?: number;
+}
+
+export interface UserSearchResult {
+    users: SearchUser[];
+    total: number;
+}
+
+class UserSearchService {
+    private baseUrl = API_URL;
+
+    /**
+     * Rechercher des utilisateurs par nom d'utilisateur ou pseudo
+     */
+    async searchUsers(query: string, limit: number = 10): Promise<UserSearchResult> {
+        try {
+            // Essayer d'utiliser la vraie API
+            const response = await fetch(`${this.baseUrl}/users/search?q=${encodeURIComponent(query)}&limit=${limit}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Adapter le format de l'API au format attendu par le client
+                const adaptedData = data.map((user: any) => ({
+                    _id: user.id.toString(),
+                    id: user.id,
+                    pseudo: user.pseudo,
+                    username: user.username,
+                    profile_picture: user.profile_picture,
+                    is_verified: user.is_verified,
+                    bio: '', // L'API ne retourne pas la bio dans la recherche
+                    followers: 0 // L'API ne retourne pas les followers pour l'instant
+                }));
+                
+                return {
+                    users: adaptedData,
+                    total: adaptedData.length
+                };
+            } else {
+                throw new Error(`API Error: ${response.status}`);
+            }
+        } catch (error) {
+            console.warn('API non disponible, utilisation des données mockées:', error);
+            return this.getMockSearchResults(query, limit);
+        }
+    }
+
+    /**
+     * Données mockées pour tester la fonctionnalité
+     */
+    private getMockSearchResults(query: string, limit: number): UserSearchResult {
+        const mockUsers: SearchUser[] = [
+            {
+                _id: '11',
+                id: 11,
+                pseudo: 'stephe',
+                username: 'stephe',
+                profile_picture: 'http://localhost:5001/uploads/users/11/11_pfp.webp?v=1759241853990',
+                bio: 'salut c moi',
+                is_verified: true,
+                followers: 42
+            }
+        ];
+
+        // Filter users based on query
+        const filteredUsers = mockUsers.filter(user => 
+            user.pseudo.toLowerCase().includes(query.toLowerCase()) ||
+            user.username.toLowerCase().includes(query.toLowerCase()) ||
+            user.bio?.toLowerCase().includes(query.toLowerCase())
+        ).slice(0, limit);
+
+        return {
+            users: filteredUsers,
+            total: filteredUsers.length
+        };
+    }
+
+    /**
+     * Obtenir les suggestions d'utilisateurs populaires
+     */
+    async getPopularUsers(limit: number = 5): Promise<SearchUser[]> {
+        try {
+            // Essayer d'utiliser la vraie API
+            const response = await fetch(`${this.baseUrl}/users/popular?limit=${limit}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Adapter le format de l'API au format attendu par le client
+                return data.map((user: any) => ({
+                    _id: user.id.toString(),
+                    id: user.id,
+                    pseudo: user.pseudo,
+                    username: user.username,
+                    profile_picture: user.profile_picture,
+                    is_verified: user.is_verified,
+                    bio: '', // L'API ne retourne pas la bio dans la liste populaire
+                    followers: 0 // L'API ne retourne pas les followers pour l'instant
+                }));
+            } else {
+                throw new Error(`API Error: ${response.status}`);
+            }
+        } catch (error) {
+            console.warn('API non disponible, utilisation des données mockées:', error);
+            return this.getMockPopularUsers(limit);
+        }
+    }
+
+    /**
+     * Données mockées pour les utilisateurs populaires (fallback)
+     */
+    private getMockPopularUsers(limit: number): SearchUser[] {
+        const mockPopularUsers: SearchUser[] = [
+            {
+                _id: '11',
+                id: 11,
+                pseudo: 'stephe',
+                username: 'stephe',
+                profile_picture: 'http://localhost:5001/uploads/users/11/11_pfp.webp?v=1759241853990',
+                bio: 'salut c moi',
+                is_verified: true,
+                followers: 42
+            }
+        ];
+
+        return mockPopularUsers.slice(0, limit);
+    }
+}
+
+export const userSearchService = new UserSearchService();

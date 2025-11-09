@@ -72,4 +72,11 @@ export class ReviewsController {
       throw new BadRequestException(`Type de cible invalide. Utilisez "artist" ou "album".`);
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findAllMyReviews(@Req() req) {
+    return this.reviewsService.findAllByUser(req.user.id);
+  }
+
 }

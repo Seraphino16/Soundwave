@@ -94,4 +94,12 @@ export class ReviewsService {
       throw new BadRequestException(`Type de cible invalide : ${type}`);
     }
   }
+
+  async findAllByUser(userId: number) {
+    return this.reviewModel
+      .find({ user_id: userId })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
 }

@@ -3,7 +3,7 @@ import AuthModals from "../modals/AuthModals";
 import { GoogleIcon, TwitterIcon, FacebookIcon, SpotifyIcon, DeezerIcon } from "../utils/Icons";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5001";
+import { API_URL } from '../../config/api';
 
 const getSpotifyAuthUrl = async (isLogin: boolean) => {
   try {

@@ -5,6 +5,7 @@
 
 
 import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from "react";
+import { API_CONFIG } from "../config/api";
 
 interface User {
   _id: string;
@@ -39,7 +40,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const fetchUser = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/users/me", {
+      const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USERS.ME}`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -47,16 +48,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        console.log("Utilisateur non authentifié:", errorData.message);
+        console.error(`Erreur lors de la récupération de l'utilisateur: statut HTTP ${res.status}`);
         setUserState(null);
         return;
       }
 
       const user = await res.json();
-      console.log("Utilisateur récupéré:", user);
-      console.log("Rôles de l'utilisateur:", user.roles);
-      console.log("Est admin?", user.roles?.includes('ADMIN'));
       setUserState(user);
     } catch (error) {
       console.error("Erreur lors de la récupération de l'utilisateur:", error);
@@ -80,7 +77,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:5001/auth/logout", {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.LOGOUT}`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -89,7 +86,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       if (response.ok) {
-        console.log("Déconnexion réussie côté serveur");
+        // Déconnexion réussie, aucun traitement supplémentaire nécessaire
       } else {
         console.error("Erreur lors de la déconnexion côté serveur");
       }
