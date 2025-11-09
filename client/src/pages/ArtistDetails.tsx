@@ -11,6 +11,7 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BackButton from "components/buttons/BackButton";
+import Meta from "components/utils/Meta";
 
 interface Artist {
     id: string;
@@ -116,6 +117,11 @@ const ArtistDetail: React.FC = () => {
     }
 
     return (
+        <>
+        <Meta
+                title={`Soundwave - ${artist.name}`}
+                description={`Page de détails de l'artiste ${artist.name} sur SoundWave`}
+            />
         <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
             <div className="bg-white shadow-xl rounded-lg p-6 sm:p-10 w-full max-w-6xl relative">
                 <BackButton
@@ -165,12 +171,9 @@ const ArtistDetail: React.FC = () => {
                 {filteredAlbums.length > 0 ? (
                     <section className="mt-6 sm:mt-8">
                         <div className="w-full mb-6 relative">
-                            {/* Titre centré */}
                             <h2 className="text-2xl sm:text-3xl font-bold text-primaryBlue text-center mb-4">
                                 Albums
                             </h2>
-
-                            {/* Bouton "Rechercher" aligné à droite */}
                             {!showSearch && (
                                 <div className="flex justify-end">
                                     <button
@@ -182,8 +185,6 @@ const ArtistDetail: React.FC = () => {
                                     </button>
                                 </div>
                             )}
-
-                            {/* Barre de recherche + bouton "Fermer" alignés à droite */}
                             {showSearch && (
                                 <div className="flex justify-end mt-2">
                                     <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -208,8 +209,6 @@ const ArtistDetail: React.FC = () => {
                                 </div>
                             )}
                         </div>
-
-                        {/* Liste des albums */}
                         <div className="overflow-x-auto scrollbar-transparent">
                             <div className="flex gap-28 sm:gap-12 md:gap-16 lg:gap-24 px-2 pb-2 min-w-max">
                                 {filteredAlbums.map((album) => (
@@ -232,10 +231,6 @@ const ArtistDetail: React.FC = () => {
                         Aucun album trouvé pour cette piste.
                     </p>
                 )}
-
-
-
-                {/* === Notes et Avis === */}
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
                 <RatingSection targetType="artist" targetId={artist.id} />
                 <div className="my-8 sm:my-10 border-t border-gray-300 opacity-30" />
@@ -244,6 +239,7 @@ const ArtistDetail: React.FC = () => {
 
             <ToastContainer />
         </div>
+        </>
     );
 };
 

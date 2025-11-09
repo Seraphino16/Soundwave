@@ -48,15 +48,12 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
                     viewBox="0 0 100 100"
                     preserveAspectRatio="none"
                 >
-                    {/* Grid lines */}
                     <defs>
                         <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
                             <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="0.5"/>
                         </pattern>
                     </defs>
                     <rect width="100" height="100" fill="url(#grid)" />
-                    
-                    {/* Line */}
                     <polyline
                         fill="none"
                         stroke={color}
@@ -64,8 +61,6 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
                         points={points}
                         vectorEffect="non-scaling-stroke"
                     />
-                    
-                    {/* Points */}
                     {data.data.map((value, index) => {
                         const x = (index / (data.data.length - 1)) * 100;
                         const y = 100 - ((value - minValue) / range) * 100;
@@ -81,8 +76,6 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
                         );
                     })}
                 </svg>
-                
-                {/* Labels */}
                 <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1">
                     {displayLabels.map(({ label, show }, index) => (
                         <span 

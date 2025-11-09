@@ -113,7 +113,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                 onClick={handleModalClick}
             >
-                {/* Header */}
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
                     <h2 className="text-xl font-bold text-gray-900 truncate pr-4">
                         {event.name}
@@ -125,10 +124,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                         <FiX className="h-5 w-5" />
                     </button>
                 </div>
-
-                {/* Content */}
                 <div className="p-6">
-                    {/* Event image */}
                     {event.image && (
                         <div className="mb-6">
                             <img 
@@ -138,8 +134,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                             />
                         </div>
                     )}
-
-                    {/* Status badges */}
                     <div className="flex flex-wrap gap-2 mb-4">
                         <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getEventTypeBadgeColor(event.type)}`}>
                             {getEventTypeLabel(event.type)}
@@ -155,8 +149,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                             </span>
                         )}
                     </div>
-
-                    {/* Description */}
                     <div className="mb-6">
                         <div className="flex items-center space-x-2 mb-2">
                             <FiInfo className="text-primaryBlue" />
@@ -164,10 +156,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                         </div>
                         <p className="text-gray-700">{event.description}</p>
                     </div>
-
-                    {/* Event details */}
                     <div className="space-y-4 mb-6">
-                        {/* Date and time */}
                         <div className="flex items-start space-x-3">
                             <FiCalendar className="text-primaryBlue mt-1 flex-shrink-0" />
                             <div>
@@ -175,8 +164,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                                 <p className="text-sm text-gray-600">{time}</p>
                             </div>
                         </div>
-
-                        {/* Location */}
                         <div className="flex items-start space-x-3">
                             <FiMapPin className="text-primaryBlue mt-1 flex-shrink-0" />
                             <div>
@@ -191,8 +178,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                                 )}
                             </div>
                         </div>
-
-                        {/* Artists */}
                         <div className="flex items-start space-x-3">
                             <FiUsers className="text-primaryBlue mt-1 flex-shrink-0" />
                             <div>
@@ -207,8 +192,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                                 </div>
                             </div>
                         </div>
-
-                        {/* Capacity */}
                         {event.capacity && (
                             <div className="flex items-center space-x-3">
                                 <FiUsers className="text-primaryBlue flex-shrink-0" />
@@ -218,8 +201,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                                 </div>
                             </div>
                         )}
-
-                        {/* Price */}
                         {event.price && (
                             <div className="flex items-center space-x-3">
                                 <FiDollarSign className="text-primaryBlue flex-shrink-0" />
@@ -235,8 +216,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                             </div>
                         )}
                     </div>
-
-                    {/* Tags */}
                     {event.tags.length > 0 && (
                         <div className="mb-6">
                             <div className="flex items-center space-x-2 mb-3">
@@ -255,8 +234,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                             </div>
                         </div>
                     )}
-
-                    {/* Action buttons */}
                     <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                         {event.ticketUrl && !isEventPast() && (
                             <button

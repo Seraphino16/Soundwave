@@ -132,7 +132,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, showDistance }) =
                 </div>
 
                 <div className="space-y-2 mb-4">
-                    {/* Date and time */}
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <FiCalendar className="flex-shrink-0 text-primaryBlue" />
                         <span>{date}</span>
@@ -142,8 +141,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, showDistance }) =
                         <FiClock className="flex-shrink-0 text-primaryBlue" />
                         <span>{time}</span>
                     </div>
-
-                    {/* Location */}
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <FiMapPin className="flex-shrink-0 text-primaryBlue" />
                         <span className="truncate">
@@ -155,15 +152,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, showDistance }) =
                             )}
                         </span>
                     </div>
-
-                    {/* Artists */}
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <FiUsers className="flex-shrink-0 text-primaryBlue" />
                         <span className="truncate">{formatArtists()}</span>
                     </div>
                 </div>
-
-                {/* Tags */}
                 {event.tags.length > 0 && (
                     <div className="flex items-center space-x-1 mb-3">
                         <FiTag className="text-gray-400 text-xs" />
@@ -184,8 +177,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, showDistance }) =
                         </div>
                     </div>
                 )}
-
-                {/* Price and ticket link */}
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                     <div className="text-sm">
                         {event.price ? (

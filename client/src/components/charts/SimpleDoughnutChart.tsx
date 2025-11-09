@@ -82,8 +82,6 @@ const SimpleDoughnutChart: React.FC<SimpleDoughnutChartProps> = ({
                         );
                     })}
                 </svg>
-                
-                {/* Center text */}
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
                         <div className="text-2xl font-bold text-gray-900">{total}</div>
@@ -91,8 +89,6 @@ const SimpleDoughnutChart: React.FC<SimpleDoughnutChartProps> = ({
                     </div>
                 </div>
             </div>
-            
-            {/* Legend */}
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
                 {data.labels.map((label, index) => {
                     const color = data.colors?.[index] || defaultColors[index % defaultColors.length];

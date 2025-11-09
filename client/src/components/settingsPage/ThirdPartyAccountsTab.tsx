@@ -1,8 +1,3 @@
-/**
- * @description Section des paramètres pour gérer les comptes tiers (Instagram, Twitter, Spotify, Deezer, Facebook)
- * @author SoundWave
- */
-
 import React, { useState, useEffect } from 'react';
 import { useUserContext } from "../../context/UserContext";
 import { useUserProfileContext } from "../../context/UserProfileContext";

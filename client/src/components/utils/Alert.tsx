@@ -1,12 +1,3 @@
-/**
- * @description Pop up apparaîssant en bas à droite de la fenêtre afin d'afficher des messages d'alerte.
- * @author SoundWave
- * @param {string} type - Types des messages (error, warning, info, success).
- * @param {string} title - Titre du message
- * @param {string} message - Message à afficher
- * @param {function} onClose - Fonction pour fermer l'alerte
- * */
-
 import React from 'react';
 import "../../assets/styles/App.css";
 

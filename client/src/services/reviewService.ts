@@ -1,7 +1,3 @@
-/**
- * @description Service unifié de gestion des Reviews de SoundWave
- */
-
 const API_URL = "http://localhost:5001";
 
 export type ReviewTargetType = 'artist' | 'album';
@@ -31,9 +27,6 @@ const mapReview = (r: any): LocalReview => ({
     isEditing: false,
 });
 
-/**
- * Récupérer toutes les reviews pour un artiste ou un album
- */
 export const getReviewsByTarget = async (
     targetType: ReviewTargetType,
     targetId: string
@@ -56,9 +49,6 @@ export const getReviewsByTarget = async (
     }
 };
 
-/**
- * Récupérer la review de l'utilisateur connecté
- */
 export const getMyReview = async (
     targetType: ReviewTargetType,
     targetId: string
@@ -88,10 +78,6 @@ export const getMyReview = async (
         throw error;
     }
 };
-
-/**
- * Créer une review
- */
 export const createReview = async (
     targetType: ReviewTargetType,
     targetId: string,
@@ -124,9 +110,6 @@ export const createReview = async (
     }
 };
 
-/**
- * Modifier une review
- */
 export const updateReview = async (
     id: string,
     message: string
@@ -156,9 +139,6 @@ export const updateReview = async (
     }
 };
 
-/**
- * Supprimer une review
- */
 export const deleteReview = async (id: string): Promise<void> => {
     try {
         const response = await fetch(`${API_URL}/reviews/${id}`, {

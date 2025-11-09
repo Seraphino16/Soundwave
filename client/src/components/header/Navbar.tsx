@@ -1,8 +1,3 @@
-/**
- * @description Barre de navigation du site SoundWave avec gestion utilisateur via UserContext
- * @autor SoundWave
- */
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavbarItem from "../utils/NavItem";
@@ -71,7 +66,6 @@ const Navbar = () => {
     return (
         <div className="fixed top-0 w-full flex justify-center z-10">
             <nav className="w-full lg:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md lg:rounded-b-xl z-10">
-                {/* === LOGO === */}
                 <div className="flex items-center space-x-2">
                     <Link to={effectiveUser ? "/home" : "/"}>
                         <img src={logo} alt="Logo" className="w-16 h-16" />
@@ -80,8 +74,6 @@ const Navbar = () => {
             SoundWave
           </span>
                 </div>
-
-                {/* === INVITÉ (non connecté) === */}
                 {isGuestPage ? (
                     <div className="hidden lg:flex space-x-6 items-center">
                         <Link
@@ -106,8 +98,6 @@ const Navbar = () => {
                         </div>
                     )
                 )}
-
-                {/* === UTILISATEUR CONNECTÉ (Desktop) === */}
                 {!isAuthRoute && !isGuestPage && (
                     <div className="hidden lg:flex space-x-6 mx-2 items-center">
                         <button className="hover:opacity-80 transition-opacity">
@@ -137,8 +127,6 @@ const Navbar = () => {
                         )}
                     </div>
                 )}
-
-                {/* === MENU MOBILE === */}
                 <div className="block lg:hidden">
                     <button
                         onClick={toggleMenu}

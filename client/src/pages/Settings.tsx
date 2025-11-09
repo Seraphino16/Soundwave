@@ -1,8 +1,3 @@
-/**
- * @description Page des paramètres utilisateur de l'application SoundWave
- * @author SoundWave
- */
-
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -165,7 +160,6 @@ const Settings: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-xl shadow-xl overflow-hidden">
             <div className="flex">
-              {/* Sidebar desktop */}
               <div className="w-80 bg-gradient-to-b from-slate-900 to-slate-800 hidden md:block">
                 <div className="p-6 border-b border-slate-700">
                   <h1 className="text-2xl font-bold mb-2">Paramètres</h1>
@@ -196,8 +190,6 @@ const Settings: React.FC = () => {
                   ))}
                 </nav>
               </div>
-
-              {/* Sidebar mobile (drawer) */}
               <AnimatePresence>
                 {isSidebarOpen && (
                   <>
@@ -261,7 +253,6 @@ const Settings: React.FC = () => {
               </AnimatePresence>
 
               <div className="flex-1 bg-gray-50">
-                {/* Barre supérieure mobile (icône burger menu + titre) */}
                 <div className="md:hidden sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-3">
                   <button
                     aria-label="Ouvrir le menu"

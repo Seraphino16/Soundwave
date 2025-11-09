@@ -1,8 +1,3 @@
-/**
- * @description Modale de confirmation pour la suppression de compte
- * @author SoundWave
- */
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUserContext } from "../../context/UserContext";

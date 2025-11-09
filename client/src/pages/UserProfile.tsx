@@ -188,9 +188,8 @@ const UserProfilePage: React.FC = () => {
 
   return (
     <>
-      <Meta title="Soundwave - Profil" description="Page de votre profil utilisateur sur SoundWave" />
+      <Meta title={`Soundwave - Profil de ${displayProfile.pseudo}`} description={`Page du profil de ${displayProfile.pseudo} sur SoundWave`} />
       <div className="min-h-screen bg-gray-50">
-        {/* Banner */}
         <div className="relative h-64 md:h-80 overflow-hidden">
           {displayProfile.bannerImage ? (
             <img src={displayProfile.bannerImage} alt="Banner" className="w-full h-full object-cover" />
@@ -199,12 +198,9 @@ const UserProfilePage: React.FC = () => {
           )}
           <div className="absolute inset-0 bg-black bg-opacity-20"></div>
         </div>
-
-        {/* Profile Header */}
         <div className="relative px-4 sm:px-6 lg:px-8 -mt-20">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row items-start md:items-end space-y-4 md:space-y-0 md:space-x-6">
-              {/* Profile Image */}
               <div className="relative">
                 <img
                   src={displayProfile.profileImage}
@@ -217,8 +213,6 @@ const UserProfilePage: React.FC = () => {
                   </div>
                 )}
               </div>
-
-              {/* Profile Info */}
               <div className="flex-1 bg-white rounded-lg shadow-md p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                   <div className="mb-4 md:mb-0">
@@ -227,7 +221,6 @@ const UserProfilePage: React.FC = () => {
                       {displayProfile.isVerified && <span className="text-blue-500 text-xl">✓</span>}
                     </div>
                     <p className="text-gray-600 mb-2">@{displayProfile.username}</p>
-
                     <div className="flex flex-wrap items-center space-x-4 text-sm text-gray-500 mb-3">
                       {displayProfile.location && (
                         <div className="flex items-center space-x-1">
@@ -251,8 +244,6 @@ const UserProfilePage: React.FC = () => {
 
                     {displayProfile.bio && <p className="text-gray-700 max-w-2xl leading-relaxed">{displayProfile.bio}</p>}
                   </div>
-
-                  {/* Action Buttons */}
                   <div className="flex space-x-3">
                     {isOwnProfile ? (
                       <Link
@@ -290,17 +281,12 @@ const UserProfilePage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Content */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pb-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
               <ProfileStats stats={displayProfile.stats} />
             </div>
-
-            {/* Waves / Reviews */}
             <div className="lg:col-span-2">
-              {/* Tabs */}
               <div className="bg-white rounded-lg shadow-md mb-6">
                 <div className="flex border-b">
                   <button
@@ -321,8 +307,6 @@ const UserProfilePage: React.FC = () => {
                   </button>
                 </div>
               </div>
-
-              {/* Reviews */}
               {activeTab === "reviews" && (
                 <div className="space-y-6">
                   {reviews.length > 0 ? (
@@ -331,9 +315,6 @@ const UserProfilePage: React.FC = () => {
                         <ReviewCard
                           key={review._id}
                           review={review}
-                          onClick={() => {
-                            /* Handle review click */
-                          }}
                         />
                       ))}
                     </div>
@@ -352,12 +333,9 @@ const UserProfilePage: React.FC = () => {
                   )}
                 </div>
               )}
-
-              {/* Waves */}
               {activeTab === "waves" && (
                 <div className="space-y-6">
                   {isOwnProfile && <CreateWaveForm onSubmit={handleCreateWave} placeholder="Partagez ce que vous écoutez en ce moment... 🎵" />}
-
                   {waves.length > 0 ? (
                     <div className="grid gap-6">
                       {waves

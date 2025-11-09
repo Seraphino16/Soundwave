@@ -1,8 +1,3 @@
-/**
- * @description Service d'authentification de l'application SoundWave
- * @author SoundWave
- */
-
 const API_URL = "http://localhost:5001";
 
 export const registerUser = async (userData: any) => {

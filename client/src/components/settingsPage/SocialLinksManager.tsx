@@ -1,8 +1,3 @@
-/**
- * @description Composant réutilisable pour gérer les liens des comptes tiers (Instagram, Twitter, Spotify, Deezer, Facebook)
- * @author SoundWave
- */
-
 import React, { useState } from 'react';
 
 interface SocialLink {

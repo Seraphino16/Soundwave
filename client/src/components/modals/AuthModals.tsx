@@ -1,8 +1,3 @@
-/**
- * @description Blocs de connexion et d'inscription de SoundWave avec modales de connexion et d'inscription incluses
- * @author SoundWave
- */
-
 import React, { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";

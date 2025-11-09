@@ -14,6 +14,7 @@ import SimpleBarChart from '../components/charts/SimpleBarChart';
 import SimpleLineChart from '../components/charts/SimpleLineChart';
 import SimpleDoughnutChart from '../components/charts/SimpleDoughnutChart';
 import { useRequireAdmin } from '../hooks/useRequireAdmin';
+import Meta from '../components/utils/Meta';
 
 interface AlertState {
     id: number;
@@ -104,6 +105,8 @@ const AdminDashboard: React.FC = () => {
 
     if (!dashboardStats) {
         return (
+            <>
+            <Meta title="Tableau de Bord - Administration" description="Statistiques et analyses du tableau de bord" />
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
                     <FiAlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -116,13 +119,13 @@ const AdminDashboard: React.FC = () => {
                     </button>
                 </div>
             </div>
+            </>
         );
     }
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Alerts */}
                 <div className="fixed top-4 right-4 z-50 space-y-2">
                     {alerts.map(alert => (
                         <Alert
@@ -135,8 +138,6 @@ const AdminDashboard: React.FC = () => {
                         />
                     ))}
                 </div>
-
-                {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
@@ -171,10 +172,7 @@ const AdminDashboard: React.FC = () => {
                     <h1 className="text-3xl font-bold text-gray-900 mt-4">Tableau de Bord Administrateur</h1>
                     <p className="text-gray-600">Vue d'ensemble des performances et statistiques de la plateforme</p>
                 </div>
-
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    {/* Users Stats */}
                     <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
@@ -199,8 +197,6 @@ const AdminDashboard: React.FC = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Content Stats */}
                     <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
@@ -252,10 +248,7 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Additional Stats Row - Interactions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {/* Interactions Stats */}
                     <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                         <div className="flex items-center justify-between">
                             <div>
@@ -322,8 +315,6 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Charts */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Croissance des Utilisateurs</h3>
@@ -387,10 +378,7 @@ const AdminDashboard: React.FC = () => {
                         )}
                     </div>
                 </div>
-
-                {/* Recent Activity and Top Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    {/* Recent Activity */}
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Activité Récente</h3>
                         <div className="space-y-4">
@@ -412,8 +400,6 @@ const AdminDashboard: React.FC = () => {
                             ))}
                         </div>
                     </div>
-
-                    {/* Top Albums */}
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Albums Populaires</h3>
                         <div className="space-y-4">
@@ -434,10 +420,7 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Additional Content Analytics */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    {/* Top Genres */}
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Genres Populaires</h3>
                         <div className="space-y-4">
@@ -457,8 +440,6 @@ const AdminDashboard: React.FC = () => {
                             ))}
                         </div>
                     </div>
-
-                    {/* Top Playlists */}
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Playlists Populaires</h3>
                         <div className="space-y-4">
@@ -486,8 +467,6 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Footer */}
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-2 lg:space-y-0">
                         <div className="text-sm text-gray-600">

@@ -1,8 +1,3 @@
-/**
- * @description Service de recherche d'utilisateurs
- * @author SoundWave
- */
-
 import { API_URL } from '../config/api';
 
 export interface SearchUser {
@@ -23,10 +18,6 @@ export interface UserSearchResult {
 
 class UserSearchService {
     private baseUrl = API_URL;
-
-    /**
-     * Rechercher des utilisateurs par nom d'utilisateur ou pseudo
-     */
     async searchUsers(query: string, limit: number = 10): Promise<UserSearchResult> {
         try {
             const response = await fetch(`${this.baseUrl}/users/search?q=${encodeURIComponent(query)}&limit=${limit}`, {
@@ -62,10 +53,6 @@ class UserSearchService {
             return this.getMockSearchResults(query, limit);
         }
     }
-
-    /**
-     * Données mockées pour tester la fonctionnalité
-     */
     private getMockSearchResults(query: string, limit: number): UserSearchResult {
         const mockUsers: SearchUser[] = [
             {
@@ -91,10 +78,6 @@ class UserSearchService {
             total: filteredUsers.length
         };
     }
-
-    /**
-     * Obtenir les suggestions d'utilisateurs populaires
-     */
     async getPopularUsers(limit: number = 5): Promise<SearchUser[]> {
         try {
             const response = await fetch(`${this.baseUrl}/users/popular?limit=${limit}`, {
@@ -125,10 +108,6 @@ class UserSearchService {
             return this.getMockPopularUsers(limit);
         }
     }
-
-    /**
-     * Données mockées pour les utilisateurs populaires (fallback)
-     */
     private getMockPopularUsers(limit: number): SearchUser[] {
         const mockPopularUsers: SearchUser[] = [
             {

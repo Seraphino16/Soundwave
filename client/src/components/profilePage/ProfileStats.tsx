@@ -43,8 +43,6 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({ stats }) => {
     return (
         <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Statistiques</h3>
-            
-            {/* Main stats grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                 {statItems.map((item, index) => (
                     <div key={index} className="text-center">
@@ -58,8 +56,6 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({ stats }) => {
                     </div>
                 ))}
             </div>
-
-            {/* Additional stats section removed to avoid duplication */}
         </div>
     );
 };

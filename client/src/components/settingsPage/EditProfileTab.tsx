@@ -1,8 +1,3 @@
-/**
- * @description Onglet d'édition du profil utilisateur dans la page des paramètres
- * @author SoundWave
- */
-
 import React, { useState, useEffect, useRef } from "react";
 import { useUserContext } from "../../context/UserContext";
 import { useUserProfileContext } from "../../context/UserProfileContext";
@@ -181,11 +176,11 @@ const EditProfileTab: React.FC = () => {
 
   const handleDeleteAccount = async () => {
     if (!user?.id) return;
-    
+
     setIsDeleting(true);
     try {
       const result = await EditProfileTabService.deleteAccount(user.id);
-      
+
       if (result.success) {
         showSuccess("Suppression réussie", "Compte supprimé avec succès. Vous allez être déconnecté.");
         setTimeout(() => {
@@ -206,7 +201,7 @@ const EditProfileTab: React.FC = () => {
 
   const handleChangePassword = async (passwordData: ChangePasswordRequest) => {
     if (!user?.id) return;
-    
+
     setIsChangingPassword(true);
     try {
       const validation = EditProfileTabService.validatePasswordChange(passwordData);
@@ -216,7 +211,7 @@ const EditProfileTab: React.FC = () => {
       }
 
       const result = await EditProfileTabService.changePassword(user.id, passwordData);
-      
+
       if (result.success) {
         showSuccess("Mot de passe changé", result.message || "Mot de passe modifié avec succès");
         setIsPasswordModalOpen(false);
@@ -328,7 +323,7 @@ const EditProfileTab: React.FC = () => {
               <h3 className="text-lg sm:text-xl font-semibold text-gray-800">{userProfile?.pseudo || user.pseudo}</h3>
               <p className="text-gray-600 font-mono text-sm sm:text-base">@{userProfile?.username || user.username}</p>
               {userProfile?.bio && <div className="text-sm text-gray-500 pt-2 rounded italic sm:text-left">{userProfile.bio}</div>}
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-3">
                 <div className="text-center">
                   <div className="text-sm sm:text-lg font-bold text-slate-600">{userProfile?.followers || 0}</div>
                   <div className="text-xs text-gray-500">Abonnés</div>
@@ -389,7 +384,9 @@ const EditProfileTab: React.FC = () => {
                 placeholder="votre_nom_utilisateur"
               />
               {usernameError && <p className="text-xs text-red-600 mt-1">{usernameError}</p>}
-              {!usernameError && <p className="text-xs text-gray-500 mt-1">Seuls les lettres, chiffres, points, tirets et underscores sont autorisés.</p>}
+              {!usernameError && (
+                <p className="text-xs text-gray-500 mt-1">Seuls les lettres, chiffres, points, tirets et underscores sont autorisés.</p>
+              )}
             </div>
           </div>
 
@@ -419,8 +416,6 @@ const EditProfileTab: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Styles musicaux ({formData.musicStyle.length}/5)</label>
-
-            {/* Zone d'ajout des styles musicaux */}
             <div className="flex flex-col sm:flex-row gap-2 mb-3">
               <input
                 type="text"
@@ -441,8 +436,6 @@ const EditProfileTab: React.FC = () => {
                 Ajouter
               </button>
             </div>
-
-            {/* Cartes des préférences musicales */}
             {formData.musicStyle.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {formData.musicStyle.map((preference, index) => (
@@ -472,14 +465,11 @@ const EditProfileTab: React.FC = () => {
               <p className="text-sm text-amber-600">⚠️ Limite atteinte : vous avez ajouté le maximum de 5 Styles musicaux.</p>
             )}
           </div>
-
-                    <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg">
             <p className="text-sm text-slate-600">
-💡 Vous pouvez gérer vos réseaux sociaux dans l'onglet "Comptes tiers" pour une meilleure organisation.
+              💡 Vous pouvez gérer vos réseaux sociaux dans l'onglet "Comptes tiers" pour une meilleure organisation.
             </p>
           </div>
-
-          {/* Informations du compte */}
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
             <h3 className="text-sm font-medium text-gray-700 mb-3">Informations du compte</h3>
             <div className="space-y-2 text-sm">
@@ -520,7 +510,9 @@ const EditProfileTab: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-gray-600">Statut :</span>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs ${userProfile?.is_active ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
+                  className={`px-2 py-1 rounded-full text-xs ${
+                    userProfile?.is_active ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                  }`}
                 >
                   {userProfile?.is_active ? "Actif" : "Inactif"}
                 </span>
@@ -536,8 +528,6 @@ const EditProfileTab: React.FC = () => {
                 </div>
               )}
             </div>
-
-            {/* Changement de mot de passe */}
             <div className="mt-4 p-4 border border-slate-200 bg-slate-50">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
@@ -552,8 +542,6 @@ const EditProfileTab: React.FC = () => {
                 </button>
               </div>
             </div>
-
-            {/* Suppression du compte */}
             <div className="mt-4 p-4 border border-rose-200 bg-rose-50">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
@@ -569,8 +557,6 @@ const EditProfileTab: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Genres musicaux favoris */}
           {userProfile?.favoriteGenres && userProfile.favoriteGenres.length > 0 && (
             <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
               <h3 className="text-sm font-medium text-indigo-700 mb-3">Genres musicaux favoris</h3>
@@ -583,8 +569,6 @@ const EditProfileTab: React.FC = () => {
               </div>
             </div>
           )}
-
-          {/* Notification de mise à jour */}
           {updateStatus === "success" && (
             <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-lg">
               <p className="text-emerald-700">✓ Profil mis à jour avec succès !</p>
@@ -606,30 +590,22 @@ const EditProfileTab: React.FC = () => {
               {loading ? "Sauvegarde..." : "Sauvegarder les modifications"}
             </button>
           </div>
-
-          {/* Inputs cachés pour l'upload d'images */}
           <input ref={profilePictureRef} type="file" accept="image/*" onChange={handleProfilePictureUpload} style={{ display: "none" }} />
           <input ref={bannerPictureRef} type="file" accept="image/*" onChange={handleBannerPictureUpload} style={{ display: "none" }} />
         </form>
       </div>
-
-      {/* Modale de suppression du compte */}
       <DeleteAccountModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteAccount}
         isDeleting={isDeleting}
       />
-
-      {/* Modale de changement de mot de passe */}
       <ChangePasswordModal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
         onConfirm={handleChangePassword}
         isChanging={isChangingPassword}
       />
-
-      {/* Conteneur des alertes */}
       <Alert alerts={alerts} onRemoveAlert={removeAlert} />
     </div>
   );

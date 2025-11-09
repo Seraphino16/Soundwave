@@ -1,8 +1,3 @@
-/**
- * @description Hook personnalisé pour gérer les alertes
- * @author SoundWave
- */
-
 import { useState, useCallback } from 'react';
 
 export interface AlertItem {

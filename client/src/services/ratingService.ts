@@ -1,7 +1,3 @@
-/**
- * @description Service unifié de gestion des notes (Ratings) de SoundWave
- */
-
 const API_URL = "http://localhost:5001";
 
 export type RatingTargetType = 'artist' | 'album';
@@ -18,9 +14,6 @@ export interface RatingSummary {
     count: number;
 }
 
-/**
- * Obtenir toutes les notes pour un artiste ou un album
- */
 export const getRatings = async (
     targetType: RatingTargetType,
     targetId: string
@@ -49,9 +42,6 @@ export const getRatings = async (
     }
 };
 
-/**
- * Obtenir le résumé (moyenne, nombre de notes)
- */
 export const getRatingSummary = async (
     targetType: RatingTargetType,
     targetId: string
@@ -75,9 +65,6 @@ export const getRatingSummary = async (
     }
 };
 
-/**
- * Ajouter ou mettre à jour une note pour un artiste ou un album
- */
 export const addOrUpdateRating = async (
     targetType: RatingTargetType,
     targetId: string,
@@ -109,9 +96,6 @@ export const addOrUpdateRating = async (
     }
 };
 
-/**
- * Modifier une note existante (par ID)
- */
 export const updateRating = async (
     ratingId: string,
     score: number
@@ -138,9 +122,6 @@ export const updateRating = async (
     }
 };
 
-/**
- * Supprimer une note (par ID)
- */
 export const deleteRating = async (ratingId: string): Promise<void> => {
     try {
         const response = await fetch(`${API_URL}/ratings/${ratingId}`, {

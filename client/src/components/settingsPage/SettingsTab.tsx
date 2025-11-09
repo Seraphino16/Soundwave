@@ -29,7 +29,6 @@ const SettingsTab: React.FC = () => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Paramètres</h2>
       
       <div className="space-y-8">
-        {/* Notifications */}
         <div className="bg-white p-6 rounded-lg border">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Notifications</h3>
           <div className="space-y-4">
@@ -67,8 +66,6 @@ const SettingsTab: React.FC = () => {
             ))}
           </div>
         </div>
-
-        {/* Confidentialité */}
         <div className="bg-white p-6 rounded-lg border">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Confidentialité</h3>
           <div className="space-y-4">
@@ -104,8 +101,6 @@ const SettingsTab: React.FC = () => {
             ))}
           </div>
         </div>
-
-        {/* Autres paramètres */}
         <div className="bg-white p-6 rounded-lg border">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Préférences générales</h3>
           <div className="space-y-4">
@@ -128,8 +123,6 @@ const SettingsTab: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Actions dangereuses */}
         <div className="bg-red-50 p-6 rounded-lg border border-red-200">
           <h3 className="text-lg font-semibold text-red-800 mb-4">Zone de danger</h3>
           <div className="space-y-3">

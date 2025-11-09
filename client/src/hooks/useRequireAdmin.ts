@@ -1,8 +1,3 @@
-/**
- * @description Hook personnalisé simple pour la vérification des permissions admin
- * @author SoundWave
- */
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';

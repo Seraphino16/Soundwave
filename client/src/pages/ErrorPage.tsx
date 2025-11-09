@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Meta from "../components/utils/Meta";
 
 interface ErrorPageProps {
   title: string;
@@ -18,11 +19,13 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
   actionTo,
   showHome = true,
 }) => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-    <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
-      {icon && <div className="mb-4 flex justify-center">{icon}</div>}
-      <h1 className="text-2xl font-bold text-red-500 mb-4">{title}</h1>
-      <div className="mb-6 text-gray-700">{message}</div>
+  <>
+    <Meta title={title} description="Page d'erreur de Soundwave"/>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
+        {icon && <div className="mb-4 flex justify-center">{icon}</div>}
+        <h1 className="text-2xl font-bold text-red-500 mb-4">{title}</h1>
+        <div className="mb-6 text-gray-700">{message}</div>
       {actionLabel && actionTo && (
         <Link
           to={actionTo}
@@ -41,6 +44,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
       )}
     </div>
   </div>
+  </>
 );
 
 export default ErrorPage;

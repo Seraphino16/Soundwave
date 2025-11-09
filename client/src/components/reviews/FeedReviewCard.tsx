@@ -47,7 +47,6 @@ const FeedReviewCard: React.FC<FeedReviewCardProps> = ({ review, onLike, onComme
 
     return (
         <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-100">
-            {/* Header avec informations utilisateur */}
             <div className="p-4 pb-0">
                 <Link 
                     to={`/profile/${review.user.id}`}
@@ -75,7 +74,6 @@ const FeedReviewCard: React.FC<FeedReviewCardProps> = ({ review, onLike, onComme
             </div>
 
             <div className="p-4 pt-0">
-                {/* Informations album */}
                 <div className="flex items-start space-x-3 mb-4">
                     <img
                         src={review.albumCover}
@@ -87,8 +85,6 @@ const FeedReviewCard: React.FC<FeedReviewCardProps> = ({ review, onLike, onComme
                             {review.albumTitle}
                         </h3>
                         <p className="text-sm text-gray-600 mb-2">{review.artist}</p>
-                        
-                        {/* Rating */}
                         <div className="flex items-center space-x-2">
                             <div className="flex items-center space-x-1">
                                 {renderStars(review.rating)}
@@ -99,15 +95,11 @@ const FeedReviewCard: React.FC<FeedReviewCardProps> = ({ review, onLike, onComme
                         </div>
                     </div>
                 </div>
-
-                {/* Contenu de la review */}
                 <div className="mb-4">
                     <p className="text-gray-700 leading-relaxed line-clamp-4">
                         {review.content}
                     </p>
                 </div>
-
-                {/* Actions */}
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                     <div className="flex items-center space-x-4">
                         <button 

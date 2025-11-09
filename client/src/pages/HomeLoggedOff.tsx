@@ -1,8 +1,3 @@
-/**
- * @description Page d'accueil du site SoundWave pour les utilisateurs non connectés
- * @author SoundWave
- * */
-
 import React from "react";
 import { Link } from "react-router-dom";
 import Meta from "../components/utils/Meta";

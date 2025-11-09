@@ -1,9 +1,3 @@
-/**
- * @description Hook personnalisé pour la vérification des permissions admin.
- * Redirige automatiquement si l'utilisateur n'est pas admin.
- * @author SoundWave
- */
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';

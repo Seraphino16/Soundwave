@@ -1,8 +1,3 @@
-/**
- * @description Conteneur pour afficher les alertes en position fixe
- * @author SoundWave
- */
-
 import React from 'react';
 import Alert from '../utils/Alert';
 import { AlertItem } from '../../hooks/useAlert';

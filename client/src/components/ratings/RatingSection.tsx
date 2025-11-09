@@ -227,8 +227,6 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
                         </div>
                     )}
                 </div>
-
-                {/* ===== Note moyenne ===== */}
                 <div className="w-full md:w-1/2 mx-auto text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         Note moyenne

@@ -21,7 +21,6 @@ const UserManagement: React.FC = () => {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [newRole, setNewRole] = useState("");
 
-  // Create user modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createUserData, setCreateUserData] = useState<CreateUserData>({
     username: "",
@@ -32,7 +31,6 @@ const UserManagement: React.FC = () => {
     birthdate: "",
   });
 
-  // Confirmation modal and alert states
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [userToBan, setUserToBan] = useState<User | null>(null);
@@ -51,7 +49,6 @@ const UserManagement: React.FC = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    // Only fetch users if authenticated and is admin
     if (!userLoading && isAdmin) {
       fetchUsers();
     }
@@ -87,7 +84,6 @@ const UserManagement: React.FC = () => {
     };
     setAlerts((prevAlerts) => [...prevAlerts, newAlert]);
 
-    // Auto-remove after 15 seconds
     setTimeout(() => {
       removeAlert(newAlert.id);
     }, 15000);
@@ -161,13 +157,11 @@ const UserManagement: React.FC = () => {
 
   const handleCreateUser = async () => {
     try {
-      // Basic validation
       if (!createUserData.username || !createUserData.email || !createUserData.pseudo || !createUserData.password) {
         showAlert("error", "Erreur", "Tous les champs obligatoires doivent être remplis");
         return;
       }
 
-      // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(createUserData.email)) {
         showAlert("error", "Erreur", "Format d'email invalide");
@@ -248,7 +242,6 @@ const UserManagement: React.FC = () => {
       <Meta title="Soundwave - Gestion des Utilisateurs" description="Page de gestion des utilisateurs sur SoundWave" />
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -273,7 +266,6 @@ const UserManagement: React.FC = () => {
             </div>
           </div>
 
-          {/* Filters */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative">
@@ -312,7 +304,6 @@ const UserManagement: React.FC = () => {
             </form>
           </div>
 
-          {/* Users Table */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -405,7 +396,6 @@ const UserManagement: React.FC = () => {
               </table>
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
                 <div className="flex-1 flex justify-between sm:hidden">
@@ -457,7 +447,6 @@ const UserManagement: React.FC = () => {
           </div>
         </div>
 
-        {/* Role Update Modal */}
         {showRoleModal && selectedUser && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -494,7 +483,6 @@ const UserManagement: React.FC = () => {
           </div>
         )}
 
-        {/* Create User Modal */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -581,7 +569,6 @@ const UserManagement: React.FC = () => {
           </div>
         )}
 
-        {/* Confirmation Modal */}
         <ConfirmModal
           isOpen={showConfirmModal}
           title={confirmAction === "delete" ? "Confirmer la suppression" : "Confirmer le bannissement"}
@@ -597,7 +584,6 @@ const UserManagement: React.FC = () => {
           onCancel={cancelAction}
         />
 
-        {/* Toast Notification */}
         <div className="fixed bottom-0 right-0 m-4 space-y-2">
           {alerts.map((alert) => (
             <Alert key={alert.id} id={alert.id} type={alert.type} title={alert.title} message={alert.message} onClose={removeAlert} />

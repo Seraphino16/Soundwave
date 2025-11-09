@@ -1,8 +1,3 @@
-/**
- * @description Icônes utilisés dans le site SoundWave
- * @author ...
- */
-
 export const BurgerMenuIcon = () => (
     <svg
         className="fill-current h-5 w-5"

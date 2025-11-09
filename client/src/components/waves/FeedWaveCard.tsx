@@ -1,8 +1,3 @@
-/**
- * @description Card pour afficher une wave dans le feed
- * @author SoundWave
- */
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FeedWave } from '../../services/feedWavesService';

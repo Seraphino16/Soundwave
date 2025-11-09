@@ -1,8 +1,3 @@
-/**
- * @description Service pour gérer les waves du feed principal
- * @author SoundWave
- */
-
 import { API_URL } from '../config/api';
 
 export interface WaveUser {
@@ -42,9 +37,6 @@ export interface FeedReview {
 class FeedWavesService {
     private baseUrl = API_URL;
 
-    /**
-     * @description Gets the waves from the main feed
-     */
     async getFeedWaves(page: number = 1, limit: number = 10): Promise<{ waves: FeedWave[], total: number }> {
         const response = await fetch(`${this.baseUrl}/waves/feed?page=${page}&limit=${limit}`, {
             method: 'GET',
@@ -60,10 +52,6 @@ class FeedWavesService {
 
         return await response.json();
     }
-
-    /**
-     * @description Gets the waves from a specific user
-     */
     async getUserWaves(userId: number, page: number = 1, limit: number = 10): Promise<{ waves: FeedWave[], total: number }> {
         const response = await fetch(`${this.baseUrl}/waves/user/${userId}?page=${page}&limit=${limit}`, {
             method: 'GET',
@@ -79,10 +67,6 @@ class FeedWavesService {
 
         return await response.json();
     }
-
-    /**
-     * @description Creates a new wave
-     */
     async createWave(content: string): Promise<FeedWave> {
         const response = await fetch(`${this.baseUrl}/waves`, {
             method: 'POST',
@@ -99,10 +83,6 @@ class FeedWavesService {
 
         return await response.json();
     }
-
-    /**
-     * @description Deletes a wave
-     */
     async deleteWave(waveId: number): Promise<void> {
         const response = await fetch(`${this.baseUrl}/waves/${waveId}`, {
             method: 'DELETE',
@@ -113,10 +93,6 @@ class FeedWavesService {
             throw new Error(`Erreur API: ${response.status}`);
         }
     }
-
-    /**
-     * @description Likes/dislikes a wave
-     */
     async toggleLike(waveId: number): Promise<boolean> {
         const response = await fetch(`${this.baseUrl}/waves/${waveId}/like`, {
             method: 'POST',
@@ -134,10 +110,6 @@ export const feedWavesService = new FeedWavesService();
 
 class ReviewsService {
     private baseUrl = 'http://localhost:5001';
-
-    /**
-     * @description Gets reviews for the main feed
-     */
     async getFeedReviews(_page: number = 1, _limit: number = 10): Promise<{ reviews: FeedReview[], total: number }> {
         const mockReviews: FeedReview[] = [
             {
@@ -185,10 +157,6 @@ class ReviewsService {
             total: mockReviews.length
         };
     }
-
-    /**
-     * @description Like/dislike a review
-     */
     async toggleLike(reviewId: number): Promise<boolean> {
         try {
             const response = await fetch(`${this.baseUrl}/reviews/${reviewId}/like`, {

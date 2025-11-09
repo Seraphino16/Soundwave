@@ -1,8 +1,3 @@
-/**
- * @description Barre de recherche du site avec recherche d'utilisateurs
- * @author SoundWave
- * */
-
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { SearchIcon, BurgerMenuIcon } from "../utils/Icons";
@@ -80,8 +75,6 @@ const SearchBar = () => {
                 </div>
                 <SearchIcon />
             </div>
-
-            {/* Résultats de recherche */}
             {showResults && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto z-50">
                     {isLoading ? (

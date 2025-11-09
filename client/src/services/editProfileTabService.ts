@@ -1,8 +1,3 @@
-/**
- * @description Service pour les opérations liées à l'édition du profil utilisateur
- * @author SoundWave
- */
-
 const API_BASE_URL = 'http://localhost:5001';
 
 export interface DeleteAccountResponse {
@@ -27,11 +22,6 @@ export interface ChangePasswordResponse {
 }
 
 export class EditProfileTabService {
-  /**
-   * Supprime définitivement le compte utilisateur
-   * @param userId ID de l'utilisateur à supprimer
-   * @returns Promise<DeleteAccountResponse>
-   */
   static async deleteAccount(userId: number): Promise<DeleteAccountResponse> {
     try {
       console.log("Tentative de suppression pour l'utilisateur:", userId);
@@ -67,12 +57,6 @@ export class EditProfileTabService {
       };
     }
   }
-
-  /**
-   * Valide un fichier image avant l'upload
-   * @param file Le fichier à valider
-   * @returns FileValidationResult
-   */
   static validateImageFile(file: File): FileValidationResult {
     if (!file.type.startsWith("image/")) {
       return {
@@ -92,28 +76,13 @@ export class EditProfileTabService {
       isValid: true
     };
   }
-
-  /**
-   * Nettoie les données locales après suppression du compte
-   */
   static clearLocalData(): void {
     localStorage.removeItem('token');
     sessionStorage.clear();
   }
-
-  /**
-   * Redirige vers la page d'accueil après suppression
-   */
   static redirectToHome(): void {
     window.location.href = "/";
   }
-
-  /**
-   * Change le mot de passe de l'utilisateur
-   * @param userId ID de l'utilisateur
-   * @param passwordData Données du changement de mot de passe
-   * @returns Promise<ChangePasswordResponse>
-   */
   static async changePassword(userId: number, passwordData: ChangePasswordRequest): Promise<ChangePasswordResponse> {
     try {
       console.log("Tentative de changement de mot de passe pour l'utilisateur:", userId);
@@ -149,12 +118,6 @@ export class EditProfileTabService {
       };
     }
   }
-
-  /**
-   * Valide les données de changement de mot de passe
-   * @param passwordData Données à valider
-   * @returns FileValidationResult
-   */
   static validatePasswordChange(passwordData: ChangePasswordRequest): FileValidationResult {
     if (!passwordData.oldPassword) {
       return {

@@ -1,8 +1,3 @@
-/**
- * @description Formulaire pour créer une nouvelle wave
- * @author SoundWave
- */
-
 import React, { useState } from 'react';
 import EmojiPicker from 'emoji-picker-react';
 

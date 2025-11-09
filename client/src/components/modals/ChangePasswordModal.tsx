@@ -1,8 +1,3 @@
-/**
- * @description Modale pour changer le mot de passe utilisateur
- * @author SoundWave
- */
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
