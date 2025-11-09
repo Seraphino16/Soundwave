@@ -46,24 +46,29 @@ const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment, on
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
-        const diffTime = Math.abs(now.getTime() - date.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        const dateInParis = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+        const nowInParis = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+        
+        const diffTime = Math.abs(nowInParis.getTime() - dateInParis.getTime());
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays === 0) {
             const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
             if (diffHours === 0) {
                 const diffMinutes = Math.floor(diffTime / (1000 * 60));
-                return `Il y a ${diffMinutes} min`;
+                return diffMinutes === 0 ? "À l'instant" : `Il y a ${diffMinutes} min`;
             }
             return `Il y a ${diffHours}h`;
         } else if (diffDays === 1) {
-            return 'Hier';
+            return "Hier";
         } else if (diffDays < 7) {
             return `Il y a ${diffDays}j`;
         } else {
-            return date.toLocaleDateString('fr-FR', {
+            return dateInParis.toLocaleDateString('fr-FR', {
                 day: 'numeric',
-                month: 'short'
+                month: 'short',
+                timeZone: 'Europe/Paris'
             });
         }
     };
