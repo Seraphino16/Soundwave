@@ -77,7 +77,7 @@ const Home: React.FC = () => {
     return (
         <>
             <Meta
-                title="Accueil"
+                title="Soundwave - Accueil"
                 description="Page d'accueil du site SoundWave"
             />
             

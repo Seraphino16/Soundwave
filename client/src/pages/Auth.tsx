@@ -11,7 +11,7 @@ const Auth: React.FC = () => {
     return (
         <>
             <Meta
-                title="Authentification Page"
+                title="Authentification"
                 description="Page d'authentification du site SoundWave"
             />
 

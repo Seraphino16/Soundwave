@@ -5,9 +5,15 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
+import Meta from "../components/utils/Meta";
 
 const HomePageGuest: React.FC = () => {
   return (
+    <>
+    <Meta
+                title="Soundwave - Accueil"
+                description="Page d'accueil du site SoundWave"
+            />
     <div className="min-h-screen w-full flex flex-col items-center justify-start relative">
       <div className="absolute top-0 left-0 w-full h-[70vh] bg-cover bg-center flex items-center justify-center" style={{ backgroundImage: "url('/background.jpg')" }}>
         <div className="relative max-w-4xl text-center bg-white p-12 rounded-xl shadow-lg border border-gray-300 bg-opacity-95">
@@ -27,6 +33,7 @@ const HomePageGuest: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
