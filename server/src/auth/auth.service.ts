@@ -51,12 +51,10 @@ export class AuthService {
       email: user.email,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const userWithoutPassword = { ...user.toObject(), password: undefined };
 
     return {
       token,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       user: userWithoutPassword,
     };
   }

@@ -96,7 +96,7 @@ const AlbumDetail: React.FC = () => {
     const handleTrackVote = (trackId: string, type: "like" | "dislike") => {
         setTrackVotes((prev) => ({
             ...prev,
-            [trackId]: prev[trackId] === type ? null : type, // toggle
+            [trackId]: prev[trackId] === type ? null : type,
         }));
 
         toast(

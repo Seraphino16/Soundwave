@@ -21,13 +21,11 @@ const SimpleBarChart: React.FC<SimpleBarChartProps> = ({
         '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1'
     ];
 
-    // Function to truncate labels if they're too long
     const truncateLabel = (label: string, maxLength: number = 6) => {
         if (label.length <= maxLength) return label;
         return label.substring(0, maxLength - 1) + '.';
     };
 
-    // Determine if we should show every label or skip some
     const shouldShowLabel = (index: number) => {
         if (data.labels.length <= 10) return true;
         if (data.labels.length <= 20) return index % 2 === 0;
@@ -66,7 +64,7 @@ const SimpleBarChart: React.FC<SimpleBarChartProps> = ({
                                     height: '24px',
                                     overflow: 'hidden'
                                 }}
-                                title={label} // Show full label on hover
+                                title={label}
                             >
                                 {showLabel ? truncatedLabel : ''}
                             </div>

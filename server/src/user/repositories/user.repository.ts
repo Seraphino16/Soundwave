@@ -126,8 +126,6 @@ export class UserRepository {
   }
 
   async findPopularUsers(limit: number = 10): Promise<User[]> {
-    // Pour l'instant, retournons les utilisateurs les plus récents
-    // Plus tard, on pourra implémenter une logique basée sur les followers, likes, etc.
     return this.userModel
       .find({ is_active: true })
       .sort({ createdAt: -1 })

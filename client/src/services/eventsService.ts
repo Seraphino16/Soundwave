@@ -1,4 +1,3 @@
-// Interfaces for events service
 import { calculateHaversineDistance } from '../utils/geoUtils';
 
 export interface EventLocation {
@@ -40,7 +39,7 @@ export interface Event {
 
 export interface EventFilters {
     artist?: string;
-    radius?: number; // in kilometers
+    radius?: number; 
     location?: {
         latitude: number;
         longitude: number;
@@ -56,7 +55,6 @@ export interface EventsResponse {
     hasMore: boolean;
 }
 
-// Mock data for development
 const mockEvents: Event[] = [
     {
         id: 1,
@@ -264,22 +262,18 @@ const mockEvents: Event[] = [
     }
 ];
 
-// Calculate distance between two coordinates (Haversine formula)
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     return calculateHaversineDistance(lat1, lon1, lat2, lon2);
 };
 
-// Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const eventsService = {
-    // Get events with filters
     getEvents: async (filters: EventFilters = {}): Promise<EventsResponse> => {
-        await delay(800); // Simulate API delay
+        await delay(800);
 
         let filteredEvents = [...mockEvents];
 
-        // Filter by artist name
         if (filters.artist && filters.artist.trim()) {
             const artistQuery = filters.artist.toLowerCase();
             filteredEvents = filteredEvents.filter(event =>
@@ -289,7 +283,6 @@ export const eventsService = {
             );
         }
 
-        // Filter by radius (if user location is provided)
         if (filters.radius && filters.location) {
             filteredEvents = filteredEvents.filter(event => {
                 const distance = calculateDistance(
@@ -302,7 +295,6 @@ export const eventsService = {
             });
         }
 
-        // Filter by date range
         if (filters.dateFrom) {
             filteredEvents = filteredEvents.filter(event => 
                 new Date(event.date) >= new Date(filters.dateFrom!)
@@ -315,28 +307,24 @@ export const eventsService = {
             );
         }
 
-        // Filter by event type
         if (filters.type && filters.type !== 'all') {
             filteredEvents = filteredEvents.filter(event => event.type === filters.type);
         }
 
-        // Sort by date (upcoming events first)
         filteredEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         return {
             events: filteredEvents,
             total: filteredEvents.length,
-            hasMore: false // For pagination in the future
+            hasMore: false
         };
     },
 
-    // Get event by ID
     getEventById: async (id: number): Promise<Event | null> => {
         await delay(300);
         return mockEvents.find(event => event.id === id) || null;
     },
 
-    // Get all unique artists for filter dropdown
     getArtists: async (): Promise<Artist[]> => {
         await delay(200);
         
@@ -348,7 +336,6 @@ export const eventsService = {
         return uniqueArtists.sort((a, b) => a.name.localeCompare(b.name));
     },
 
-    // Get user's location (browser geolocation)
     getUserLocation: async (): Promise<{ latitude: number; longitude: number } | null> => {
         return new Promise((resolve) => {
             if (!navigator.geolocation) {
@@ -364,7 +351,7 @@ export const eventsService = {
                     });
                 },
                 () => {
-                    resolve(null); // User denied location or error occurred
+                    resolve(null);
                 }
             );
         });

@@ -112,7 +112,6 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
   };
 
   if (mode === 'connect') {
-    // Mode connexion
     return (
       <div className="space-y-4">
         {socialPlatforms.map((platform) => {
@@ -223,7 +222,6 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
     );
   }
 
-  // Mode édition
   return (
     <div className="space-y-3">
       {socialPlatforms.map((platform) => (

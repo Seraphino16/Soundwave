@@ -34,13 +34,11 @@ const FeedWaves: React.FC = () => {
     };
 
     const handleComment = async (_waveId: number) => {
-        // TODO: Implement comment modal
     };
 
     const handleDelete = async (waveId: number) => {
         try {
             await feedWavesService.deleteWave(waveId);
-            // Retirer la wave de la liste
             setWaves(prev => prev.filter(w => w.id !== waveId));
         } catch (error) {
             console.error("Erreur lors de la suppression:", error);

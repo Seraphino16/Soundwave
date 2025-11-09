@@ -589,16 +589,10 @@ export class UserService {
     return this.enrichUsersWithProfile(users);
   }
 
-  /**
-   * Enrichit les utilisateurs avec leurs informations de profil.
-   * @param users Liste des utilisateurs à enrichir
-   */
   private async enrichUsersWithProfile(users: User[]): Promise<any[]> {
-    // Récupérer les infos de profil pour tous les utilisateurs
     const userIds = users.map(user => user.id);
     const userInfos = await this.userInfosRepository.findByUserIds(userIds);
 
-    // Créer une map pour un accès rapide aux infos
     const userInfosMap = new Map(userInfos.map(info => [info.user_id, info]));
     return users.map(user => {
       const infos = userInfosMap.get(user.id);

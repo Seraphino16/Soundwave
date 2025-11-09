@@ -25,7 +25,6 @@ interface AlertState {
 const AdminDashboard: React.FC = () => {
     const { loading: userLoading, isAdmin } = useRequireAdmin();
     
-    // State management
     const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
     const [userGrowthChart, setUserGrowthChart] = useState<ChartData | null>(null);
     const [contentChart, setContentChart] = useState<ChartData | null>(null);
@@ -41,12 +40,11 @@ const AdminDashboard: React.FC = () => {
         if (!userLoading && isAdmin) {
             fetchDashboardData();
         }
-    }, [period, isAdmin, userLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [period, isAdmin, userLoading]);
 
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            // Fetch all dashboard data
             const [stats, userGrowth, content, authMethods] = await Promise.all([
                 adminService.getDashboardStats(period),
                 adminService.getUserGrowthChart(period),
@@ -78,7 +76,6 @@ const AdminDashboard: React.FC = () => {
         };
         setAlerts(prev => [...prev, newAlert]);
         
-        // Auto-remove alert after 3 seconds
         setTimeout(() => {
             setAlerts(prev => prev.filter(alert => alert.id !== newAlert.id));
         }, 3000);

@@ -22,11 +22,9 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
     const range = maxValue - minValue || 1;
     const color = data.color || '#3B82F6';
 
-    // Calculate how many labels to show based on chart width and label length
     const maxLabelsToShow = Math.min(data.labels.length, 8);
     const showEveryNth = Math.ceil(data.labels.length / maxLabelsToShow);
     
-    // Filter labels to avoid overcrowding
     const displayLabels = data.labels.map((label, index) => ({
         label: label.length > 8 ? label.substring(0, 6) + '...' : label,
         show: index % showEveryNth === 0 || index === data.labels.length - 1

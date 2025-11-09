@@ -49,7 +49,6 @@ const Settings: React.FC = () => {
     { id: "logout", label: "Déconnexion", icon: "🚪", component: LogoutSection },
   ];
 
-  // Gestion des paramètres d'URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get("tab") as TabType;
@@ -128,7 +127,6 @@ const Settings: React.FC = () => {
     );
   }
 
-  // Redirection si l'utilisateur n'est pas connecté
   if (!user) {
     return (
       <>

@@ -17,7 +17,6 @@ import EventDetailsModal from '../components/events/EventDetailsModal';
 import Alert from '../components/utils/Alert';
 
 const Events: React.FC = () => {
-    // State management
     const [events, setEvents] = useState<Event[]>([]);
     const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
     const [artists, setArtists] = useState<Artist[]>([]);
@@ -28,7 +27,6 @@ const Events: React.FC = () => {
     const [showEventModal, setShowEventModal] = useState(false);
     const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     
-    // Filter states
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedArtist, setSelectedArtist] = useState('');
     const [radiusFilter, setRadiusFilter] = useState<number>(50);
@@ -44,21 +42,17 @@ const Events: React.FC = () => {
         type: 'success' | 'error' | 'info' | 'warning';
     }>>([]);
 
-    // Load initial data
     useEffect(() => {
         loadInitialData();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
-    // Apply filters when they change
     useEffect(() => {
-        // Only apply filters if events are loaded and there are actual filters or search terms
         if (events.length > 0 && (searchTerm || selectedArtist || dateFromFilter || dateToFilter || (typeFilter && typeFilter !== 'all') || userLocation)) {
             applyFilters();
         } else if (events.length > 0) {
-            // No filters active, show all events
             setFilteredEvents(events);
         }
-    }, [searchTerm, selectedArtist, radiusFilter, dateFromFilter, dateToFilter, typeFilter, userLocation, events]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [searchTerm, selectedArtist, radiusFilter, dateFromFilter, dateToFilter, typeFilter, userLocation, events]);
 
     const loadInitialData = async () => {
         try {
@@ -150,7 +144,6 @@ const Events: React.FC = () => {
         };
         setAlerts(prev => [...prev, newAlert]);
         
-        // Auto-remove after 5 seconds
         setTimeout(() => {
             setAlerts(prev => prev.filter(alert => alert.id !== newAlert.id));
         }, 5000);

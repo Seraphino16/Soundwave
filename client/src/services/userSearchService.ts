@@ -29,7 +29,6 @@ class UserSearchService {
      */
     async searchUsers(query: string, limit: number = 10): Promise<UserSearchResult> {
         try {
-            // Essayer d'utiliser la vraie API
             const response = await fetch(`${this.baseUrl}/users/search?q=${encodeURIComponent(query)}&limit=${limit}`, {
                 method: 'GET',
                 credentials: 'include',
@@ -40,7 +39,6 @@ class UserSearchService {
 
             if (response.ok) {
                 const data = await response.json();
-                // Adapter le format de l'API au format attendu par le client
                 const adaptedData = data.map((user: any) => ({
                     _id: user.id.toString(),
                     id: user.id,
@@ -48,8 +46,8 @@ class UserSearchService {
                     username: user.username,
                     profile_picture: user.profile_picture,
                     is_verified: user.is_verified,
-                    bio: '', // L'API ne retourne pas la bio dans la recherche
-                    followers: 0 // L'API ne retourne pas les followers pour l'instant
+                    bio: '',
+                    followers: 0 
                 }));
                 
                 return {
@@ -82,7 +80,6 @@ class UserSearchService {
             }
         ];
 
-        // Filter users based on query
         const filteredUsers = mockUsers.filter(user => 
             user.pseudo.toLowerCase().includes(query.toLowerCase()) ||
             user.username.toLowerCase().includes(query.toLowerCase()) ||
@@ -100,7 +97,6 @@ class UserSearchService {
      */
     async getPopularUsers(limit: number = 5): Promise<SearchUser[]> {
         try {
-            // Essayer d'utiliser la vraie API
             const response = await fetch(`${this.baseUrl}/users/popular?limit=${limit}`, {
                 method: 'GET',
                 credentials: 'include',
@@ -111,7 +107,6 @@ class UserSearchService {
 
             if (response.ok) {
                 const data = await response.json();
-                // Adapter le format de l'API au format attendu par le client
                 return data.map((user: any) => ({
                     _id: user.id.toString(),
                     id: user.id,
@@ -119,8 +114,8 @@ class UserSearchService {
                     username: user.username,
                     profile_picture: user.profile_picture,
                     is_verified: user.is_verified,
-                    bio: '', // L'API ne retourne pas la bio dans la liste populaire
-                    followers: 0 // L'API ne retourne pas les followers pour l'instant
+                    bio: '',
+                    followers: 0
                 }));
             } else {
                 throw new Error(`API Error: ${response.status}`);

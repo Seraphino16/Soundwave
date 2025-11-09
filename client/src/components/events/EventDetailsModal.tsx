@@ -94,15 +94,12 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
     const distance = calculateDistance();
     const { date, time } = formatDate(event.date, event.endDate);
 
-    // Handle click outside modal to close
     const handleBackdropClick = (e: React.MouseEvent) => {
-        // Close modal when clicking on the backdrop (not on the modal content)
         if (e.target === e.currentTarget) {
             onClose();
         }
     };
 
-    // Prevent modal from closing when clicking inside the modal content
     const handleModalClick = (e: React.MouseEvent) => {
         e.stopPropagation();
     };

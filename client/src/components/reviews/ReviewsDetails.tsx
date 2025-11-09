@@ -13,7 +13,7 @@ import {
 } from "../../services/reviewService";
 
 interface ReviewsDetailsProps {
-    targetType: ReviewTargetType; // 'artist' | 'album'
+    targetType: ReviewTargetType;
 }
 
 const ReviewsDetails: React.FC<ReviewsDetailsProps> = ({ targetType }) => {

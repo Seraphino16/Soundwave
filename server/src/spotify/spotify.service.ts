@@ -75,11 +75,6 @@ export class SpotifyService {
     return authResponse.data.access_token;
   }
 
-  // ================================
-  // ALBUMS
-  // ================================
-
-  // Récupérer tous les albums récents
   async getAllNewReleases() {
     try {
       const accessToken = await this.getAccessToken();
@@ -116,7 +111,6 @@ export class SpotifyService {
     }
   }
 
-  // Détails d’un album
   async getAlbumById(id: string) {
     try {
       const accessToken = await this.getAccessToken();
@@ -137,14 +131,12 @@ export class SpotifyService {
         label: album.label,
         popularity: album.popularity,
 
-        // Artistes associés
         artists: album.artists.map((artist: any) => ({
           id: artist.id,
           name: artist.name,
           spotifyUrl: artist.external_urls.spotify,
         })),
 
-        // Pistes
         tracks: album.tracks.items.map((track: any) => ({
           id: track.id,
           title: track.name,
@@ -159,10 +151,6 @@ export class SpotifyService {
       throw new Error("Impossible de récupérer l'album");
     }
   }
-
-  // ================================
-  // ARTISTES
-  // ================================
 
   async getAllNewArtists() {
     try {
@@ -204,7 +192,6 @@ export class SpotifyService {
     }
   }
 
-  // Détails d’un artiste
   async getArtistById(id: string) {
     try {
       const accessToken = await this.getAccessToken();
@@ -228,7 +215,6 @@ export class SpotifyService {
     }
   }
 
-  // Albums d’un artiste
   async getAlbumsByArtistId(artistId: string) {
     try {
       const accessToken = await this.getAccessToken();
@@ -255,14 +241,10 @@ export class SpotifyService {
     }
   }
 
-  // ================================
-  // Albums avec pistes
-  // ================================
   async getAlbumsWithTracksByArtistId(artistId: string) {
     try {
       const accessToken = await this.getAccessToken();
 
-      // 1️⃣ Récupération des albums
       const response = await axios.get(`${this.spotifyApiUrl}/artists/${artistId}/albums`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         params: { include_groups: 'album', market: 'FR', limit: 50 },
@@ -298,9 +280,6 @@ export class SpotifyService {
     }
   }
 
-  // ================================
-  // 🔍 RECHERCHES
-  // ================================
   private async searchSpotify(type: 'album' | 'artist', filters: Record<string, string>): Promise<any> {
     const accessToken = await this.getAccessToken();
     const queryParts: string[] = [];

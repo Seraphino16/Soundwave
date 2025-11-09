@@ -26,14 +26,12 @@ const ProfileSettings: React.FC = () => {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    // Charger le profil de l'utilisateur au montage du composant
     useEffect(() => {
         if (user?.id) {
             fetchUserProfile(user.id);
         }
     }, [user?.id, fetchUserProfile]);
 
-    // Mettre à jour le state local quand le profil est chargé
     useEffect(() => {
         if (userProfile) {
             setProfileData({
@@ -41,7 +39,7 @@ const ProfileSettings: React.FC = () => {
                 username: userProfile.username || '',
                 bio: userProfile.bio || '',
                 location: userProfile.location || '',
-                website: userProfile.socialLinks?.Facebook || '', // Utiliser un des liens sociaux comme site web
+                website: userProfile.socialLinks?.Facebook || '',
                 profileImage: userProfile.profile_picture || '',
                 bannerImage: userProfile.banner_picture || ''
             });
@@ -87,7 +85,6 @@ const ProfileSettings: React.FC = () => {
         }
     };
 
-    // Afficher un état de chargement si le profil n'est pas encore chargé
     if (profileLoading) {
         return (
             <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
@@ -99,7 +96,6 @@ const ProfileSettings: React.FC = () => {
         );
     }
 
-    // Afficher un message d'erreur si le profil n'a pas pu être chargé
     if (error) {
         return (
             <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">

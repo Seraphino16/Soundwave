@@ -19,7 +19,6 @@ interface MapProps {
     userLocation?: { latitude: number; longitude: number } | null;
 }
 
-// Custom marker component
 const EventMarker: React.FC<{
     map: google.maps.Map;
     event: Event;
@@ -30,7 +29,6 @@ const EventMarker: React.FC<{
     const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
     useEffect(() => {
-        // Create marker
         const marker = new google.maps.Marker({
             position: {
                 lat: event.location.latitude,
@@ -48,7 +46,6 @@ const EventMarker: React.FC<{
             }
         });
 
-        // Create info window content
         const eventDate = new Date(event.date);
         const formattedDate = eventDate.toLocaleDateString('fr-FR', {
             day: 'numeric',
@@ -96,7 +93,6 @@ const EventMarker: React.FC<{
             content: infoContent
         });
 
-        // Add click listener
         marker.addListener('click', () => {
             onClick();
             infoWindow.open(map, marker);
@@ -111,7 +107,6 @@ const EventMarker: React.FC<{
         };
     }, [map, event, isSelected, onClick]);
 
-    // Update marker when selection changes
     useEffect(() => {
         if (markerRef.current) {
             markerRef.current.setIcon({
@@ -123,7 +118,6 @@ const EventMarker: React.FC<{
                 strokeWeight: 2
             });
 
-            // Show info window for selected event
             if (isSelected && infoWindowRef.current) {
                 infoWindowRef.current.open(map, markerRef.current);
             } else if (!isSelected && infoWindowRef.current) {
@@ -135,7 +129,6 @@ const EventMarker: React.FC<{
     return null;
 });
 
-// Map component
 const Map: React.FC<MapProps> = ({ events, selectedEvent, onEventSelect, center, userLocation }) => {
     const ref = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -159,7 +152,6 @@ const Map: React.FC<MapProps> = ({ events, selectedEvent, onEventSelect, center,
 
             setMap(googleMap);
 
-            // Fit bounds to show all events
             if (events.length > 0) {
                 const bounds = new google.maps.LatLngBounds();
                 events.forEach(event => {
@@ -169,7 +161,6 @@ const Map: React.FC<MapProps> = ({ events, selectedEvent, onEventSelect, center,
                     });
                 });
                 
-                // Add user location to bounds if available
                 if (userLocation) {
                     bounds.extend({
                         lat: userLocation.latitude,
@@ -182,7 +173,6 @@ const Map: React.FC<MapProps> = ({ events, selectedEvent, onEventSelect, center,
         }
     }, [ref, map, center, events, userLocation]);
 
-    // Add user location marker
     useEffect(() => {
         if (map && userLocation) {
             new google.maps.Marker({
@@ -220,7 +210,6 @@ const Map: React.FC<MapProps> = ({ events, selectedEvent, onEventSelect, center,
     );
 };
 
-// Loading component
 const LoadingMap: React.FC = () => (
     <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
         <div className="text-center">
@@ -230,7 +219,6 @@ const LoadingMap: React.FC = () => (
     </div>
 );
 
-// Error component
 const ErrorMap: React.FC<{ status: Status }> = ({ status }) => (
     <div className="w-full h-[400px] bg-red-50 border border-red-200 rounded-lg flex items-center justify-center">
         <div className="text-center text-red-600">
@@ -242,7 +230,6 @@ const ErrorMap: React.FC<{ status: Status }> = ({ status }) => (
     </div>
 );
 
-// Render function for the wrapper
 const render = (status: Status): React.ReactElement => {
     switch (status) {
         case Status.LOADING:
@@ -256,16 +243,13 @@ const render = (status: Status): React.ReactElement => {
     }
 };
 
-// Main component
 const GoogleEventMap: React.FC<GoogleEventMapProps> = ({
     events,
     selectedEvent,
     onEventSelect,
-    center = { lat: 46.2276, lng: 2.2137 }, // Center of France
+    center = { lat: 46.2276, lng: 2.2137 },
     userLocation
 }) => {
-    // For demo purposes, we'll use a test API key
-    // In production, you should use environment variables
     const API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE';
 
     if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') {

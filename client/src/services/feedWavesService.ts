@@ -178,7 +178,6 @@ class ReviewsService {
             }
         ];
 
-        // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 400));
 
         return {

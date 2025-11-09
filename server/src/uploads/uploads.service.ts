@@ -7,7 +7,7 @@ const Sharp = require('sharp');
 export class UploadsService {
   private readonly uploadPath = path.join(process.cwd(), 'uploads');
   private readonly allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
+  private readonly maxFileSize = 5 * 1024 * 1024;
 
   constructor() {
     if (!fs.existsSync(this.uploadPath)) {

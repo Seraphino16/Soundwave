@@ -77,7 +77,6 @@ export const userProfileService = {
         }
     },
 
-    // ✅ Méthode mise à jour : appel réel à l’API pour récupérer les reviews de l’utilisateur connecté
     getUserReviews: async (): Promise<Review[]> => {
         try {
             const response = await fetch(`${API_URL}/reviews/me`, {

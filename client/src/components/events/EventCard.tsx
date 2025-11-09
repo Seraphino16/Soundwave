@@ -5,7 +5,7 @@ import { FiMapPin, FiCalendar, FiUsers, FiClock, FiExternalLink, FiTag } from 'r
 interface EventCardProps {
     event: Event;
     onClick: () => void;
-    showDistance?: number | undefined; // Distance in km if available
+    showDistance?: number | undefined;
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, onClick, showDistance }) => {
@@ -26,13 +26,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, showDistance }) =
         };
         
         if (endDate && endDate.toDateString() !== startDate.toDateString()) {
-            // Multi-day event
             return {
                 date: `Du ${startDate.toLocaleDateString('fr-FR', dateOptions)} au ${endDate.toLocaleDateString('fr-FR', dateOptions)}`,
                 time: `${startDate.toLocaleTimeString('fr-FR', timeOptions)}`
             };
         } else {
-            // Single day event
             return {
                 date: startDate.toLocaleDateString('fr-FR', dateOptions),
                 time: startDate.toLocaleTimeString('fr-FR', timeOptions)
@@ -62,7 +60,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick, showDistance }) =
         const eventDate = new Date(event.date);
         const now = new Date();
         const diffHours = (eventDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-        return diffHours > 0 && diffHours <= 24; // Event is within next 24 hours
+        return diffHours > 0 && diffHours <= 24;
     };
 
     const isEventPast = () => {

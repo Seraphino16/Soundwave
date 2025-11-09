@@ -3,7 +3,6 @@
  * @author ...
  */
 
-// Icône de menu "burger"
 export const BurgerMenuIcon = () => (
     <svg
         className="fill-current h-5 w-5"
@@ -15,7 +14,6 @@ export const BurgerMenuIcon = () => (
     </svg>
 );
 
-// Icône de bulle de message
 export const MessagesIcon = () => (
     <svg
         width="28"
@@ -34,7 +32,6 @@ export const MessagesIcon = () => (
     </svg>
 );
 
-// Icône de profil (bonhomme)
 export const ProfileIcon = () => (
     <svg
         width="27"
@@ -53,7 +50,6 @@ export const ProfileIcon = () => (
     </svg>
 );
 
-// Icône de loupe (recherche)
 export const SearchIcon = () => (
     <svg
         className="h-6 w-6 fill-current text-gray-600"
@@ -71,7 +67,6 @@ export const SearchIcon = () => (
     </svg>
 );
 
-// Icône d'engrenage (paramètres)
 export const SettingsIcon = () => (
     <svg
         width="28"
@@ -95,7 +90,6 @@ export const SettingsIcon = () => (
     </svg>
 );
 
-// Icône Google
 export const GoogleIcon = () => (
     <svg
         aria-hidden="true"
@@ -113,7 +107,6 @@ export const GoogleIcon = () => (
     </svg>
 );
 
-// Icône Twitter
 export const TwitterIcon = () => (
     <svg
         width="24"
@@ -131,7 +124,6 @@ export const TwitterIcon = () => (
     </svg>
 );
 
-// Icône Facebook
 export const FacebookIcon = () => (
     <svg
         width="24"
@@ -150,7 +142,6 @@ export const FacebookIcon = () => (
     </svg>
 );
 
-// Icône Spotify
 export const SpotifyIcon = () => (
     <svg
         width="24px"
@@ -162,7 +153,6 @@ export const SpotifyIcon = () => (
     </svg>
 );
 
-// Icône Deezer
 export const DeezerIcon = () => (
     <svg
         width="24px"

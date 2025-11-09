@@ -72,10 +72,8 @@ const EditProfileTab: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
-    // Gestion de la validation du nom d'utilisateur
     if (name === "username") {
       let formattedValue = value;
-      // Garde uniquement lettres, chiffres, points, tirets et underscores
       formattedValue = formattedValue.replace(/[^a-zA-Z0-9_.-]/g, "");
 
       if (formattedValue.length < 3) {
@@ -190,7 +188,6 @@ const EditProfileTab: React.FC = () => {
       
       if (result.success) {
         showSuccess("Suppression réussie", "Compte supprimé avec succès. Vous allez être déconnecté.");
-        // Attendre un peu pour que l'utilisateur voit l'alerte
         setTimeout(() => {
           EditProfileTabService.clearLocalData();
           EditProfileTabService.redirectToHome();

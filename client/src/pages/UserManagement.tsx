@@ -20,7 +20,6 @@ const UserManagement: React.FC = () => {
     const [showRoleModal, setShowRoleModal] = useState(false);
     const [newRole, setNewRole] = useState("");
     
-    // Create user modal state
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [createUserData, setCreateUserData] = useState<CreateUserData>({
         username: '',
@@ -31,7 +30,6 @@ const UserManagement: React.FC = () => {
         birthdate: ''
     });
     
-    // Confirmation modal and alert states
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
     const [userToBan, setUserToBan] = useState<User | null>(null);
@@ -48,11 +46,10 @@ const UserManagement: React.FC = () => {
     const itemsPerPage = 10;
 
     useEffect(() => {
-        // Only fetch users if authenticated and is admin
         if (!userLoading && isAdmin) {
             fetchUsers();
         }
-    }, [currentPage, search, roleFilter, statusFilter, isAdmin, userLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [currentPage, search, roleFilter, statusFilter, isAdmin, userLoading]);
 
     const fetchUsers = async () => {
         try {
@@ -90,7 +87,6 @@ const UserManagement: React.FC = () => {
         };
         setAlerts(prevAlerts => [...prevAlerts, newAlert]);
 
-        // Auto-remove after 15 seconds
         setTimeout(() => {
             removeAlert(newAlert.id);
         }, 15000);
@@ -164,13 +160,11 @@ const UserManagement: React.FC = () => {
 
     const handleCreateUser = async () => {
         try {
-            // Basic validation
             if (!createUserData.username || !createUserData.email || !createUserData.pseudo || !createUserData.password) {
                 showAlert("error", "Erreur", "Tous les champs obligatoires doivent être remplis");
                 return;
             }
 
-            // Email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(createUserData.email)) {
                 showAlert("error", "Erreur", "Format d'email invalide");

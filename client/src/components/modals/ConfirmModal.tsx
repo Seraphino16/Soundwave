@@ -27,14 +27,12 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         ? 'bg-red-600 hover:bg-red-700 text-white'
         : 'bg-primaryBlue hover:bg-blue-700 text-white';
 
-    // Handle click outside modal to close
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) {
             onCancel();
         }
     };
 
-    // Prevent modal from closing when clicking inside the modal content
     const handleModalClick = (e: React.MouseEvent) => {
         e.stopPropagation();
     };

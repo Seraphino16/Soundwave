@@ -16,7 +16,6 @@ const SearchBar = () => {
     const [popularUsers, setPopularUsers] = useState<SearchUser[]>([]);
     const searchRef = useRef<HTMLDivElement>(null);
 
-    // Charger les utilisateurs populaires au montage
     useEffect(() => {
         const loadPopularUsers = async () => {
             const users = await userSearchService.getPopularUsers(5);
@@ -25,7 +24,6 @@ const SearchBar = () => {
         loadPopularUsers();
     }, []);
 
-    // Recherche avec debounce
     useEffect(() => {
         const searchUsers = async () => {
             if (query.trim().length < 2) {
@@ -43,7 +41,6 @@ const SearchBar = () => {
         return () => clearTimeout(timeoutId);
     }, [query]);
 
-    // Fermer les résultats en cliquant à l'extérieur
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(event.target as Node)) {

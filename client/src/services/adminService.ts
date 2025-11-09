@@ -1,4 +1,3 @@
-// Interfaces for admin service
 export interface User {
     id: number;
     pseudo: string;
@@ -23,7 +22,6 @@ export interface UserListResponse {
     };
 }
 
-// Dashboard interfaces
 export interface DashboardStats {
     users: {
         total: number;
@@ -95,7 +93,6 @@ export interface ChartData {
     }>;
 }
 
-// User creation interface
 export interface CreateUserData {
     username: string;
     email: string;
@@ -105,7 +102,6 @@ export interface CreateUserData {
     birthdate?: string;
 }
 
-// Mock data for development
 const mockUsers: User[] = [
     {
         id: 1,
@@ -193,7 +189,6 @@ const mockUsers: User[] = [
     },
 ];
 
-// Mock dashboard data
 const mockDashboardStats: DashboardStats = {
     users: {
         total: 403,
@@ -282,11 +277,9 @@ const mockDashboardStats: DashboardStats = {
     ],
 };
 
-// Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const adminService = {
-    // Get all users with pagination and filters
     getAllUsers: async (
         page: number = 1,
         limit: number = 10,
@@ -294,11 +287,10 @@ export const adminService = {
         role?: string,
         status?: string
     ): Promise<UserListResponse> => {
-        await delay(500); // Simulate API delay
+        await delay(500);
 
         let filteredUsers = [...mockUsers];
 
-        // Apply search filter
         if (search) {
             const searchLower = search.toLowerCase();
             filteredUsers = filteredUsers.filter(user => 
@@ -308,19 +300,16 @@ export const adminService = {
             );
         }
 
-        // Apply role filter
         if (role && role !== 'all') {
             filteredUsers = filteredUsers.filter(user => user.roles.includes(role));
         }
 
-        // Apply status filter
         if (status && status !== 'all') {
             filteredUsers = filteredUsers.filter(user => 
                 status === 'active' ? user.is_active : !user.is_active
             );
         }
 
-        // Apply pagination
         const totalUsers = filteredUsers.length;
         const totalPages = Math.ceil(totalUsers / limit);
         const startIndex = (page - 1) * limit;
@@ -339,7 +328,6 @@ export const adminService = {
         };
     },
 
-    // Get user details by ID
     getUserById: async (id: number) => {
         await delay(300);
         
@@ -358,7 +346,6 @@ export const adminService = {
         };
     },
 
-    // Update user role
     updateUserRole: async (id: number, role: string) => {
         await delay(400);
         
@@ -376,7 +363,6 @@ export const adminService = {
         };
     },
 
-    // Toggle user active status
     toggleUserStatus: async (id: number) => {
         await delay(400);
         
@@ -394,7 +380,6 @@ export const adminService = {
         };
     },
 
-    // Delete user
     deleteUser: async (id: number) => {
         await delay(400);
         
@@ -414,11 +399,9 @@ export const adminService = {
         };
     },
 
-    // Create new user
     createUser: async (userData: CreateUserData) => {
         await delay(600);
         
-        // Check if username or email already exists
         const existingUser = mockUsers.find(u => 
             u.username === userData.username || u.email === userData.email
         );
@@ -440,7 +423,7 @@ export const adminService = {
             ...(userData.birthdate && { birthdate: userData.birthdate }),
         };
         
-        mockUsers.unshift(newUser); // Add to beginning of array
+        mockUsers.unshift(newUser);
         
         return {
             message: 'Utilisateur créé avec succès',
@@ -448,7 +431,6 @@ export const adminService = {
         };
     },
 
-    // Ban/unban user (toggle banned status)
     banUser: async (id: number) => {
         await delay(400);
         
@@ -461,9 +443,8 @@ export const adminService = {
             throw new Error("Impossible de bannir un administrateur");
         }
 
-        // We'll use is_active to represent banned status (false = banned)
         const wasBanned = !mockUsers[userIndex].is_active;
-        mockUsers[userIndex].is_active = wasBanned; // Toggle ban status
+        mockUsers[userIndex].is_active = wasBanned;
         mockUsers[userIndex].updatedAt = new Date().toISOString();
 
         return {
@@ -472,16 +453,13 @@ export const adminService = {
         };
     },
 
-    // Dashboard methods
     getDashboardStats: async (period: 'day' | 'week' | 'month' | 'year' = 'month'): Promise<DashboardStats> => {
         await delay(800);
         
-        // Simulate different stats based on period
         const multiplier = period === 'day' ? 0.1 : period === 'week' ? 0.7 : period === 'month' ? 1 : 12;
         
         const stats = { ...mockDashboardStats };
         
-        // Adjust stats based on period
         stats.users.newToday = Math.floor(stats.users.newToday * multiplier);
         stats.users.newThisWeek = Math.floor(stats.users.newThisWeek * multiplier);
         stats.users.newThisMonth = Math.floor(stats.users.newThisMonth * multiplier);
@@ -492,9 +470,8 @@ export const adminService = {
     },
 
     getUserGrowthChart: async (period: 'day' | 'week' | 'month' | 'year' = 'month'): Promise<ChartData> => {
-        await delay(1100); // Combined delay for both operations
+        await delay(1100);
         
-        // Generate mock time series data inline
         const generateTimeSeriesData = (period: string) => {
             const baseData = [
                 { date: '2024-07-01', users: 120 },
@@ -529,13 +506,13 @@ export const adminService = {
             ];
 
             if (period === 'day') {
-                return baseData.slice(-6); // Last 6 data points
+                return baseData.slice(-6);
             } else if (period === 'week') {
-                return baseData.slice(-7); // Last 7 days
+                return baseData.slice(-7);
             } else if (period === 'month') {
-                return baseData; // All data
+                return baseData;
             } else {
-                return baseData.filter((_, index) => index % 3 === 0).slice(-12); // Every 3rd for year
+                return baseData.filter((_, index) => index % 3 === 0).slice(-12);
             }
         };
 
@@ -563,31 +540,26 @@ export const adminService = {
     getContentChart: async (period: 'day' | 'week' | 'month' | 'year' = 'month'): Promise<ChartData> => {
         await delay(500);
         
-        // Create a more suitable dataset for bar chart visualization
         let labels: string[];
         let data: number[];
         let colors: string[];
         
         if (period === 'day') {
-            // Show hourly data for today
             const hours = ['06h', '09h', '12h', '15h', '18h', '21h'];
             labels = hours;
             data = hours.map(() => Math.floor(Math.random() * 15) + 5);
             colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
         } else if (period === 'week') {
-            // Show daily data for this week
             const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
             labels = weekDays;
             data = weekDays.map(() => Math.floor(Math.random() * 50) + 20);
             colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16'];
         } else if (period === 'month') {
-            // Show weekly data for this month
             const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
             labels = weeks;
             data = weeks.map(() => Math.floor(Math.random() * 200) + 100);
             colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
         } else {
-            // Show monthly data for this year
             const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
             labels = months;
             data = months.map(() => Math.floor(Math.random() * 500) + 200);
