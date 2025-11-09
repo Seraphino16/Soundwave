@@ -58,8 +58,8 @@ export interface EventsResponse {
 const mockEvents: Event[] = [
     {
         id: 1,
-        name: "Festival Zouk en Seine",
-        description: "Le plus grand festival de zouk de France avec des zoukeurs internationaux.",
+        name: "Festival Rock en Seine",
+        description: "Le plus grand festival de rock de France avec des rockeurs internationaux.",
         date: "2025-08-15T20:00:00Z",
         endDate: "2025-08-18T23:59:00Z",
         type: "festival",
@@ -72,9 +72,9 @@ const mockEvents: Event[] = [
             venue: "Parc de Saint-Cloud"
         },
         artists: [
-            { id: 1, name: "Zoukeurs Fous", genre: "Zouk" },
-            { id: 2, name: "Big Zook", genre: "Encore Zouk" },
-            { id: 3, name: "The Zooks", genre: "Toujours Zouk" }
+            { id: 1, name: "Arctic Monkeys", genre: "rock" },
+            { id: 2, name: "Led Zeppelin", genre: "Encore rock" },
+            { id: 3, name: "The Strokes", genre: "Toujours rock" }
         ],
         price: {
             min: 89,
@@ -85,7 +85,7 @@ const mockEvents: Event[] = [
         image: "/api/placeholder/400/300",
         capacity: 50000,
         soldOut: false,
-        tags: ["zouk", "festival", "outdoor"]
+        tags: ["rock", "festival", "outdoor"]
     },
     {
         id: 2,
@@ -131,9 +131,9 @@ const mockEvents: Event[] = [
             venue: "Parc des Expositions"
         },
         artists: [
-            { id: 6, name: "Séraphin Beoint", genre: "House" },
+            { id: 6, name: "David Guetta", genre: "House" },
             { id: 7, name: "Aronchupa", genre: "Techno" },
-            { id: 8, name: "DJ Callede", genre: "Techno" }
+            { id: 8, name: "DJ Khaled", genre: "Techno" }
         ],
         price: {
             min: 45,
@@ -219,7 +219,7 @@ const mockEvents: Event[] = [
         },
         artists: [
             { id: 14, name: "Orchestre National", genre: "Classical" },
-            { id: 15, name: "Archestre Notianol", genre: "Classical" }
+            { id: 15, name: "Philarmonique de Roubaix", genre: "Classical" }
         ],
         price: {
             min: 25,
@@ -246,9 +246,9 @@ const mockEvents: Event[] = [
             venue: "Epitech Lille"
         },
         artists: [
-            { id: 17, name: "Badman Simon", genre: "Reggaeton" },
-            { id: 18, name: "Don Dada Fabienne", genre: "Gangsta Rap" },
-            { id: 19, name: "Baldaswag", genre: "Reggaeton" }
+            { id: 17, name: "Bad Bunny", genre: "Reggaeton" },
+            { id: 18, name: "Daddy Yankee", genre: "Reggaeton" },
+            { id: 19, name: "J Balvin", genre: "Reggaeton" }
         ],
         price: {
             min: 25,
