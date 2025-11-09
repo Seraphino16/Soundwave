@@ -1,9 +1,3 @@
-/**
- * @description Controller pour la gestion des utilisateurs
- * @author SoundWave
- */
-
-
 import {
   Controller,
   Put,

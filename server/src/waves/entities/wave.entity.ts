@@ -1,8 +1,3 @@
-/**
- * @description Entité des Waves
- * @author SoundWave
- */
-
 import { Document, Schema } from 'mongoose';
 import { User } from '../../user/entities/user.entity';
 

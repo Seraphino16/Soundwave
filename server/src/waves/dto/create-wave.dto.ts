@@ -1,8 +1,3 @@
-/**
- * @description DTO pour créer une wave
- * @author SoundWave
- */
-
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 

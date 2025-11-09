@@ -1,8 +1,3 @@
-/**
- * @description Service pour la gestion des utilisateurs
- * @author SoundWave
- */
-
 import {
   Injectable,
   BadRequestException,

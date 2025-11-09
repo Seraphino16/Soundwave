@@ -1,8 +1,3 @@
-/**
- * @description Strategy JWT pour l'authentification via cookies
- * @author SoundWave
- */
-
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';

@@ -1,9 +1,3 @@
-/**
- * @description Service de gestion des tokens d'authentification
- * @author SoundWave
- */
-
-
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { GenerateTokenDto } from './dto/generate-token.dto';

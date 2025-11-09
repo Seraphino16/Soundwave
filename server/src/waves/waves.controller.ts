@@ -1,8 +1,3 @@
-/**
- * @description Contrôleur pour gérer les waves
- * @author SoundWave
- */
-
 import {
   Controller,
   Get,

@@ -1,8 +1,3 @@
-/**
- * @description Module pour gérer les waves
- * @author SoundWave
- */
-
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { WavesController } from './waves.controller';

@@ -1,8 +1,3 @@
-/**
- * @description Service pour gérer les waves (posts musicaux)
- * @author SoundWave
- */
-
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,17 +11,11 @@ export class WavesService {
     private readonly waveModel: Model<Wave>,
   ) {}
 
-  /**
-   * @description Générer un nouvel ID unique pour chaque wave
-   */
   private async setId(): Promise<number> {
     const lastWave = await this.waveModel.findOne().sort({ id: -1 }).exec();
     return lastWave ? lastWave.id + 1 : 1;
   }
 
-  /**
-   * @description Créer une nouvelle wave
-   */
   async create(userId: number, createWaveDto: CreateWaveDto): Promise<Wave> {
     const id = await this.setId();
     
@@ -43,9 +32,6 @@ export class WavesService {
     return await wave.save();
   }
 
-  /**
-   * @description Récupérer le feed de waves (ordre chronologique inversé)
-   */
   async getFeed(page: number = 1, limit: number = 10): Promise<{ waves: any[], total: number }> {
     const skip = (page - 1) * limit;
 
@@ -96,9 +82,6 @@ export class WavesService {
     return { waves: mappedWaves, total };
   }
 
-  /**
-   * @descriptionRécupérer les waves d'un utilisateur spécifique
-   */
   async getUserWaves(userId: number, page: number = 1, limit: number = 10): Promise<{ waves: any[], total: number }> {
     const skip = (page - 1) * limit;
     const waves = await this.waveModel
@@ -143,9 +126,6 @@ export class WavesService {
     return { waves: mappedWaves, total };
   }
 
-  /**
-   * @description Récupérer une wave par son ID
-   */
   async findOne(id: number): Promise<Wave> {
     const wave = await this.waveModel
       .findOne({ id })
@@ -171,9 +151,6 @@ export class WavesService {
     await this.waveModel.findOneAndDelete({ id });
   }
 
-  /**
-   * @description Liker/disliker une wave
-   */
   async toggleLike(id: number, increment: boolean): Promise<Wave> {
     const wave = await this.findOne(id);
 

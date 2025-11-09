@@ -1,8 +1,3 @@
-/**
- * @description Controller d'authentification
- * @author SoundWave
- */
-
 import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth-dto';
