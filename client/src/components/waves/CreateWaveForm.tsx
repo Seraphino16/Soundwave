@@ -74,7 +74,7 @@ const CreateWaveForm: React.FC<CreateWaveFormProps> = ({
                             <button
                                 type="button"
                                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition"
+                                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition cursor-pointer"
                                 title="Ajouter un emoji"
                                 disabled={isSubmitting}
                             >

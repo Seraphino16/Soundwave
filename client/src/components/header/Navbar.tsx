@@ -129,7 +129,7 @@ const Navbar = () => {
                         {shouldShowUserInfo && (
                             <button
                                 onClick={handleLogout}
-                                className="text-red-500 hover:text-red-600 transition-colors"
+                                className="text-red-500 hover:text-red-600 transition-colors cursor-pointer"
                                 title="Déconnexion"
                             >
                                 <LogoutIcon />
@@ -199,7 +199,7 @@ const Navbar = () => {
                                             <div className="flex space-x-2">
                                                 <button
                                                     onClick={handleLogout}
-                                                    className="text-red-500 hover:text-red-600 transition-colors"
+                                                    className="text-red-500 hover:text-red-600 transition-colors cursor-pointer"
                                                     title="Déconnexion"
                                                 >
                                                     <LogoutIcon />

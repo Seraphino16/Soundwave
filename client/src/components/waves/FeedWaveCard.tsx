@@ -21,7 +21,6 @@ const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment, on
     const menuRef = useRef<HTMLDivElement>(null);
     const { user } = useUserContext();
 
-    // Fermer le menu si on clique en dehors
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -165,12 +164,12 @@ const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment, on
                     <div className="flex items-center space-x-6">
                         <button 
                             onClick={handleLike}
-                            className={`flex items-center space-x-2 transition-colors group ${
+                            className={`flex items-center space-x-2 cursor-pointer transition-colors group ${
                                 isLiked 
                                     ? 'text-red-500' 
                                     : 'text-gray-500 hover:text-red-500'
                             }`}
-                            title={isLiked ? "Contrairement à" : "Aimer"}
+                            title={isLiked ? "Disliker" : "Liker"}
                         >
                             <span className="text-lg">{isLiked ? '❤️' : '🤍'}</span>
                             <span className="text-sm font-medium">
