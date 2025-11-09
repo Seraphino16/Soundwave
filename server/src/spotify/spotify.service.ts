@@ -10,42 +10,43 @@ export class SpotifyService {
   private readonly redirectUriRegister: string;
   private readonly redirectUriLogin: string;
 
-
   constructor(private configService: ConfigService) {
     this.spotifyApiUrl = this.configService.get<string>('SPOTIFY_API_URL')!;
     this.clientId = this.configService.get<string>('SPOTIFY_CLIENT_ID')!;
     this.clientSecret = this.configService.get<string>('SPOTIFY_CLIENT_SECRET')!;
     this.redirectUriRegister = this.configService.get<string>('SPOTIFY_REDIRECT_URI_REGISTER')!;
     this.redirectUriLogin = this.configService.get<string>('SPOTIFY_REDIRECT_URI_LOGIN')!;
-
   }
 
   generateSpotifyAuthUrl(isLogin: boolean = false): string {
-    const redirectUri = isLogin
-      ? this.redirectUriLogin
-      : this.redirectUriRegister;
+    const redirectUri = isLogin ? this.redirectUriLogin : this.redirectUriRegister;
 
-    return `https://accounts.spotify.com/authorize?` +
-        `client_id=${this.clientId}&` +
-        `response_type=code&` +
-        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `scope=user-read-email user-read-private`;
+    return (
+      `https://accounts.spotify.com/authorize?` +
+      `client_id=${this.clientId}&` +
+      `response_type=code&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `scope=user-read-email%20user-read-private`
+    );
   }
 
   async getAccessTokenFromCode(code: string, isLogin: boolean = false): Promise<string> {
-    const redirectUri = isLogin
-      ? this.redirectUriLogin
-      : this.redirectUriRegister;
-    const response = await axios.post('https://accounts.spotify.com/api/token', null, {
-      params: {
-        code,
-        redirect_uri: redirectUri,
-        grant_type: 'authorization_code',
+    const redirectUri = isLogin ? this.redirectUriLogin : this.redirectUriRegister;
+
+    const response = await axios.post(
+      'https://accounts.spotify.com/api/token',
+      null,
+      {
+        params: {
+          code,
+          redirect_uri: redirectUri,
+          grant_type: 'authorization_code',
+        },
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`,
+        },
       },
-      headers: {
-        'Authorization': `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`,
-      },
-    });
+    );
 
     return response.data.access_token;
   }
@@ -53,7 +54,7 @@ export class SpotifyService {
   async getSpotifyUserData(accessToken: string): Promise<any> {
     const response = await axios.get('https://api.spotify.com/v1/me', {
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return response.data;
@@ -61,25 +62,24 @@ export class SpotifyService {
 
   private async getAccessToken(): Promise<string> {
     const authResponse = await axios.post(
-        'https://accounts.spotify.com/api/token',
-        new URLSearchParams({ grant_type: 'client_credentials' }),
-        {
-          headers: {
-            'Authorization': `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
+      'https://accounts.spotify.com/api/token',
+      new URLSearchParams({ grant_type: 'client_credentials' }),
+      {
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
+      },
     );
 
     return authResponse.data.access_token;
   }
 
-  // Récupérer tous les albums récents
   async getAllNewReleases() {
     try {
       const accessToken = await this.getAccessToken();
-      let allAlbums: { title: string; coverImage: string | null }[] = [];
-      let limit = 50;
+      let allAlbums: { id: string; title: string; coverImage: string | null }[] = [];
+      const limit = 50;
       let offset = 0;
       let hasMore = true;
 
@@ -97,9 +97,7 @@ export class SpotifyService {
 
         allAlbums = [...allAlbums, ...albums];
 
-        const totalAlbumsFromSpotify = response.data.albums.total;
-
-        if (offset + limit >= totalAlbumsFromSpotify) {
+        if (offset + limit >= response.data.albums.total) {
           hasMore = false;
         } else {
           offset += limit;
@@ -113,15 +111,16 @@ export class SpotifyService {
     }
   }
 
-  // Récupère détails d'un album
   async getAlbumById(id: string) {
     try {
       const accessToken = await this.getAccessToken();
+
       const response = await axios.get(`${this.spotifyApiUrl}/albums/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       const album = response.data;
+
       return {
         id: album.id,
         title: album.name,
@@ -131,17 +130,20 @@ export class SpotifyService {
         spotifyUrl: album.external_urls.spotify,
         label: album.label,
         popularity: album.popularity,
+
         artists: album.artists.map((artist: any) => ({
           id: artist.id,
           name: artist.name,
           spotifyUrl: artist.external_urls.spotify,
         })),
+
         tracks: album.tracks.items.map((track: any) => ({
           id: track.id,
           title: track.name,
           durationMs: track.duration_ms,
-          spotifyUrl: track.external_urls.spotify,
-          previewUrl: track.preview_url,
+          trackNumber: track.track_number,
+          spotifyUrl: track.external_urls?.spotify || null,
+          previewUrl: track.preview_url || null,
         })),
       };
     } catch (error) {
@@ -150,13 +152,11 @@ export class SpotifyService {
     }
   }
 
-
-  // Récupérer tous les artistes récents
   async getAllNewArtists() {
     try {
       const accessToken = await this.getAccessToken();
       let allArtists: { id: string; name: string; image: string | null }[] = [];
-      let limit = 50;
+      const limit = 50;
       let offset = 0;
       let hasMore = true;
 
@@ -167,14 +167,14 @@ export class SpotifyService {
         });
 
         const artists = response.data.albums.items
-            .flatMap((album: any) => album.artists.map((artist: any) => ({
+          .flatMap((album: any) =>
+            album.artists.map((artist: any) => ({
               id: artist.id,
               name: artist.name,
               image: album.images.length > 0 ? album.images[0].url : null,
-            })))
-            .filter((artist, index, self) =>
-                index === self.findIndex((a) => a.id === artist.id)
-            );
+            })),
+          )
+          .filter((artist, index, self) => index === self.findIndex((a) => a.id === artist.id));
 
         allArtists = [...allArtists, ...artists];
 
@@ -192,7 +192,6 @@ export class SpotifyService {
     }
   }
 
-  // Récupérer détails d'un artiste
   async getArtistById(id: string) {
     try {
       const accessToken = await this.getAccessToken();
@@ -208,7 +207,7 @@ export class SpotifyService {
         followers: artist.followers.total,
         genres: artist.genres,
         popularity: artist.popularity,
-        spotifyUrl: artist.external_urls.spotify
+        spotifyUrl: artist.external_urls.spotify,
       };
     } catch (error) {
       console.error("Erreur lors de la récupération de l'artiste:", error);
@@ -216,5 +215,139 @@ export class SpotifyService {
     }
   }
 
+  async getAlbumsByArtistId(artistId: string) {
+    try {
+      const accessToken = await this.getAccessToken();
 
+      const response = await axios.get(`${this.spotifyApiUrl}/artists/${artistId}/albums`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: {
+          include_groups: 'album',
+          market: 'FR',
+          limit: 50,
+        },
+      });
+
+      const albums = response.data.items.map((album: any) => ({
+        id: album.id,
+        title: album.name,
+        coverImage: album.images?.[0]?.url || null,
+      }));
+
+      return { albums };
+    } catch (error) {
+      console.error("Erreur lors de la récupération des albums de l'artiste:", error);
+      throw new Error("Impossible de récupérer les albums de l'artiste");
+    }
+  }
+
+  async getAlbumsWithTracksByArtistId(artistId: string) {
+    try {
+      const accessToken = await this.getAccessToken();
+
+      const response = await axios.get(`${this.spotifyApiUrl}/artists/${artistId}/albums`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: { include_groups: 'album', market: 'FR', limit: 50 },
+      });
+
+      const albums = response.data.items;
+
+      const albumsWithTracks = await Promise.all(
+        albums.map(async (album: any) => {
+          const albumDetails = await axios.get(`${this.spotifyApiUrl}/albums/${album.id}`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+
+          return {
+            id: album.id,
+            title: album.name,
+            coverImage: album.images?.[0]?.url || null,
+            tracks: albumDetails.data.tracks.items.map((track: any) => ({
+              id: track.id,
+              title: track.name,
+              durationMs: track.duration_ms,
+              trackNumber: track.track_number,
+              spotifyUrl: track.external_urls?.spotify || null,
+            })),
+          };
+        })
+      );
+
+      return { albums: albumsWithTracks };
+    } catch (error) {
+      console.error('Erreur lors de la récupération des albums avec pistes:', error);
+      throw new Error("Impossible de récupérer les albums avec les pistes");
+    }
+  }
+
+  private async searchSpotify(type: 'album' | 'artist', filters: Record<string, string>): Promise<any> {
+    const accessToken = await this.getAccessToken();
+    const queryParts: string[] = [];
+
+    if (type === 'album') {
+      if (filters.name) queryParts.push(`album:${filters.name}`);
+      if (filters.year) queryParts.push(`year:${filters.year}`);
+    }
+
+    if (type === 'artist') {
+      if (filters.name) queryParts.push(filters.name);
+      if (filters.genre) queryParts.push(`genre:"${filters.genre}"`);
+    }
+
+    const q = queryParts.join(' ').trim();
+
+    const response = await axios.get(`${this.spotifyApiUrl}/search`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { q, type, limit: 50 },
+    });
+
+    return response.data;
+  }
+
+  async searchAlbums({ name, year }: { name?: string; year?: string }) {
+    try {
+      const filters: Record<string, string> = {};
+      if (name) filters.name = name;
+      if (year) filters.year = year;
+
+      const data = await this.searchSpotify('album', filters);
+
+      const albums = data.albums.items.map((album: any) => ({
+        id: album.id,
+        title: album.name,
+        coverImage: album.images.length > 0 ? album.images[0].url : null,
+      }));
+
+      return { albums };
+    } catch (error) {
+      console.error('Erreur lors de la recherche d’albums:', error);
+      throw new Error('Impossible de rechercher les albums');
+    }
+  }
+
+  async searchArtists({ name, genre }: { name?: string; genre?: string }) {
+    try {
+      const filters: Record<string, string> = {};
+      if (name) filters.name = name;
+      if (genre) filters.genre = genre;
+
+      const data = await this.searchSpotify('artist', filters);
+
+      let artists = data.artists.items.map((artist: any) => ({
+        id: artist.id,
+        name: artist.name,
+        image: artist.images?.[0]?.url || null,
+      }));
+
+      if (name) {
+        const lowerName = name.toLowerCase();
+        artists = artists.filter((a) => a.name.toLowerCase().includes(lowerName));
+      }
+
+      return { artists };
+    } catch (error) {
+      console.error("Erreur lors de la recherche d'artistes:", error);
+      throw new Error('Erreur lors de la recherche des artistes');
+    }
+  }
 }

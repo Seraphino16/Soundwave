@@ -1,52 +1,117 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { MailerSuccess } from './success/mailer.success';
+import * as fs from 'fs';
+import * as path from 'path';
 import { MailerErrors } from './errors/mailer.errors';
+import { MailerSuccess } from './success/mailer.success';
+import {
+  SendSuppressionEmailParams,
+  SendValidationEmailParams,
+} from './interfaces/mailer.interfaces';
 
 @Injectable()
 export class MailerService {
-  private transporter: nodemailer.Transporter;
+  private readonly transporter = nodemailer.createTransport({
+    host: process.env.MAIL_HOST,
+    port: parseInt(process.env.MAIL_PORT || '587', 10),
+    secure: false,
+    auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
+    },
+  });
 
-  constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST as string,
-      port: parseInt(process.env.MAIL_PORT as string, 10),
-      secure: false,
-      auth: {
-        user: process.env.MAIL_USER as string,
-        pass: process.env.MAIL_PASS as string,
-      },
+  async sendValidationEmail({
+    to,
+    username,
+    token,
+  }: SendValidationEmailParams): Promise<MailerSuccess | MailerErrors> {
+    const validationLink = `http://localhost:5001/users/validate?token=${token}`;
+
+    const html = this.loadTemplate('account-validation', {
+      username,
+      validationLink,
     });
-  }
-  sendValidationEmail(userEmail: string, Token: string): void {
-    const validationLink = `http://localhost:5001/users/validate?token=${Token}`;
-    const mailOptions = {
-      from: process.env.MAIL_FROM,
-      to: userEmail,
-      subject: 'Validation de votre compte',
-      html: `
-      <p>Bonjour,</p>
-      <p>Pour valider votre compte, cliquez sur le lien suivant :</p>
-      <p><a href="${validationLink}" target="_blank">Valider mon compte</a></p>
-      <p>Si vous n'avez pas demandé cette validation, veuillez ignorer cet email.</p>
-    `,
-    };
 
-    this.transporter
-      .sendMail(mailOptions)
-      .then(() => {
-        return MailerSuccess.accountValidationEmailSent({
-          email: userEmail,
-          token: Token,
-          validationLink,
-        });
-      })
-      .catch((error: Error) => {
-        console.error(
-          "Erreur lors de l'envoi du mail de validation:",
-          error.message,
-        );
-        return MailerErrors.emailNotSent();
+    if (typeof html !== 'string') {
+      return html;
+    }
+
+    try {
+      const mailOptions = {
+        from: process.env.MAIL_FROM,
+        to,
+        subject: 'Validation de votre compte',
+        html,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+
+      return MailerSuccess.accountValidationEmailSent({
+        email: to,
+        token,
+        validationLink,
       });
+    } catch (error) {
+      console.error("Erreur d'envoi mail :", error);
+      return MailerErrors.emailNotSent();
+    }
+  }
+
+  async sendSuppressionEmail({
+    to,
+    username,
+  }: SendSuppressionEmailParams): Promise<MailerSuccess | MailerErrors> {
+    const html = this.loadTemplate('account-suppression', {
+      username,
+    });
+
+    if (typeof html !== 'string') {
+      return html;
+    }
+
+    try {
+      const mailOptions = {
+        from: process.env.MAIL_FROM,
+        to,
+        subject: 'Suppression de votre compte',
+        html,
+      };
+
+      await this.transporter.sendMail(mailOptions);
+
+      return MailerSuccess.accountSuppressionEmailSent({
+        email: to,
+      });
+    } catch (error) {
+      console.error("Erreur d'envoi mail :", error);
+      return MailerErrors.emailNotSent();
+    }
+  }
+
+  private loadTemplate(
+    templateName: string,
+    context: Record<string, string>,
+  ): string | MailerErrors {
+    const templatePath = path.resolve(
+      'src',
+      'mailer',
+      'templates',
+      `${templateName}.html`,
+    );
+
+    if (!fs.existsSync(templatePath)) {
+      return MailerErrors.mailTemplateNotFound();
+    }
+
+    let content = fs.readFileSync(templatePath, 'utf8');
+
+    for (const key in context) {
+      const value = context[key];
+      const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      content = content.replace(regex, value);
+    }
+
+    return content;
   }
 }

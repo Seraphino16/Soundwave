@@ -21,8 +21,8 @@ const Waves = () => {
 
     const newWave: Wave = {
       id: Date.now(),
-      username: "JohnDoe", // Replace with actual user data
-      avatar: "https://via.placeholder.com/50", // Replace with actual user avatar
+      username: "JohnDoe",
+      avatar: "https://via.placeholder.com/50",
       content,
       timestamp: new Date().toLocaleString(),
       isEditing: false,

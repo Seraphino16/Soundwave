@@ -1,8 +1,3 @@
-/**
- * @description Pied de page du site SoundWave
- * @author SoundWave
- */
-
 import NavItem from "../utils/NavItem";
 import "../../assets/styles/Navbar.css";
 import footerWaveLeft from "../../assets/images/footerWaveLeft.png";

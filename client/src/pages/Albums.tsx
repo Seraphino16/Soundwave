@@ -1,119 +1,208 @@
 import React, { useEffect, useState } from "react";
-import { fetchAlbums } from "../services/spotifyService";
+import { fetchAlbums, searchAlbums } from "../services/spotifyService";
 import AlbumCard from "../components/cards/AlbumCard";
+import Meta from "../components/utils/Meta";
 
 interface Album {
-    id: string;
-    title: string;
-    coverImage: string;
+  id: string;
+  title: string;
+  coverImage: string;
 }
 
 const Albums: React.FC = () => {
-    const [albums, setAlbums] = useState<Album[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const albumsPerPage = 12;
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const albumsPerPage = 12;
 
-    useEffect(() => {
-        const loadAlbums = async () => {
-            const data = await fetchAlbums();
-            if (data && data.albums) {
-                setAlbums(data.albums);
-            }
-            setLoading(false);
-        };
+  const [albumName, setAlbumName] = useState("");
+  const [releaseYear, setReleaseYear] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
-        loadAlbums();
-    }, []);
+  useEffect(() => {
+    loadAlbums();
+  }, []);
 
-    const indexOfLastAlbum = currentPage * albumsPerPage;
-    const indexOfFirstAlbum = indexOfLastAlbum - albumsPerPage;
-    const currentAlbums = albums.slice(indexOfFirstAlbum, indexOfLastAlbum);
-    const totalPages = Math.ceil(albums.length / albumsPerPage);
+  const loadAlbums = async () => {
+    setLoading(true);
+    const data = await fetchAlbums();
+    if (data?.albums) {
+      setAlbums(data.albums);
+    }
+    setLoading(false);
+  };
 
-    const getPageNumbers = () => {
-        const maxPagesToShow = 5;
-        const pageNumbers: (number | string)[] = [];
+  const handleSearch = async () => {
+    setLoading(true);
+    const result = await searchAlbums({
+      name: albumName,
+      year: releaseYear,
+    });
+    setAlbums(result.albums);
+    setCurrentPage(1);
+    setLoading(false);
+  };
 
-        if (totalPages <= maxPagesToShow) {
-            return Array.from({ length: totalPages }, (_, i) => i + 1);
-        }
+  const handleReset = async () => {
+    setAlbumName("");
+    setReleaseYear("");
+    setCurrentPage(1);
+    await loadAlbums();
+  };
 
-        if (currentPage <= 3) {
-            pageNumbers.push(1, 2, 3, "...", totalPages);
-        } else if (currentPage >= totalPages - 2) {
-            pageNumbers.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
-        } else {
-            pageNumbers.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
-        }
+  const indexOfLastAlbum = currentPage * albumsPerPage;
+  const indexOfFirstAlbum = indexOfLastAlbum - albumsPerPage;
+  const currentAlbums = albums.slice(indexOfFirstAlbum, indexOfLastAlbum);
+  const totalPages = Math.ceil(albums.length / albumsPerPage);
 
-        return pageNumbers;
-    };
+  const getPageNumbers = () => {
+    const maxPagesToShow = 5;
+    const pageNumbers: (number | string)[] = [];
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <div className="bg-white shadow-lg rounded-lg w-full max-w-6xl p-10">
-                <h1 className="text-3xl font-bold text-center mb-8 text-primaryBlue">ALBUMS</h1>
+    if (totalPages <= maxPagesToShow) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
 
-                {loading ? (
-                    <p className="text-center">Chargement...</p>
-                ) : (
-                    <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 ml-20">
-                            {currentAlbums.map((album) => (
-                                <AlbumCard key={album.id} id={album.id} title={album.title} coverImage={album.coverImage} />
-                            ))}
-                        </div>
+    if (currentPage <= 3) {
+      pageNumbers.push(1, 2, 3, "...", totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      pageNumbers.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      pageNumbers.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+    }
 
-                        <nav className="flex justify-center mt-8" aria-label="Pagination">
-                            <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg shadow-md">
-                                <button
-                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1}
-                                    className="px-3 py-2 rounded-md text-gray-700 bg-white hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                                    aria-label="Previous"
-                                >
-                                    <svg className="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </button>
+    return pageNumbers;
+  };
 
-                                {getPageNumbers().map((page, index) =>
-                                    page === "..." ? (
-                                        <span key={index} className="text-gray-500 px-3 text-lg">•••</span>
-                                    ) : (
-                                        <button
-                                            key={index}
-                                            onClick={() => setCurrentPage(Number(page))}
-                                            className={`px-4 py-2 rounded-md transition font-semibold ${
-                                                currentPage === page
-                                                    ? "bg-primaryBlue text-white shadow-md"
-                                                    : "bg-white text-gray-700 hover:bg-gray-200"
-                                            }`}
-                                            aria-current={currentPage === page ? "page" : undefined}
-                                        >
-                                            {page}
-                                        </button>
-                                    )
-                                )}
+  return (
+    <>
+      <Meta title="Soundwave - Albums" description="Page de liste des albums sur SoundWave" />
+      <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8">
+        <div className="w-full max-w-7xl bg-white shadow-lg rounded-lg p-4 sm:p-6 md:p-10">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="lg:w-64 lg:border-r lg:pr-6 w-full">
+              <div className="flex items-center justify-between lg:hidden mb-4">
+                <h2 className="text-xl font-semibold text-primaryBlue">Filtres</h2>
+                <button
+                  onClick={() => setShowFilters((prev) => !prev)}
+                  className="text-sm text-primaryBlue underline focus:outline-none"
+                  aria-expanded={showFilters}
+                >
+                  {showFilters ? "Masquer" : "Afficher"}
+                </button>
+              </div>
+              <div className={`${showFilters ? "block" : "hidden"} lg:block space-y-4`}>
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">Nom Album</label>
+                  <input
+                    type="text"
+                    placeholder="Album..."
+                    value={albumName}
+                    onChange={(e) => setAlbumName(e.target.value)}
+                    className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-primaryBlue"
+                  />
+                </div>
 
-                                <button
-                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                                    disabled={currentPage === totalPages}
-                                    className="px-3 py-2 rounded-md text-gray-700 bg-white hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                                    aria-label="Next"
-                                >
-                                    <svg className="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </nav>
-                    </>
-                )}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">Année</label>
+                  <input
+                    type="number"
+                    placeholder="Ex: 2023"
+                    value={releaseYear}
+                    onChange={(e) => setReleaseYear(e.target.value)}
+                    className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:border-primaryBlue"
+                  />
+                </div>
+
+                <button className="bg-primaryBlue text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-full" onClick={handleSearch}>
+                  Rechercher
+                </button>
+
+                <button onClick={handleReset} className="text-sm text-gray-600 underline hover:text-primaryBlue transition w-full">
+                  Réinitialiser les filtres
+                </button>
+              </div>
             </div>
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-center mb-8 text-primaryBlue">ALBUMS</h1>
+
+              {loading ? (
+                <p className="text-center">Chargement...</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+                    {currentAlbums.map((album) => (
+                      <AlbumCard key={album.id} id={album.id} title={album.title} coverImage={album.coverImage} />
+                    ))}
+                  </div>
+                  <nav className="flex justify-center mt-8" aria-label="Pagination">
+                    <div className="flex sm:hidden items-center justify-center space-x-4 mt-4">
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="p-2 rounded-md bg-primaryBlue text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Page précédente"
+                      >
+                        ←
+                      </button>
+
+                      <span className="text-sm text-gray-700 font-medium">
+                        Page {currentPage} / {totalPages}
+                      </span>
+
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="p-2 rounded-md bg-primaryBlue text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Page suivante"
+                      >
+                        →
+                      </button>
+                    </div>
+                    <div className="hidden sm:flex items-center space-x-2 bg-gray-100 p-2 rounded-lg shadow-md">
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-3 py-2 rounded-md text-gray-700 bg-white hover:bg-gray-200 transition disabled:opacity-50"
+                      >
+                        ←
+                      </button>
+
+                      {getPageNumbers().map((page, index) =>
+                        page === "..." ? (
+                          <span key={index} className="text-gray-500 px-3 text-lg">
+                            •••
+                          </span>
+                        ) : (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentPage(Number(page))}
+                            className={`px-4 py-2 rounded-md font-semibold ${
+                              currentPage === page ? "bg-primaryBlue text-white shadow-md" : "bg-white text-gray-700 hover:bg-gray-200"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        )
+                      )}
+
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-2 rounded-md text-gray-700 bg-white hover:bg-gray-200 transition disabled:opacity-50"
+                      >
+                        →
+                      </button>
+                    </div>
+                  </nav>
+                </>
+              )}
+            </div>
+          </div>
         </div>
-    );
+      </div>
+    </>
+  );
 };
 
 export default Albums;

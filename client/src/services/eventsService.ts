@@ -1,0 +1,359 @@
+import { calculateHaversineDistance } from '../utils/geoUtils';
+
+export interface EventLocation {
+    latitude: number;
+    longitude: number;
+    address: string;
+    city: string;
+    country: string;
+    venue: string;
+}
+
+export interface Artist {
+    id: number;
+    name: string;
+    genre: string;
+    image?: string;
+}
+
+export interface Event {
+    id: number;
+    name: string;
+    description: string;
+    date: string;
+    endDate?: string;
+    type: 'concert' | 'festival' | 'tour' | 'other';
+    location: EventLocation;
+    artists: Artist[];
+    price?: {
+        min: number;
+        max: number;
+        currency: string;
+    };
+    ticketUrl?: string;
+    image?: string;
+    capacity?: number;
+    soldOut: boolean;
+    tags: string[];
+}
+
+export interface EventFilters {
+    artist?: string;
+    radius?: number; 
+    location?: {
+        latitude: number;
+        longitude: number;
+    };
+    dateFrom?: string;
+    dateTo?: string;
+    type?: string;
+}
+
+export interface EventsResponse {
+    events: Event[];
+    total: number;
+    hasMore: boolean;
+}
+
+const mockEvents: Event[] = [
+    {
+        id: 1,
+        name: "Festival Rock en Seine",
+        description: "Le plus grand festival de rock de France avec des rockeurs internationaux.",
+        date: "2025-08-15T20:00:00Z",
+        endDate: "2025-08-18T23:59:00Z",
+        type: "festival",
+        location: {
+            latitude: 48.8566,
+            longitude: 2.3522,
+            address: "123 Avenue des Champs-Élysées",
+            city: "Paris",
+            country: "France",
+            venue: "Parc de Saint-Cloud"
+        },
+        artists: [
+            { id: 1, name: "Arctic Monkeys", genre: "rock" },
+            { id: 2, name: "Led Zeppelin", genre: "Encore rock" },
+            { id: 3, name: "The Strokes", genre: "Toujours rock" }
+        ],
+        price: {
+            min: 89,
+            max: 299,
+            currency: "EUR"
+        },
+        ticketUrl: "https://example.com/tickets/1",
+        image: "/api/placeholder/400/300",
+        capacity: 50000,
+        soldOut: false,
+        tags: ["rock", "festival", "outdoor"]
+    },
+    {
+        id: 2,
+        name: "Concert Jazz au Sunset",
+        description: "Soirée jazz intime avec des musiciens locaux et internationaux.",
+        date: "2025-09-20T21:00:00Z",
+        type: "concert",
+        location: {
+            latitude: 48.8606,
+            longitude: 2.3376,
+            address: "60 Rue des Lombards",
+            city: "Paris",
+            country: "France",
+            venue: "Le Sunset/Sunside"
+        },
+        artists: [
+            { id: 4, name: "Marcus Miller", genre: "Jazz" },
+            { id: 5, name: "Esperanza Spalding", genre: "Jazz Fusion" }
+        ],
+        price: {
+            min: 35,
+            max: 65,
+            currency: "EUR"
+        },
+        ticketUrl: "https://example.com/tickets/2",
+        capacity: 200,
+        soldOut: false,
+        tags: ["jazz", "intimate", "indoor"]
+    },
+    {
+        id: 3,
+        name: "Électro Night Festival",
+        description: "Festival de musique électronique avec les meilleurs DJs du moment.",
+        date: "2025-09-05T22:00:00Z",
+        endDate: "2025-09-06T06:00:00Z",
+        type: "festival",
+        location: {
+            latitude: 43.6047,
+            longitude: 1.4442,
+            address: "Place du Capitole",
+            city: "Toulouse",
+            country: "France",
+            venue: "Parc des Expositions"
+        },
+        artists: [
+            { id: 6, name: "David Guetta", genre: "House" },
+            { id: 7, name: "Aronchupa", genre: "Techno" },
+            { id: 8, name: "DJ Khaled", genre: "Techno" }
+        ],
+        price: {
+            min: 45,
+            max: 120,
+            currency: "EUR"
+        },
+        ticketUrl: "https://example.com/tickets/3",
+        capacity: 25000,
+        soldOut: false,
+        tags: ["electronic", "techno", "night", "outdoor"]
+    },
+    {
+        id: 4,
+        name: "Indie Folk Acoustique",
+        description: "Concert acoustique dans un cadre intimiste.",
+        date: "2025-08-02T19:30:00Z",
+        type: "concert",
+        location: {
+            latitude: 45.7640,
+            longitude: 4.8357,
+            address: "1 Place des Terreaux",
+            city: "Lyon",
+            country: "France",
+            venue: "Café de la Danse"
+        },
+        artists: [
+            { id: 9, name: "Bon Iver", genre: "Indie Folk" },
+            { id: 10, name: "Iron & Wine", genre: "Folk" }
+        ],
+        price: {
+            min: 28,
+            max: 45,
+            currency: "EUR"
+        },
+        ticketUrl: "https://example.com/tickets/4",
+        capacity: 150,
+        soldOut: true,
+        tags: ["folk", "acoustic", "intimate", "indoor"]
+    },
+    {
+        id: 5,
+        name: "Hip-Hop Summer Jam",
+        description: "Festival hip-hop avec les stars du rap français et international.",
+        date: "2025-08-12T18:00:00Z",
+        endDate: "2025-08-12T23:59:00Z",
+        type: "festival",
+        location: {
+            latitude: 43.2965,
+            longitude: 5.3698,
+            address: "Vieux-Port",
+            city: "Marseille",
+            country: "France",
+            venue: "Stade Vélodrome"
+        },
+        artists: [
+            { id: 11, name: "PNL", genre: "Rap" },
+            { id: 12, name: "Kaaris", genre: "Hip-Hop" },
+            { id: 13, name: "Kendrick Lamar", genre: "Hip-Hop" }
+        ],
+        price: {
+            min: 55,
+            max: 180,
+            currency: "EUR"
+        },
+        ticketUrl: "https://example.com/tickets/5",
+        capacity: 35000,
+        soldOut: false,
+        tags: ["hip-hop", "rap", "festival", "outdoor"]
+    },
+    {
+        id: 6,
+        name: "Classical Evening",
+        description: "Soirée de musique classique avec l'orchestre symphonique.",
+        date: "2025-08-25T20:00:00Z",
+        type: "concert",
+        location: {
+            latitude: 47.2184,
+            longitude: -1.5536,
+            address: "Place Graslin",
+            city: "Nantes",
+            country: "France",
+            venue: "Opéra de Nantes"
+        },
+        artists: [
+            { id: 14, name: "Orchestre National", genre: "Classical" },
+            { id: 15, name: "Philarmonique de Roubaix", genre: "Classical" }
+        ],
+        price: {
+            min: 25,
+            max: 95,
+            currency: "EUR"
+        },
+        ticketUrl: "https://example.com/tickets/6",
+        capacity: 800,
+        soldOut: false,
+        tags: ["classical", "orchestra", "formal", "indoor"]
+    },
+    {
+        id: 7,
+        name: "Reggaeton Epifest",
+        description: "Festival de reggaeton par les étudiants d'Epitech.",
+        date: "2025-08-25T20:00:00Z",
+        type: "festival",
+        location: {
+            latitude: 50.636988971719155,
+            longitude: 3.058393929105051,
+            address: "101 Rue de l'Hôpital Militaire",
+            city: "Lille",
+            country: "France",
+            venue: "Epitech Lille"
+        },
+        artists: [
+            { id: 17, name: "Bad Bunny", genre: "Reggaeton" },
+            { id: 18, name: "Daddy Yankee", genre: "Reggaeton" },
+            { id: 19, name: "J Balvin", genre: "Reggaeton" }
+        ],
+        price: {
+            min: 25,
+            max: 95,
+            currency: "EUR"
+        },
+        ticketUrl: "https://example.com/tickets/7",
+        capacity: 800,
+        soldOut: false,
+        tags: ["reggaeton", "student", "festival", "outdoor"]
+    }
+];
+
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    return calculateHaversineDistance(lat1, lon1, lat2, lon2);
+};
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export const eventsService = {
+    getEvents: async (filters: EventFilters = {}): Promise<EventsResponse> => {
+        await delay(800);
+
+        let filteredEvents = [...mockEvents];
+
+        if (filters.artist && filters.artist.trim()) {
+            const artistQuery = filters.artist.toLowerCase();
+            filteredEvents = filteredEvents.filter(event =>
+                event.artists.some(artist => 
+                    artist.name.toLowerCase().includes(artistQuery)
+                ) || event.name.toLowerCase().includes(artistQuery)
+            );
+        }
+
+        if (filters.radius && filters.location) {
+            filteredEvents = filteredEvents.filter(event => {
+                const distance = calculateDistance(
+                    filters.location!.latitude,
+                    filters.location!.longitude,
+                    event.location.latitude,
+                    event.location.longitude
+                );
+                return distance <= filters.radius!;
+            });
+        }
+
+        if (filters.dateFrom) {
+            filteredEvents = filteredEvents.filter(event => 
+                new Date(event.date) >= new Date(filters.dateFrom!)
+            );
+        }
+
+        if (filters.dateTo) {
+            filteredEvents = filteredEvents.filter(event => 
+                new Date(event.date) <= new Date(filters.dateTo!)
+            );
+        }
+
+        if (filters.type && filters.type !== 'all') {
+            filteredEvents = filteredEvents.filter(event => event.type === filters.type);
+        }
+
+        filteredEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        return {
+            events: filteredEvents,
+            total: filteredEvents.length,
+            hasMore: false
+        };
+    },
+
+    getEventById: async (id: number): Promise<Event | null> => {
+        await delay(300);
+        return mockEvents.find(event => event.id === id) || null;
+    },
+
+    getArtists: async (): Promise<Artist[]> => {
+        await delay(200);
+        
+        const allArtists = mockEvents.flatMap(event => event.artists);
+        const uniqueArtists = allArtists.filter((artist, index, self) => 
+            index === self.findIndex(a => a.id === artist.id)
+        );
+        
+        return uniqueArtists.sort((a, b) => a.name.localeCompare(b.name));
+    },
+
+    getUserLocation: async (): Promise<{ latitude: number; longitude: number } | null> => {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) {
+                resolve(null);
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    resolve({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    });
+                },
+                () => {
+                    resolve(null);
+                }
+            );
+        });
+    }
+};

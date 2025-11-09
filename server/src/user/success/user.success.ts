@@ -54,4 +54,27 @@ export class UserSuccess {
       'Informations utilisateur enregistrée avec succès',
     );
   }
+
+  static accountDeleted() {
+    return UserSuccess.createSuccess(
+      'success',
+      200,
+      'Compte supprimé avec succèss',
+    );
+  }
+  static passwordUpdate() {
+    return UserSuccess.createSuccess(
+      'success',
+      200,
+      'Mot de passe modifié avec succès',
+    );
+  }
+
+  static passwordCreate() {
+    return UserSuccess.createSuccess(
+      'success',
+      201,
+      'Mot de passe défini avec succès',
+    );
+  }
 }

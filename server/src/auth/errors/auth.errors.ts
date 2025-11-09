@@ -58,11 +58,6 @@ export class AuthErrors {
   }
 
   static unauthorized(data?: any): AuthErrors {
-    return AuthErrors.createError(
-        'error',
-        401,
-        'Accès non autorisé',
-        data,
-    );
+    return AuthErrors.createError('error', 401, 'Accès non autorisé', data);
   }
 }

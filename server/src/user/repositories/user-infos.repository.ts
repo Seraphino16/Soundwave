@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserInfos } from '../entities/user-infos.entity';
 import { CreateUserInfosDto } from '../dto/create-user-infos.dto';
+import { UpdateUserInfosDto } from '../dto/update-user-infos.dto';
 
 @Injectable()
 export class UserInfosRepository {
@@ -11,33 +12,42 @@ export class UserInfosRepository {
   ) {}
 
   async setId(): Promise<number> {
-    const lastUser = await this.userModel.findOne().sort({ id: -1 }).exec();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return lastUser ? lastUser.id + 1 : 1;
+    const last = await this.userModel.findOne().sort({ id: -1 }).exec();
+    return last ? last.id + 1 : 1;
   }
 
   async create(createUserInfosDto: CreateUserInfosDto): Promise<UserInfos> {
-    const newUser = new this.userModel({
+    const newUserInfos = new this.userModel({
       ...createUserInfosDto,
-      user_id: createUserInfosDto.user_id,
+      id: await this.setId(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      id: await this.setId(),
     });
 
-    return newUser.save();
+    return newUserInfos.save();
   }
 
   async update(
     userId: number,
-    updateUserDto: Partial<UserInfos>,
+    updateUserDto: Partial<UpdateUserInfosDto>,
   ): Promise<UserInfos | null> {
     return this.userModel
       .findOneAndUpdate(
         { user_id: userId },
-        { ...updateUserDto, updatedAt: new Date() },
+        {
+          ...updateUserDto,
+          updatedAt: new Date(),
+        },
         { new: true },
       )
       .exec();
+  }
+
+  async findByUserId(userId: number): Promise<UserInfos | null> {
+    return this.userModel.findOne({ user_id: userId }).exec();
+  }
+
+  async findByUserIds(userIds: number[]): Promise<UserInfos[]> {
+    return this.userModel.find({ user_id: { $in: userIds } }).exec();
   }
 }

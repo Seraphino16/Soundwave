@@ -22,6 +22,9 @@ export class AuthService {
     const user = await this.getUserByUsernameOrEmail(username, email);
 
     if (!user) {
+      console.error(
+        `Login attempt failed: User not found for username: ${username}, email: ${email}`,
+      );
       throw new UnauthorizedException(AuthErrors.invalidCredentials().message);
     }
 
@@ -29,6 +32,9 @@ export class AuthService {
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
+        console.error(
+          `Login attempt failed: Invalid password for user ${user.username}`,
+        );
         throw new UnauthorizedException(
           AuthErrors.invalidCredentials().message,
         );
@@ -45,20 +51,18 @@ export class AuthService {
       email: user.email,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const userWithoutPassword = { ...user.toObject(), password: undefined };
 
     return {
       token,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       user: userWithoutPassword,
     };
   }
 
-  private async getUserByUsernameOrEmail(username: string, email: string) {
+  private async getUserByUsernameOrEmail(username?: string, email?: string) {
     if (email) {
       return this.userRepository.findByEmail(email);
     }
-    return this.userRepository.findByUsername(username);
+    return this.userRepository.findByUsername(username as string);
   }
 }

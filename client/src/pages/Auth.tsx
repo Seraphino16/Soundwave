@@ -11,9 +11,8 @@ const Auth: React.FC = () => {
     return (
         <>
             <Meta
-                title="Authentification Page"
+                title="Authentification"
                 description="Page d'authentification du site SoundWave"
-                // Rajouter la canonical URL quand il y en aura une (valable pour toutes les pages)
             />
 
             <div className="flex flex-col items-center">

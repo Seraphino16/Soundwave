@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User } from '../entities/user.entity';
 import { UserRole } from '../../config/user.config';
 import { UserErrors } from '../errors/user.errors';
+import { CreateUserDto } from '../dto/create-user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -14,40 +15,10 @@ export class UserRepository {
     return lastUser ? lastUser.id + 1 : 1;
   }
 
-  async create(
-    id: number,
-    email: string,
-    password: string,
-    pseudo: string,
-    username: string,
-    birthdate: Date | null,
-    googleId?: string,
-    facebookId?: string,
-    twitterId?: string,
-    deezerId?: string,
-    spotifyId?: string,
-    roles?: string[],
-    verification_token?: string,
-    is_verified: boolean = false,
-    is_active: boolean = true,
-  ): Promise<User> {
-    return await this.userModel.create({
-      id,
-      email,
-      password,
-      pseudo,
-      username,
-      birthdate,
-      googleId,
-      facebookId,
-      twitterId,
-      deezerId,
-      spotifyId,
-      roles,
-      verification_token,
-      is_verified,
-      is_active,
-      createdAt: new Date(),
+  async create(userData: Partial<CreateUserDto>): Promise<User> {
+    return this.userModel.create({
+      ...userData,
+      createdAt: userData.createdAt ?? new Date(),
       updatedAt: new Date(),
     });
   }
@@ -58,6 +29,11 @@ export class UserRepository {
   async findByUsername(username: string): Promise<User | null> {
     return this.userModel.findOne({ username }).exec();
   }
+
+  async findBySpotifyId(spotifyId: string): Promise<User | null> {
+    return this.userModel.findOne({ spotifyId }).exec();
+  }
+
   async findById(id: number): Promise<User | null> {
     return this.userModel.findOne({ id }).exec();
   }
@@ -124,4 +100,38 @@ export class UserRepository {
     user.updatedAt = new Date();
     return user.save();
   }
+
+  async save(user: User): Promise<User> {
+    return user.save();
+  }
+
+  async deleteById(userId: number): Promise<User | null> {
+    return this.userModel.findOneAndDelete({ id: userId }).exec();
+  }
+
+  async searchUsers(query: string, limit: number = 10): Promise<User[]> {
+    const searchRegex = new RegExp(query, 'i');
+    return this.userModel
+      .find({
+        $or: [
+          { username: searchRegex },
+          { pseudo: searchRegex },
+          { email: searchRegex }
+        ],
+        is_active: true
+      })
+      .limit(limit)
+      .select('id username pseudo email is_verified')
+      .exec();
+  }
+
+  async findPopularUsers(limit: number = 10): Promise<User[]> {
+    return this.userModel
+      .find({ is_active: true })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .select('id username pseudo email is_verified')
+      .exec();
+  }
+
 }

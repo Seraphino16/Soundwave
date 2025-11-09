@@ -1,11 +1,3 @@
-/**
- * @description Liens cliquables de la barre de navigation et du pied de page du site SoundWave
- * @param {string} text - Texte à afficher dans l'élément de navigation
- * @param {string} href - URL vers laquelle l'élément de navigation pointe
- * @param {function} [onClick] - Fonction à appeler lors du clic sur l'élément de navigation
- * @param {JSX.Element} [icon] - Icône à afficher à côté du texte
- */
-
 import React, { JSX } from 'react';
 import { Link } from 'react-router-dom';
 import "../../assets/styles/Navbar.css";

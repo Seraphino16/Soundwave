@@ -5,7 +5,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { MailerService } from './mailer/mailer.service';
-import { MailerController } from './mailer/mailer.controller';
 import { MailerModule } from './mailer/mailer.module';
 import { TokenModule } from './token/token.module';
 import { SpotifyService } from './spotify/spotify.service';
@@ -16,6 +15,13 @@ import { UploadsService } from './uploads/uploads.service';
 import { UploadsController } from './uploads/uploads.controller';
 import { UploadsModule } from './uploads/uploads.module';
 import { SpotifyModule } from './spotify/spotify.module';
+import { GoogleService } from './google/google.service';
+import { GoogleController } from './google/google.controller';
+import { GoogleModule } from './google/google.module';
+import { UtilsModule } from './utils/utils.module';
+import { RatingsModule } from './ratings/ratings.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { WavesModule } from './waves/waves.module';
 
 @Module({
   imports: [
@@ -33,14 +39,25 @@ import { SpotifyModule } from './spotify/spotify.module';
     AuthModule,
     UploadsModule,
     SpotifyModule,
+    GoogleModule,
+    UtilsModule,
+    RatingsModule,
+    ReviewsModule,
+    WavesModule,
   ],
   controllers: [
     AppController,
-    MailerController,
     SpotifyController,
     AuthController,
     UploadsController,
+    GoogleController,
   ],
-  providers: [AppService, MailerService, SpotifyService, UploadsService],
+  providers: [
+    AppService,
+    MailerService,
+    SpotifyService,
+    UploadsService,
+    GoogleService,
+  ],
 })
 export class AppModule {}

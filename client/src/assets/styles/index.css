@@ -26,3 +26,22 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* === Scrollbar transparente pour la section Albums === */
+.scrollbar-transparent::-webkit-scrollbar {
+    height: 8px;
+}
+
+.scrollbar-transparent::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-transparent::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+
+.scrollbar-transparent {
+    scrollbar-color: transparent transparent;
+}
+
+

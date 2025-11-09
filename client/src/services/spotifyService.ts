@@ -30,7 +30,7 @@ export const fetchArtists = async () => {
         if (!response.ok) throw new Error("Erreur lors de la récupération des artistes");
 
         const data = await response.json();
-        return { artists: data.artists };
+        return { artists: data.artists ?? [] };
     } catch (error) {
         console.error(error);
         return { artists: [] };
@@ -47,5 +47,72 @@ export const fetchArtistById = async (id: string) => {
     } catch (error) {
         console.error(error);
         return null;
+    }
+};
+
+export const fetchAlbumsByArtistId = async (artistId: string) => {
+    try {
+        const response = await fetch(`http://localhost:5001/artist/${artistId}/albums`);
+        if (!response.ok) throw new Error("Erreur lors de la récupération des albums de l'artiste");
+
+        const data = await response.json();
+        return { albums: data.albums ?? [] };
+    } catch (error) {
+        console.error("Erreur frontend fetchAlbumsByArtistId:", error);
+        return { albums: [] };
+    }
+};
+
+export const searchAlbums = async (filters: { name?: string; year?: string; }) => {
+    const query = new URLSearchParams();
+
+    if (filters.name) query.append("name", filters.name);
+    if (filters.year) query.append("year", filters.year);
+
+    try {
+        const response = await fetch(`http://localhost:5001/albums/search?${query.toString()}`);
+        if (!response.ok) throw new Error("Erreur lors de la recherche des albums");
+
+        const data = await response.json();
+        return { albums: data.albums ?? [] };
+    } catch (error) {
+        console.error(error);
+        return { albums: [] };
+    }
+};
+
+export const searchArtists = async (filters: { name?: string; genre?: string }) => {
+    const params = new URLSearchParams();
+
+    if (filters.name) params.append("name", filters.name);
+    if (filters.genre) params.append("genre", filters.genre);
+
+    try {
+        const response = await fetch(`http://localhost:5001/artists/search?${params.toString()}`);
+        if (!response.ok) throw new Error("Erreur lors de la recherche des artistes");
+
+        const data = await response.json();
+
+        return {
+            artists: data.artists ?? [],
+        };
+    } catch (error) {
+        console.error("Erreur frontend searchArtists:", error);
+        return { artists: [] };
+    }
+};
+
+export const fetchAlbumsWithTracksByArtistId = async (artistId: string) => {
+    try {
+        const response = await fetch(`http://localhost:5001/artist/${artistId}/albums-with-tracks`);
+        if (!response.ok) throw new Error("Erreur lors de la récupération des albums avec pistes");
+
+        const data = await response.json();
+        return {
+            albums: data.albums ?? [],
+        };
+    } catch (error) {
+        console.error("Erreur frontend fetchAlbumsWithTracksByArtistId:", error);
+        return { albums: [] };
     }
 };

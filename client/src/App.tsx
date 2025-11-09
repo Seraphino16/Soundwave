@@ -9,6 +9,14 @@ import Navbar from "./components/header/Navbar";
 import Auth from './pages/Auth';
 import ArtistDetail from "pages/ArtistDetails";
 import HomeLoggedOff from 'pages/HomeLoggedOff';
+import EmailAlreadyExists from "./pages/EmailAlreadyExists";
+import AdminPanel from './pages/AdminPanel';
+import UserManagement from './pages/UserManagement';
+import AdminDashboard from './pages/AdminDashboard';
+import Events from './pages/Events';
+import Footer from "./components/footer/Footer";
+import Settings from "pages/Settings";
+import UserProfile from './pages/UserProfile';
 
 export default function App() {
   return (
@@ -25,8 +33,17 @@ export default function App() {
             <Route path="/artists/:id" element={<ArtistDetail />} />
             <Route path="/alert" element={<AlertTestPage />} />
             <Route path="/auth" element={<Auth />} /> 
+            <Route path="/error-email-already-exists" element={<EmailAlreadyExists />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/profile/:userId" element={<UserProfile />} />
           </Routes>
         </div>
+        <Footer />
       </div>
     </Router>
   );

@@ -1,8 +1,3 @@
-/**
- * @description Barre de navigation du site SoundWave
- * @author SoundWave
- * */
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavbarItem from "../utils/NavItem";
@@ -10,7 +5,9 @@ import "../../assets/styles/Navbar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import SearchBar from "../searchBar/SearchBar";
-import { MessagesIcon, ProfileIcon, SettingsIcon, BurgerMenuIcon } from "../utils/Icons";
+import {MessagesIcon, ProfileIcon, SettingsIcon, BurgerMenuIcon, LogoutIcon} from "../utils/Icons";
+import AdminButton from "./AdminButton";
+import { useUserContext } from "../../context/UserContext";
 
 interface NavItem {
     text: string;
@@ -19,7 +16,7 @@ interface NavItem {
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [user, setUser] = useState<{ pseudo: string; username: string } | null>(null);
+    const { user, loading, logout } = useUserContext();
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
     const location = useLocation();
@@ -29,21 +26,14 @@ const Navbar = () => {
         closeMenu();
     }, [location]);
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            const parsedData = JSON.parse(storedUser);
-            const userData = parsedData.user;
-            if (userData && userData.pseudo && userData.username) {
-                setUser({ pseudo: userData.pseudo, username: userData.username });
-            }
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate("/auth");
+        } catch (error) {
+            console.error("Erreur lors de la déconnexion:", error);
+            navigate("/auth");
         }
-    }, []);
-
-    const handleLogout = () => {
-        localStorage.removeItem("user");
-        setUser(null);
-        navigate("/auth");
     };
 
     const navItems: NavItem[] = [
@@ -55,20 +45,35 @@ const Navbar = () => {
     const isAuthRoute = location.pathname.startsWith("/auth");
     const isGuestPage = location.pathname === "/";
 
+    const mockUser = {
+        _id: "1",
+        id: 1,
+        pseudo: "Alex Martin",
+        username: "music_lover_2024",
+        email: "alex@example.com",
+        birthdate: "1990-01-01",
+        roles: ["user"],
+        is_verified: true,
+        is_active: true,
+        createdAt: "2023-03-15T10:00:00Z",
+        updatedAt: "2024-08-01T12:00:00Z",
+        verification_token: "",
+    };
+
+    const effectiveUser = user || mockUser;
+    const shouldShowUserInfo = !loading && effectiveUser;
+
     return (
         <div className="fixed top-0 w-full flex justify-center z-10">
             <nav className="w-full lg:w-[95%] flex items-center bg-white justify-between py-4 xl:px-4 font-inter shadow-md lg:rounded-b-xl z-10">
-                {/* Logo */}
                 <div className="flex items-center space-x-2">
-                    <Link to={user ? "/home" : "/"}>
+                    <Link to={effectiveUser ? "/home" : "/"}>
                         <img src={logo} alt="Logo" className="w-16 h-16" />
                     </Link>
                     <span className="text-2xl md:text-3xl lg:text-4xl mt-6 hover:text-text-200 font-site-name text-primaryBlue">
-                        SoundWave
-                    </span>
+            SoundWave
+          </span>
                 </div>
-
-                {/* If on the guest homepage, show "Sign Up" and "Login" */}
                 {isGuestPage ? (
                     <div className="hidden lg:flex space-x-6 items-center">
                         <Link
@@ -93,32 +98,33 @@ const Navbar = () => {
                         </div>
                     )
                 )}
-
                 {!isAuthRoute && !isGuestPage && (
                     <div className="hidden lg:flex space-x-6 mx-2 items-center">
-                        <a href="#" className="hover:opacity-80 transition-opacity">
+                        <button className="hover:opacity-80 transition-opacity">
                             <MessagesIcon />
-                        </a>
-                        <a href="#" className="hover:opacity-80 transition-opacity">
+                        </button>
+                        <Link to="/profile" className="hover:opacity-80 transition-opacity" title="Mon profil">
                             <ProfileIcon />
-                        </a>
-                        {user && (
-                            <div className="flex items-center space-x-4 ml-4">
-                                <div className="flex flex-col items-end">
-                                    <span className="text-lg font-semibold">{user.pseudo}</span>
-                                    <span className="text-sm text-gray-500">@{user.username}</span>
-                                </div>
-                                <button
-                                    onClick={handleLogout}
-                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                                >
-                                    Déconnexion
-                                </button>
+                        </Link>
+                        <Link to="/settings?tab=settings" className="hover:opacity-80 transition-opacity">
+                            <SettingsIcon />
+                        </Link>
+                        <AdminButton />
+                        {shouldShowUserInfo && (
+                            <div className="flex flex-col items-end">
+                                <span className="text-lg font-semibold">{effectiveUser.pseudo}</span>
+                                <span className="text-sm text-gray-500">@{effectiveUser.username}</span>
                             </div>
                         )}
-                        <a href="#" className="hover:opacity-80 transition-opacity">
-                            <SettingsIcon />
-                        </a>
+                        {shouldShowUserInfo && (
+                            <button
+                                onClick={handleLogout}
+                                className="text-red-500 hover:text-red-600 transition-colors cursor-pointer"
+                                title="Déconnexion"
+                            >
+                                <LogoutIcon />
+                            </button>
+                        )}
                     </div>
                 )}
                 <div className="block lg:hidden">
@@ -156,32 +162,43 @@ const Navbar = () => {
                                             ))}
                                         </>
                                     )}
-                                    <div className="flex space-x-6 mt-4">
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
-                                            <MessagesIcon />
-                                        </a>
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
-                                            <ProfileIcon />
-                                        </a>
-                                        {user && (
-                                            <div className="flex items-center space-x-4 ml-4">
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-lg font-semibold">{user.pseudo}</span>
-                                                    <span className="text-sm text-gray-500">@{user.username}</span>
-                                                </div>
+
+
+                                    {shouldShowUserInfo && (
+                                        <div className="flex flex-col items-center space-y-4">
+                                            <div className="flex space-x-6">
+                                                <button className="hover:opacity-80 transition-opacity">
+                                                    <MessagesIcon />
+                                                </button>
+                                                <Link to="/profile" className="hover:opacity-80 transition-opacity">
+                                                    <ProfileIcon />
+                                                </Link>
+                                                <Link to="/settings" className="hover:opacity-80 transition-opacity">
+                                                    <SettingsIcon />
+                                                </Link>
+                                                <AdminButton />
+                                            </div>
+
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-lg font-semibold">{effectiveUser.pseudo}</span>
+                                                <span className="text-sm text-gray-500">@{effectiveUser.username}</span>
+                                            </div>
+
+                                            <div className="flex space-x-2">
                                                 <button
                                                     onClick={handleLogout}
-                                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                                                    className="text-red-500 hover:text-red-600 transition-colors cursor-pointer"
+                                                    title="Déconnexion"
                                                 >
-                                                    Déconnexion
+                                                    <LogoutIcon />
                                                 </button>
                                             </div>
-                                        )}
-                                        <a href="#" className="hover:opacity-80 transition-opacity">
-                                            <SettingsIcon />
-                                        </a>
-                                    </div>
+                                        </div>
+                                    )}
+
+
                                     <SearchBar />
+
                                     {isGuestPage && (
                                         <>
                                             <Link
