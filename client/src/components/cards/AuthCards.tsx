@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AuthModals from "../modals/AuthModals";
-import { GoogleIcon, TwitterIcon, FacebookIcon, SpotifyIcon, DeezerIcon } from "../utils/Icons";
+import { SpotifyIcon } from "../utils/Icons";
 import { useNavigate } from "react-router-dom";
 
 import { API_URL } from '../../config/api';
@@ -53,25 +53,11 @@ export const LoginCard: React.FC = () => {
             CONNEXION
           </button>
           <div className="grid grid-cols-3 gap-2 md:flex md:justify-center md:space-x-6">
-            <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
-              <GoogleIcon />
-            </button>
-            <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
-              <TwitterIcon />
-            </button>
-            <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
-              <FacebookIcon />
-            </button>
-          </div>
-          <div className="col-span-3 flex justify-center lg:space-x-6 space-x-2">
             <button
               onClick={handleSpotifyLogin}
               className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer"
             >
               <SpotifyIcon />
-            </button>
-            <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
-              <DeezerIcon />
             </button>
           </div>
         </div>
@@ -119,25 +105,11 @@ export const RegisterCard: React.FC = () => {
             CRÉER UN COMPTE
           </button>
           <div className="grid grid-cols-3 gap-2 md:flex md:justify-center md:space-x-6">
-            <button className="bg-[#F5F5F5]/75 p-2 rounded flex cursor-pointer items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200">
-              <GoogleIcon />
-            </button>
-            <button className="bg-[#F5F5F5]/75 p-2 rounded flex cursor-pointer items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200">
-              <TwitterIcon />
-            </button>
-            <button className="bg-[#F5F5F5]/75 p-2 rounded flex cursor-pointer items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200">
-              <FacebookIcon />
-            </button>
-          </div>
-          <div className="col-span-3 flex justify-center lg:space-x-6 space-x-2">
-            <button
+             <button
               onClick={handleSpotifyRegister}
               className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer"
             >
               <SpotifyIcon />
-            </button>
-            <button className="bg-[#F5F5F5]/75 p-2 rounded flex items-center justify-center hover:bg-[#E0E0E0]/75 transition duration-200 cursor-pointer">
-              <DeezerIcon />
             </button>
           </div>
         </div>
