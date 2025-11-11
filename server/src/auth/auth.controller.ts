@@ -27,7 +27,6 @@ export class AuthController {
         path: '/',
       });
 
-
       return res.status(200).json({
         success: true,
         message: 'Connexion réussie',
@@ -76,7 +75,6 @@ export class AuthController {
 
   @Post('logout')
   logout(@Res() res) {
-
     res.clearCookie('token', {
       path: '/',
       httpOnly: true,

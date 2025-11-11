@@ -74,7 +74,9 @@ export class RatingsService {
       throw new NotFoundException('Note non trouvée');
     }
     if (rating.user_id !== userId) {
-      throw new ForbiddenException('Vous ne pouvez modifier que votre propre note');
+      throw new ForbiddenException(
+        'Vous ne pouvez modifier que votre propre note',
+      );
     }
 
     rating.score = score;
@@ -88,7 +90,9 @@ export class RatingsService {
       throw new NotFoundException('Note non trouvée');
     }
     if (rating.user_id !== userId) {
-      throw new ForbiddenException('Vous ne pouvez supprimer que votre propre note');
+      throw new ForbiddenException(
+        'Vous ne pouvez supprimer que votre propre note',
+      );
     }
 
     return rating.deleteOne();
@@ -97,7 +101,9 @@ export class RatingsService {
   private validateTargetType(type: string) {
     const allowed = ['artist', 'album'];
     if (!allowed.includes(type)) {
-      throw new BadRequestException(`Type de cible invalide. Doit être l'un de : ${allowed.join(', ')}`);
+      throw new BadRequestException(
+        `Type de cible invalide. Doit être l'un de : ${allowed.join(', ')}`,
+      );
     }
   }
 }

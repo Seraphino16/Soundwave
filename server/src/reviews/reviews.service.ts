@@ -69,7 +69,9 @@ export class ReviewsService {
     if (!review) throw new NotFoundException('Review non trouvée');
 
     if (review.user_id !== userId) {
-      throw new ConflictException('Vous ne pouvez modifier que vos propres reviews');
+      throw new ConflictException(
+        'Vous ne pouvez modifier que vos propres reviews',
+      );
     }
 
     review.message = message;
@@ -82,7 +84,9 @@ export class ReviewsService {
     if (!review) throw new NotFoundException('Review non trouvée');
 
     if (review.user_id !== userId) {
-      throw new ConflictException('Vous ne pouvez supprimer que vos propres reviews');
+      throw new ConflictException(
+        'Vous ne pouvez supprimer que vos propres reviews',
+      );
     }
 
     return review.deleteOne();
@@ -101,5 +105,4 @@ export class ReviewsService {
       .sort({ createdAt: -1 })
       .exec();
   }
-
 }

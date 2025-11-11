@@ -415,11 +415,15 @@ export class UserService {
       if (updateData.pseudo) {
         user.pseudo = updateData.pseudo;
       }
-      
+
       if (updateData.username) {
-        const existingUser = await this.userRepository.findByUsername(updateData.username);
+        const existingUser = await this.userRepository.findByUsername(
+          updateData.username,
+        );
         if (existingUser && existingUser.id !== userId) {
-          throw new BadRequestException('Ce nom d\'utilisateur est déjà utilisé');
+          throw new BadRequestException(
+            "Ce nom d'utilisateur est déjà utilisé",
+          );
         }
         user.username = updateData.username;
       }
@@ -428,32 +432,39 @@ export class UserService {
       await this.userRepository.save(user);
     }
 
-    if (updateData.bio !== undefined || updateData.location !== undefined || updateData.musicStyle !== undefined || updateData.profile_picture !== undefined || updateData.banner_picture !== undefined) {
+    if (
+      updateData.bio !== undefined ||
+      updateData.location !== undefined ||
+      updateData.musicStyle !== undefined ||
+      updateData.profile_picture !== undefined ||
+      updateData.banner_picture !== undefined
+    ) {
       const userInfosUpdateData: any = {};
-      
+
       if (updateData.bio !== undefined) {
         userInfosUpdateData.bio = updateData.bio;
       }
-      
+
       if (updateData.location !== undefined) {
         userInfosUpdateData.location = updateData.location;
       }
-      
+
       if (updateData.musicStyle !== undefined) {
         userInfosUpdateData.musicStyle = updateData.musicStyle;
       }
-      
+
       if (updateData.profile_picture !== undefined) {
         userInfosUpdateData.profile_picture = updateData.profile_picture;
       }
-      
+
       if (updateData.banner_picture !== undefined) {
         userInfosUpdateData.banner_picture = updateData.banner_picture;
       }
 
       userInfosUpdateData.updatedAt = new Date();
 
-      const existingUserInfos = await this.userInfosRepository.findByUserId(userId);
+      const existingUserInfos =
+        await this.userInfosRepository.findByUserId(userId);
       if (existingUserInfos) {
         await this.userInfosRepository.update(userId, userInfosUpdateData);
       } else {
@@ -467,7 +478,7 @@ export class UserService {
           location: updateData.location || '',
           musicStyle: updateData.musicStyle || [],
           socialLinks: {},
-          ...userInfosUpdateData
+          ...userInfosUpdateData,
         };
         await this.userInfosRepository.create(createUserInfosData);
       }
@@ -572,9 +583,11 @@ export class UserService {
 
   async searchUsers(query: string, limit: number = 10) {
     if (!query || query.trim().length < 2) {
-      throw new BadRequestException('La recherche doit contenir au moins 2 caractères');
+      throw new BadRequestException(
+        'La recherche doit contenir au moins 2 caractères',
+      );
     }
-    
+
     const users = await this.userRepository.searchUsers(query.trim(), limit);
     return this.enrichUsersWithProfile(users);
   }
@@ -585,18 +598,18 @@ export class UserService {
   }
 
   private async enrichUsersWithProfile(users: User[]): Promise<any[]> {
-    const userIds = users.map(user => user.id);
+    const userIds = users.map((user) => user.id);
     const userInfos = await this.userInfosRepository.findByUserIds(userIds);
 
-    const userInfosMap = new Map(userInfos.map(info => [info.user_id, info]));
-    return users.map(user => {
+    const userInfosMap = new Map(userInfos.map((info) => [info.user_id, info]));
+    return users.map((user) => {
       const infos = userInfosMap.get(user.id);
       return {
         id: user.id,
         username: user.username,
         pseudo: user.pseudo,
         profile_picture: infos?.profile_picture || null,
-        is_verified: user.is_verified
+        is_verified: user.is_verified,
       };
     });
   }

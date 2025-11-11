@@ -64,7 +64,9 @@ export class RatingsController {
   private validateTargetType(type: string) {
     const allowed = ['artist', 'album'];
     if (!allowed.includes(type)) {
-      throw new BadRequestException(`Invalid target_type. Must be one of: ${allowed.join(', ')}`);
+      throw new BadRequestException(
+        `Invalid target_type. Must be one of: ${allowed.join(', ')}`,
+      );
     }
   }
 }

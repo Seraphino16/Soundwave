@@ -34,6 +34,17 @@ export interface UserResponse {
   updatedAt: Date;
 }
 
+export interface UserListResponse {
+  users: UserResponse[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalUsers: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
 export const UserSchema = new Schema<User>(
   {
     id: {
