@@ -1,25 +1,27 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
+  Param,
+  Patch,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserListResponse } from '../user/entities/user.entity';
+import { UserListResponse, UserResponse } from '../user/entities/user.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles/roles.guard';
 import { Roles } from '../auth/decorator/roles.decorator';
 import { AdminService } from './admin.service';
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
 @Controller('admin')
 export class AdminController {
-  constructor(
-    private readonly adminService: AdminService,
-  ) {}
+  constructor(private readonly adminService: AdminService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
   @Get('users')
   async getAllUsers(
     @Query('page') page: string = '1',
@@ -46,7 +48,6 @@ export class AdminController {
         );
       }
 
-      // Construire les filtres
       const filters = {
         search,
         role: role ?? undefined,
@@ -67,6 +68,28 @@ export class AdminController {
         order,
         filters,
       );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Erreur lors de la récupération des utilisateurs',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Patch('users/:id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() adminUpdateUserDto: AdminUpdateUserDto,
+  ): Promise<UserResponse> {
+    try {
+      if (Number.isNaN(id)) {
+        throw new HttpException('ID non valide', HttpStatus.BAD_REQUEST);
+      }
+
+      return this.adminService.updateUser(Number(id), adminUpdateUserDto);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

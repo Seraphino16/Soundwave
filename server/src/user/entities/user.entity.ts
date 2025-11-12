@@ -26,7 +26,7 @@ export interface UserResponse {
   pseudo: string;
   username: string;
   email: string;
-  birthdate: Date;
+  birthdate?: Date;
   roles: UserRole[];
   is_verified: boolean;
   is_active: boolean;

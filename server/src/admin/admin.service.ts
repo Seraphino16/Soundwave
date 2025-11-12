@@ -1,4 +1,9 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import {
@@ -6,6 +11,7 @@ import {
   UserListResponse,
   UserResponse,
 } from '../user/entities/user.entity';
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 
 @Injectable()
 export class AdminService {
@@ -25,10 +31,8 @@ export class AdminService {
   ): Promise<UserListResponse> {
     const skip = (page - 1) * limit;
 
-    // Construction de la query de recherche
     const query: FilterQuery<User> = {};
 
-    // Recherche par texte (pseudo, email, username)
     if (filters.search) {
       query.$or = [
         { pseudo: { $regex: filters.search, $options: 'i' } },
@@ -37,7 +41,6 @@ export class AdminService {
       ];
     }
 
-    // Filtres supplémentaires
     if (filters.role) {
       query.roles = filters.role;
     }
@@ -50,22 +53,20 @@ export class AdminService {
       query.is_verified = filters.isVerified;
     }
 
-    // Construction du tri
     const sortOrder = order === 'asc' ? 1 : -1;
     const sortOptions: any = { [sortBy]: sortOrder };
 
     try {
-      // Exécution des requêtes en parallèle
       const [users, totalUsers] = await Promise.all([
         this.userModel
           .find(query)
-          .select('-password -verification_token') // Exclure les données sensibles
+          .select('-password -verification_token')
           .sort(sortOptions)
           .skip(skip)
           .limit(limit)
           .lean()
           .exec(),
-        this.userModel.countDocuments(query).exec(),
+        this.userModel.countDocuments().exec(),
       ]);
 
       const totalPages = Math.ceil(totalUsers / limit);
@@ -86,5 +87,24 @@ export class AdminService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async updateUser(
+    id: number,
+    adminUpdateUserDto: AdminUpdateUserDto,
+  ): Promise<UserResponse> {
+    const user = await this.userModel
+      .findOneAndUpdate({ id }, adminUpdateUserDto, {
+        new: true,
+        runValidators: true,
+      })
+      .lean<UserResponse>()
+      .exec();
+
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+
+    return user;
   }
 }

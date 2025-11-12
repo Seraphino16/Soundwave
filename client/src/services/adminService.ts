@@ -313,10 +313,7 @@ export const adminService = {
         });
 
         const data = await res.json();
-
-        console.log(data);
         return data;
-
     },
 
     getUserById: async (id: number) => {
@@ -338,37 +335,53 @@ export const adminService = {
     },
 
     updateUserRole: async (id: number, role: string) => {
-        await delay(400);
-        
-        const userIndex = mockUsers.findIndex(u => u.id === id);
-        if (userIndex === -1) {
-            throw new Error("Utilisateur introuvable");
+        const res = await fetch(`${API_CONFIG.BASE_URL}/admin/users/${id}`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                roles: [role]
+            }),
+        });
+
+        if (res.status !== 200) {
+            throw new Error(res.statusText);
         }
 
-        mockUsers[userIndex].roles = [role];
-        mockUsers[userIndex].updatedAt = new Date().toISOString();
+        const user = await res.json();
 
-        return {
-            message: 'Rôle utilisateur mis à jour avec succès',
-            user: mockUsers[userIndex],
-        };
+        if (!user) {
+            throw new Error("Erreur lors de la mise à jours du rôle");
+        }
+
+        return user;
     },
 
-    toggleUserStatus: async (id: number) => {
-        await delay(400);
-        
-        const userIndex = mockUsers.findIndex(u => u.id === id);
-        if (userIndex === -1) {
-            throw new Error("Utilisateur introuvable");
+    toggleUserStatus: async (id: number, status: boolean) => {
+        const res = await fetch(`${API_CONFIG.BASE_URL}/admin/users/${id}`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                is_active :status,
+            }),
+        });
+
+        if (res.status !== 200) {
+            throw new Error(res.statusText);
         }
 
-        mockUsers[userIndex].is_active = !mockUsers[userIndex].is_active;
-        mockUsers[userIndex].updatedAt = new Date().toISOString();
+        const user = await res.json();
 
-        return {
-            message: `Utilisateur ${mockUsers[userIndex].is_active ? 'activé' : 'désactivé'} avec succès`,
-            user: mockUsers[userIndex],
-        };
+        if (!user) {
+            throw new Error("Erreur lors de la mise à jours du statut");
+        }
+
+        return user;
     },
 
     deleteUser: async (id: number) => {

@@ -97,11 +97,17 @@ const UserManagement: React.FC = () => {
     if (!selectedUser || !newRole) return;
 
     try {
-      await adminService.updateUserRole(selectedUser.id, newRole);
+      const user = await adminService.updateUserRole(selectedUser.id, newRole);
       setShowRoleModal(false);
       setSelectedUser(null);
       setNewRole("");
-      fetchUsers();
+      if (user) {
+        setUsers(prevUsers => prevUsers.map(
+            (prevUser) => prevUser.id === user.id ? user : prevUser
+        ));
+      } else {
+        throw new Error("User not received");
+      }
       showAlert("success", "Succès", "Rôle mis à jour avec succès");
     } catch (error) {
       console.error("Error updating role:", error);
@@ -111,8 +117,16 @@ const UserManagement: React.FC = () => {
 
   const handleToggleStatus = async (user: User) => {
     try {
-      await adminService.toggleUserStatus(user.id);
-      fetchUsers();
+      const newActiveStatus = !user.is_active;
+
+      const newUser = await adminService.toggleUserStatus(user.id, newActiveStatus);
+      if (user) {
+        setUsers(prevUsers => prevUsers.map(
+            (prevUser) => prevUser.id === newUser.id ? newUser : prevUser
+        ));
+      } else {
+        throw new Error("User not received");
+      }
       showAlert("success", "Succès", `Utilisateur ${user.is_active ? "désactivé" : "activé"} avec succès`);
     } catch (error) {
       console.error("Error toggling status:", error);
@@ -340,11 +354,13 @@ const UserManagement: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              {user.is_active ? (
-                                  <FiToggleRight className="text-green-500 text-xl mr-2" />
-                              ) : (
-                                  <FiToggleLeft className="text-gray-400 text-xl mr-2" />
-                              )}
+                              <button
+                                  onClick={() => handleToggleStatus(user)}
+                                  className={`${user.is_active ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}`}
+                                  title={user.is_active ? "Désactiver" : "Activer"}
+                              >
+                                {user.is_active ? <FiToggleRight className="text-green-500 text-xl mr-2"/> : <FiToggleLeft className="text-gray-400 text-xl mr-2" />}
+                              </button>
                               <span className={`text-sm ${user.is_active ? "text-green-600" : "text-gray-500"}`}>
                             {user.is_active ? "Actif" : "Inactif"}
                           </span>
@@ -363,13 +379,6 @@ const UserManagement: React.FC = () => {
                                   title="Modifier le rôle"
                               >
                                 <FiEdit2 />
-                              </button>
-                              <button
-                                  onClick={() => handleToggleStatus(user)}
-                                  className={`${user.is_active ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}`}
-                                  title={user.is_active ? "Désactiver" : "Activer"}
-                              >
-                                {user.is_active ? <FiToggleLeft /> : <FiToggleRight />}
                               </button>
                               {!user.roles.includes("ADMIN") && (
                                   <>
