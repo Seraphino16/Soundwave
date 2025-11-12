@@ -22,6 +22,8 @@ import { UtilsModule } from './utils/utils.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { WavesModule } from './waves/waves.module';
+import { EventsModule } from './events/events.module';
+import { DiscussionsModule } from './discussions/discussions.module';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { WavesModule } from './waves/waves.module';
     RatingsModule,
     ReviewsModule,
     WavesModule,
+    EventsModule,
+    DiscussionsModule,
   ],
   controllers: [
     AppController,
