@@ -21,6 +21,11 @@ export const API_CONFIG = {
       PROFILE_PICTURE: (userId: number) => `/uploads/profile-picture/${userId}`,
       BANNER_PICTURE: (userId: number) => `/uploads/banner-picture/${userId}`,
     },
+      EVENTS: {
+          LIST: '/events',
+          DETAILS: (id: number) => `/events/${id}`,
+          ARTISTS: '/artists',
+      },
   },
 } as const;
 
