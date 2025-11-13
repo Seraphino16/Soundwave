@@ -49,6 +49,7 @@ export class WavesService {
       .limit(limit)
       .exec();
 
+
     const total = await this.waveModel.countDocuments({ visibility: true });
 
     const User = this.waveModel.db.collection('users');
