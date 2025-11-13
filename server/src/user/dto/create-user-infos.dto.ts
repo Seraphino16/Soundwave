@@ -11,7 +11,6 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserInfosDto {
-
   @ApiProperty()
   @IsInt()
   user_id: number;
@@ -46,7 +45,6 @@ export class CreateUserInfosDto {
   @IsOptional()
   @IsObject()
   socialLinks?: { [network: string]: string };
-
 
   @ApiProperty()
   @IsDate()

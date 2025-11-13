@@ -6,8 +6,10 @@ import { RatingSchema } from './rating.schema';
 import { TokenModule } from '../token/token.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'Rating', schema: RatingSchema }]),
-  TokenModule],
+  imports: [
+    MongooseModule.forFeature([{ name: 'Rating', schema: RatingSchema }]),
+    TokenModule,
+  ],
   providers: [RatingsService],
   controllers: [RatingsController],
 })

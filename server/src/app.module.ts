@@ -24,6 +24,11 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { WavesModule } from './waves/waves.module';
 import { EventsModule } from './events/events.module';
 import { DiscussionsModule } from './discussions/discussions.module';
+import { AdminController } from './admin/admin.controller';
+import { AdminService } from './admin/admin.service';
+import {UserSchema} from "./user/entities/user.entity";
+import {UserInfosSchema} from "./user/entities/user-infos.entity";
+import {UserSettingsSchema} from "./user/entities/user-settings.entity";
 
 @Module({
   imports: [
@@ -35,6 +40,7 @@ import { DiscussionsModule } from './discussions/discussions.module';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     UserModule,
     TokenModule,
     MailerModule,
@@ -55,6 +61,7 @@ import { DiscussionsModule } from './discussions/discussions.module';
     AuthController,
     UploadsController,
     GoogleController,
+    AdminController,
   ],
   providers: [
     AppService,
@@ -62,6 +69,7 @@ import { DiscussionsModule } from './discussions/discussions.module';
     SpotifyService,
     UploadsService,
     GoogleService,
+    AdminService,
   ],
 })
 export class AppModule {}

@@ -9,7 +9,12 @@ import {
   UseGuards,
   BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
 import { WavesService } from './waves.service';
 import { CreateWaveDto } from './dto/create-wave.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
@@ -25,37 +30,37 @@ export class WavesController {
   @ApiOperation({ summary: 'Créer une nouvelle wave' })
   @ApiOkResponse({ description: 'Wave créée avec succès' })
   @ApiBadRequestResponse({ description: 'Données invalides' })
-  async create(
-    @Body() createWaveDto: CreateWaveDto,
-    @CurrentUser() user: any,
-  ) {
+  async create(@Body() createWaveDto: CreateWaveDto, @CurrentUser() user: any) {
     return await this.wavesService.create(user.id, createWaveDto);
   }
 
   @Get('feed')
   @ApiOperation({ summary: 'Récupérer le feed de waves' })
   @ApiOkResponse({ description: 'Feed récupéré avec succès' })
-  async getFeed(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  async getFeed(@Query('page') page?: string, @Query('limit') limit?: string) {
     const pageNum = page ? parseInt(page, 10) : 1;
     const limitNum = limit ? parseInt(limit, 10) : 10;
 
     if (isNaN(pageNum) || pageNum < 1) {
-      throw new BadRequestException('Le numéro de page doit être un nombre positif');
+      throw new BadRequestException(
+        'Le numéro de page doit être un nombre positif',
+      );
     }
 
     if (isNaN(limitNum) || limitNum < 1 || limitNum > 50) {
-      throw new BadRequestException('La limite doit être un nombre entre 1 et 50');
+      throw new BadRequestException(
+        'La limite doit être un nombre entre 1 et 50',
+      );
     }
 
     return await this.wavesService.getFeed(pageNum, limitNum);
   }
 
   @Get('user/:userId')
-  @ApiOperation({ summary: 'Récupérer les waves d\'un utilisateur' })
-  @ApiOkResponse({ description: 'Waves de l\'utilisateur récupérées avec succès' })
+  @ApiOperation({ summary: "Récupérer les waves d'un utilisateur" })
+  @ApiOkResponse({
+    description: "Waves de l'utilisateur récupérées avec succès",
+  })
   async getUserWaves(
     @Param('userId') userId: string,
     @Query('page') page?: string,
@@ -77,7 +82,7 @@ export class WavesController {
   @ApiOkResponse({ description: 'Wave récupérée avec succès' })
   async findOne(@Param('id') id: string) {
     const waveId = parseInt(id, 10);
-    
+
     if (isNaN(waveId)) {
       throw new BadRequestException('ID de wave invalide');
     }
@@ -88,12 +93,9 @@ export class WavesController {
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer une wave' })
   @ApiOkResponse({ description: 'Wave supprimée avec succès' })
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser() user: any,
-  ) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
     const waveId = parseInt(id, 10);
-    
+
     if (isNaN(waveId)) {
       throw new BadRequestException('ID de wave invalide');
     }
@@ -107,7 +109,7 @@ export class WavesController {
   @ApiOkResponse({ description: 'Wave likée avec succès' })
   async like(@Param('id') id: string) {
     const waveId = parseInt(id, 10);
-    
+
     if (isNaN(waveId)) {
       throw new BadRequestException('ID de wave invalide');
     }
@@ -120,7 +122,7 @@ export class WavesController {
   @ApiOkResponse({ description: 'Wave unlikée avec succès' })
   async unlike(@Param('id') id: string) {
     const waveId = parseInt(id, 10);
-    
+
     if (isNaN(waveId)) {
       throw new BadRequestException('ID de wave invalide');
     }

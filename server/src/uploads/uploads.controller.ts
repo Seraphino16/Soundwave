@@ -22,9 +22,7 @@ export class UploadsController {
   ) {}
 
   @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('file')
-  )
+  @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
@@ -45,7 +43,12 @@ export class UploadsController {
     }
 
     const payload: any = this.tokenService.verifyToken(token);
-    const result = await this.uploadsService.processUserImage(payload.id, payload.username, 'profile', file);
+    const result = await this.uploadsService.processUserImage(
+      payload.id,
+      payload.username,
+      'profile',
+      file,
+    );
 
     return {
       message: 'Fichier uploadé avec succès',
@@ -81,7 +84,12 @@ export class UploadsController {
     }
 
     const payload: any = this.tokenService.verifyToken(token);
-    const result = await this.uploadsService.processUserImage(parseInt(userId), payload.username, 'profile', file);
+    const result = await this.uploadsService.processUserImage(
+      parseInt(userId),
+      payload.username,
+      'profile',
+      file,
+    );
 
     return {
       message: 'Photo de profil uploadée avec succès',
@@ -117,7 +125,12 @@ export class UploadsController {
     }
 
     const payload: any = this.tokenService.verifyToken(token);
-    const result = await this.uploadsService.processUserImage(parseInt(userId), payload.username, 'banner', file);
+    const result = await this.uploadsService.processUserImage(
+      parseInt(userId),
+      payload.username,
+      'banner',
+      file,
+    );
 
     return {
       message: 'Bannière uploadée avec succès',
