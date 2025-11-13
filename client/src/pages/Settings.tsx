@@ -6,10 +6,6 @@ import { BurgerMenuIcon } from "../components/utils/Icons";
 import Meta from "../components/utils/Meta";
 
 import EditProfileTab from "../components/settingsPage/EditProfileTab";
-import FollowFollowersTab from "../components/settingsPage/FollowFollowersTab";
-import ListTab from "../components/settingsPage/ListTab";
-import GroupsTab from "../components/settingsPage/GroupsTab";
-import SettingsTab from "../components/settingsPage/SettingsTab";
 import ThirdPartyAccountsTab from "../components/settingsPage/ThirdPartyAccountsTab";
 import LogoutSection from "../components/settingsPage/LogoutSection";
 
@@ -36,10 +32,6 @@ const Settings: React.FC = () => {
 
   const menuItems: MenuItem[] = [
     { id: "profile", label: "Profil", icon: "👤", component: EditProfileTab },
-    { id: "follow", label: "Abonnements/Abonnés", icon: "👥", component: FollowFollowersTab },
-    { id: "lists", label: "Listes", icon: "📋", component: ListTab },
-    { id: "groups", label: "Groupes", icon: "👥", component: GroupsTab },
-    { id: "settings", label: "Paramètres généraux", icon: "⚙️", component: SettingsTab },
     { id: "accounts", label: "Comptes tiers", icon: "🔗", component: ThirdPartyAccountsTab },
     { id: "logout", label: "Déconnexion", icon: "🚪", component: LogoutSection },
   ];
