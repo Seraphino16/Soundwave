@@ -23,7 +23,6 @@ import { RatingsModule } from './ratings/ratings.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { WavesModule } from './waves/waves.module';
 import { EventsModule } from './events/events.module';
-import { DiscussionsModule } from './discussions/discussions.module';
 import { AdminController } from './admin/admin.controller';
 import { AdminService } from './admin/admin.service';
 import {UserSchema} from "./user/entities/user.entity";
@@ -53,7 +52,6 @@ import {UserSettingsSchema} from "./user/entities/user-settings.entity";
     ReviewsModule,
     WavesModule,
     EventsModule,
-    DiscussionsModule,
   ],
   controllers: [
     AppController,
