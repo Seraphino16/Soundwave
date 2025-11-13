@@ -347,7 +347,7 @@ export class UserController {
     params.set('client_id', process.env.GOOGLE_CLIENT_ID);
     params.set(
       'redirect_uri',
-      'http://localhost:5001/users/create/google/callback',
+      `${process.env.REACT_APP_API_BASE_URL}/users/create/google/callback`,
     );
     params.set('response_type', 'code');
     params.set('scope', 'openid email profile');

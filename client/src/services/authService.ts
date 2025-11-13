@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5001";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 export const registerUser = async (userData: any) => {
     try {
@@ -22,7 +22,7 @@ export const registerUser = async (userData: any) => {
 };
 
 export const loginUser = async (loginData: any) => {
-    try {        
+    try {
         const response = await fetch(`${API_URL}/auth`, {
             method: "POST",
             headers: {

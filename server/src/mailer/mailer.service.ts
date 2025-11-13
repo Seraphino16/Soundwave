@@ -26,7 +26,7 @@ export class MailerService {
     username,
     token,
   }: SendValidationEmailParams): Promise<MailerSuccess | MailerErrors> {
-    const validationLink = `http://localhost:5001/users/validate?token=${token}`;
+    const validationLink = `${process.env.REACT_APP_API_BASE_URL}/users/validate?token=${token}`;
 
     const html = this.loadTemplate('account-validation', {
       username,

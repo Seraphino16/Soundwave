@@ -1,6 +1,6 @@
 export const fetchAlbums = async () => {
     try {
-        const response = await fetch(`http://localhost:5001/albums`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/albums`);
         if (!response.ok) throw new Error("Erreur lors de la récupération des albums");
 
         const data = await response.json();
@@ -13,7 +13,7 @@ export const fetchAlbums = async () => {
 
 export const fetchAlbumById = async (id: string) => {
     try {
-        const response = await fetch(`http://localhost:5001/album/${id}`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/album/${id}`);
         if (!response.ok) throw new Error("Erreur lors de la récupération de l'album");
 
         const data = await response.json();
@@ -26,7 +26,7 @@ export const fetchAlbumById = async (id: string) => {
 
 export const fetchArtists = async () => {
     try {
-        const response = await fetch(`http://localhost:5001/artists`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/artists`);
         if (!response.ok) throw new Error("Erreur lors de la récupération des artistes");
 
         const data = await response.json();
@@ -39,7 +39,7 @@ export const fetchArtists = async () => {
 
 export const fetchArtistById = async (id: string) => {
     try {
-        const response = await fetch(`http://localhost:5001/artist/${id}`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/artist/${id}`);
         if (!response.ok) throw new Error("Erreur lors de la récupération de l'artiste");
 
         const data = await response.json();
@@ -52,7 +52,7 @@ export const fetchArtistById = async (id: string) => {
 
 export const fetchAlbumsByArtistId = async (artistId: string) => {
     try {
-        const response = await fetch(`http://localhost:5001/artist/${artistId}/albums`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/artist/${artistId}/albums`);
         if (!response.ok) throw new Error("Erreur lors de la récupération des albums de l'artiste");
 
         const data = await response.json();
@@ -70,7 +70,7 @@ export const searchAlbums = async (filters: { name?: string; year?: string; }) =
     if (filters.year) query.append("year", filters.year);
 
     try {
-        const response = await fetch(`http://localhost:5001/albums/search?${query.toString()}`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/albums/search?${query.toString()}`);
         if (!response.ok) throw new Error("Erreur lors de la recherche des albums");
 
         const data = await response.json();
@@ -88,7 +88,7 @@ export const searchArtists = async (filters: { name?: string; genre?: string }) 
     if (filters.genre) params.append("genre", filters.genre);
 
     try {
-        const response = await fetch(`http://localhost:5001/artists/search?${params.toString()}`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/artists/search?${params.toString()}`);
         if (!response.ok) throw new Error("Erreur lors de la recherche des artistes");
 
         const data = await response.json();
@@ -104,7 +104,7 @@ export const searchArtists = async (filters: { name?: string; genre?: string }) 
 
 export const fetchAlbumsWithTracksByArtistId = async (artistId: string) => {
     try {
-        const response = await fetch(`http://localhost:5001/artist/${artistId}/albums-with-tracks`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/artist/${artistId}/albums-with-tracks`);
         if (!response.ok) throw new Error("Erreur lors de la récupération des albums avec pistes");
 
         const data = await response.json();

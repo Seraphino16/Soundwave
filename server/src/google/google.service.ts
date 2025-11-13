@@ -14,7 +14,7 @@ export class GoogleService {
           code,
           client_id: process.env.GOOGLE_CLIENT_ID!,
           client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-          redirect_uri: 'http://localhost:5001/users/create/google/callback',
+          redirect_uri: `${process.env.REACT_APP_API_BASE_URL}/users/create/google/callback`,
           grant_type: 'authorization_code',
         }),
         {
@@ -56,7 +56,7 @@ export class GoogleService {
           code,
           client_id: process.env.GOOGLE_CLIENT_ID!,
           client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-          redirect_uri: 'http://localhost:5001/auth/google/callback',
+          redirect_uri: `${process.env.REACT_APP_API_BASE_URL}/auth/google/callback`,
           grant_type: 'authorization_code',
         }),
         {

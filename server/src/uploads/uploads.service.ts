@@ -59,7 +59,7 @@ export class UploadsService {
   }
 
   getFileUrl(filename: string, subdir?: string): string {
-    const base = 'http://localhost:5001/uploads';
+    const base = `${process.env.REACT_APP_API_BASE_URL}/uploads`;
     return subdir ? `${base}/${subdir}/${filename}` : `${base}/${filename}`;
   }
 

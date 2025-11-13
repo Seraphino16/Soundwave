@@ -40,7 +40,7 @@ const RatingSection: React.FC<RatingSectionProps> = ({ targetType, targetId }) =
     useEffect(() => {
         const fetchAllData = async () => {
             try {
-                const res = await fetch("http://localhost:5001/users/me", {
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/me`, {
                     credentials: "include",
                 });
                 if (!res.ok) return;
