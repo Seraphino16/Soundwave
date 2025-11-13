@@ -85,9 +85,6 @@ const Navbar = () => {
                 )}
                 {!isAuthRoute && !isGuestPage && (
                     <div className="hidden lg:flex space-x-6 mx-2 items-center">
-                        <button className="hover:opacity-80 transition-opacity">
-                            <MessagesIcon />
-                        </button>
                         <Link to="/profile" className="hover:opacity-80 transition-opacity" title="Mon profil">
                             <ProfileIcon />
                         </Link>

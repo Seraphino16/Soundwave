@@ -105,7 +105,6 @@ const UserProfilePage: React.FC = () => {
   };
 
   const handleLike = (waveId: number) => console.log("Like wave:", waveId);
-  const handleComment = (waveId: number) => console.log("Comment wave:", waveId);
 
   const handleCreateWave = async (content: string) => {
     try {
@@ -341,7 +340,7 @@ const UserProfilePage: React.FC = () => {
                       {waves
                         .filter((wave) => wave.user)
                         .map((wave) => (
-                          <FeedWaveCard key={wave.id} wave={wave} onLike={handleLike} onComment={handleComment} onDelete={handleDelete} />
+                          <FeedWaveCard key={wave.id} wave={wave} onLike={handleLike} onDelete={handleDelete} />
                         ))}
                     </div>
                   ) : (
