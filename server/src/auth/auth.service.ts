@@ -49,6 +49,7 @@ export class AuthService {
       username: user.username,
       id: user.id,
       email: user.email,
+      roles: user.roles,
     });
 
     const userWithoutPassword = { ...user.toObject(), password: undefined };

@@ -44,10 +44,7 @@ export class SpotifyController {
   }
 
   @Get('artists/search')
-  searchArtists(
-    @Query('name') name?: string,
-    @Query('genre') genre?: string,
-  ) {
+  searchArtists(@Query('name') name?: string, @Query('genre') genre?: string) {
     return this.spotifyService.searchArtists({ name, genre });
   }
 }

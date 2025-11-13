@@ -17,15 +17,12 @@ export const registerUser = async (userData: any) => {
 
         return response.json();
     } catch (error) {
-        console.log("Register Error:", error);
         throw error;
     }
 };
 
 export const loginUser = async (loginData: any) => {
-    try {
-        console.log("Tentative de connexion avec:", loginData);
-        
+    try {        
         const response = await fetch(`${API_URL}/auth`, {
             method: "POST",
             headers: {
@@ -35,15 +32,12 @@ export const loginUser = async (loginData: any) => {
             body: JSON.stringify(loginData),
         });
 
-        console.log("Réponse de connexion - Status:", response.status);
-
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || "Échec de la connexion de l'utilisateur");
         }
 
         const result = await response.json();
-        console.log("Connexion réussie:", result);
         
         return result;
     } catch (error) {

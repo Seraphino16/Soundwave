@@ -53,5 +53,5 @@ export const ReviewSchema = new Schema<Review>(
 
 ReviewSchema.index(
   { target_type: 1, target_id: 1, user_id: 1 },
-  { unique: true }
+  { unique: true },
 );

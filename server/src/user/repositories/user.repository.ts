@@ -116,9 +116,9 @@ export class UserRepository {
         $or: [
           { username: searchRegex },
           { pseudo: searchRegex },
-          { email: searchRegex }
+          { email: searchRegex },
         ],
-        is_active: true
+        is_active: true,
       })
       .limit(limit)
       .select('id username pseudo email is_verified')
@@ -133,5 +133,4 @@ export class UserRepository {
       .select('id username pseudo email is_verified')
       .exec();
   }
-
 }

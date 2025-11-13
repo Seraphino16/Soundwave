@@ -27,8 +27,6 @@ export class AuthController {
         path: '/',
       });
 
-      console.log('Cookie set for token:', loginResponse.token);
-
       return res.status(200).json({
         success: true,
         message: 'Connexion réussie',
@@ -69,7 +67,6 @@ export class AuthController {
         maxAge: 60 * 60 * 24 * 7 * 1000,
         path: '/',
       });
-      console.log('Cookie set for token:', loginResponse.token);
       return res.redirect('http://localhost:3000/home');
     } catch (error) {
       return res.redirect('http://localhost:3000/error');
@@ -78,16 +75,12 @@ export class AuthController {
 
   @Post('logout')
   logout(@Res() res) {
-    console.log('Déconnexion demandée');
-
     res.clearCookie('token', {
       path: '/',
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
     });
-
-    console.log('Cookie token supprimé');
 
     return res.status(200).json({
       success: true,
