@@ -5,7 +5,7 @@ export class CreateWaveDto {
   @ApiProperty({
     description: 'Le contenu de la wave',
     example: 'Je viens de découvrir ce super album! 🎵',
-    maxLength: 500
+    maxLength: 500,
   })
   @IsNotEmpty({ message: 'Le contenu ne peut pas être vide' })
   @IsString()

@@ -23,9 +23,7 @@ export interface ChangePasswordResponse {
 
 export class EditProfileTabService {
   static async deleteAccount(userId: number): Promise<DeleteAccountResponse> {
-    try {
-      console.log("Tentative de suppression pour l'utilisateur:", userId);
-      
+    try {      
       const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
         method: "DELETE",
         credentials: "include",
@@ -33,8 +31,6 @@ export class EditProfileTabService {
           "Content-Type": "application/json",
         },
       });
-
-      console.log("Réponse de l'API:", response.status, response.statusText);
 
       if (response.ok) {
         return {
@@ -85,7 +81,6 @@ export class EditProfileTabService {
   }
   static async changePassword(userId: number, passwordData: ChangePasswordRequest): Promise<ChangePasswordResponse> {
     try {
-      console.log("Tentative de changement de mot de passe pour l'utilisateur:", userId);
       
       const response = await fetch(`${API_BASE_URL}/users/${userId}/password`, {
         method: "PATCH",

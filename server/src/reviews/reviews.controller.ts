@@ -25,7 +25,8 @@ export class ReviewsController {
 
     const userId = req.user.id;
     const username = req.user.username;
-    const profile_picture = req.user.profile_picture || 'https://via.placeholder.com/50';
+    const profile_picture =
+      req.user.profile_picture || 'https://via.placeholder.com/50';
 
     return this.reviewsService.create(dto, userId, username, profile_picture);
   }
@@ -47,7 +48,11 @@ export class ReviewsController {
     @Req() req,
   ) {
     this.validateTargetType(targetType);
-    return this.reviewsService.findUserReview(targetType, targetId, req.user.id);
+    return this.reviewsService.findUserReview(
+      targetType,
+      targetId,
+      req.user.id,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -69,7 +74,9 @@ export class ReviewsController {
   private validateTargetType(type: string) {
     const allowed = ['artist', 'album'];
     if (!allowed.includes(type)) {
-      throw new BadRequestException(`Type de cible invalide. Utilisez "artist" ou "album".`);
+      throw new BadRequestException(
+        `Type de cible invalide. Utilisez "artist" ou "album".`,
+      );
     }
   }
 
@@ -78,5 +85,4 @@ export class ReviewsController {
   async findAllMyReviews(@Req() req) {
     return this.reviewsService.findAllByUser(req.user.id);
   }
-
 }

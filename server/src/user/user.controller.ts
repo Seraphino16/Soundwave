@@ -16,7 +16,7 @@ import {
   NotFoundException,
   UseGuards,
   Delete,
-  Req
+  Req,
 } from '@nestjs/common';
 import { UserErrors } from './errors/user.errors';
 import { UserSuccess } from './success/user.success';
@@ -106,6 +106,7 @@ export class UserController {
         email: createUserDto.email,
         username: createUserDto.username,
         id: userId,
+        roles: createUserDto.roles,
       });
 
       await this.userService.saveValidationToken(userId, activationToken);
@@ -392,7 +393,7 @@ export class UserController {
   async updateUserProfile(
     @Param('userId') userId: number,
     @Body() updateData: any,
-    @Req() req: any
+    @Req() req: any,
   ) {
     try {
       const token = req.cookies?.token;
@@ -414,10 +415,14 @@ export class UserController {
       if (decoded.id !== Number(userId)) {
         throw new BadRequestException('Vous ne pouvez pas modifier ce profil');
       }
-      
+
       return await this.userService.updateUserProfile(userId, updateData);
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) throw error;
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      )
+        throw error;
       throw new InternalServerErrorException(
         'Erreur lors de la mise à jour du profil',
       );
@@ -461,10 +466,7 @@ export class UserController {
   @Get('/search')
   @ApiOperation({ summary: 'Rechercher des utilisateurs' })
   @ApiOkResponse({ description: 'Liste des utilisateurs trouvés' })
-  async searchUsers(
-    @Query('q') query: string,
-    @Query('limit') limit?: number,
-  ) {
+  async searchUsers(@Query('q') query: string, @Query('limit') limit?: number) {
     return await this.userService.searchUsers(query, limit || 10);
   }
 

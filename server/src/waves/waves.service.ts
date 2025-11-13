@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Wave } from './entities/wave.entity';
@@ -18,7 +22,7 @@ export class WavesService {
 
   async create(userId: number, createWaveDto: CreateWaveDto): Promise<Wave> {
     const id = await this.setId();
-    
+
     const wave = new this.waveModel({
       id,
       userId,
@@ -32,7 +36,10 @@ export class WavesService {
     return await wave.save();
   }
 
-  async getFeed(page: number = 1, limit: number = 10): Promise<{ waves: any[], total: number }> {
+  async getFeed(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ waves: any[]; total: number }> {
     const skip = (page - 1) * limit;
 
     const waves = await this.waveModel
@@ -42,23 +49,33 @@ export class WavesService {
       .limit(limit)
       .exec();
 
-    console.log('🌊 Waves brutes depuis MongoDB:', JSON.stringify(waves, null, 2));
-
     const total = await this.waveModel.countDocuments({ visibility: true });
 
     const User = this.waveModel.db.collection('users');
-    
-    const userIds = [...new Set(waves.map(w => {
-      const waveObj: any = w.toObject ? w.toObject() : w;
-      return waveObj.userId || waveObj.user_id || (Array.isArray(waveObj.user_id) ? waveObj.user_id[0] : null);
-    }).filter(Boolean))];    
+
+    const userIds = [
+      ...new Set(
+        waves
+          .map((w) => {
+            const waveObj: any = w.toObject ? w.toObject() : w;
+            return (
+              waveObj.userId ||
+              waveObj.user_id ||
+              (Array.isArray(waveObj.user_id) ? waveObj.user_id[0] : null)
+            );
+          })
+          .filter(Boolean),
+      ),
+    ];
     const users = await User.find({ id: { $in: userIds } }).toArray();
     const UserInfos = this.waveModel.db.collection('userinfos');
-    const userInfos = await UserInfos.find({ user_id: { $in: userIds } }).toArray();
+    const userInfos = await UserInfos.find({
+      user_id: { $in: userIds },
+    }).toArray();
     const userInfosMap = new Map();
-    userInfos.forEach(ui => userInfosMap.set(ui.user_id, ui));
+    userInfos.forEach((ui) => userInfosMap.set(ui.user_id, ui));
     const userMap = new Map();
-    users.forEach(u => {
+    users.forEach((u) => {
       const userInfo = userInfosMap.get(u.id);
       userMap.set(u.id, {
         id: u.id,
@@ -66,12 +83,15 @@ export class WavesService {
         username: u.username,
         email: u.email,
         profile_picture: userInfo?.profile_picture || null,
-        is_verified: u.is_verified
+        is_verified: u.is_verified,
       });
     });
-    const mappedWaves = waves.map(wave => {
+    const mappedWaves = waves.map((wave) => {
       const waveObj: any = wave.toObject();
-      const actualUserId = waveObj.userId || waveObj.user_id || (Array.isArray(waveObj.user_id) ? waveObj.user_id[0] : null);
+      const actualUserId =
+        waveObj.userId ||
+        waveObj.user_id ||
+        (Array.isArray(waveObj.user_id) ? waveObj.user_id[0] : null);
       const userData = userMap.get(actualUserId);
       return {
         ...waveObj,
@@ -82,7 +102,11 @@ export class WavesService {
     return { waves: mappedWaves, total };
   }
 
-  async getUserWaves(userId: number, page: number = 1, limit: number = 10): Promise<{ waves: any[], total: number }> {
+  async getUserWaves(
+    userId: number,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ waves: any[]; total: number }> {
     const skip = (page - 1) * limit;
     const waves = await this.waveModel
       .find({ $or: [{ userId }, { user_id: userId }], visibility: true })
@@ -90,19 +114,34 @@ export class WavesService {
       .skip(skip)
       .limit(limit)
       .exec();
-    const total = await this.waveModel.countDocuments({ $or: [{ userId }, { user_id: userId }], visibility: true });
+    const total = await this.waveModel.countDocuments({
+      $or: [{ userId }, { user_id: userId }],
+      visibility: true,
+    });
     const User = this.waveModel.db.collection('users');
-    const userIds = [...new Set(waves.map(w => {
-      const waveObj: any = w.toObject ? w.toObject() : w;
-      return waveObj.userId || waveObj.user_id || (Array.isArray(waveObj.user_id) ? waveObj.user_id[0] : null);
-    }).filter(Boolean))];
+    const userIds = [
+      ...new Set(
+        waves
+          .map((w) => {
+            const waveObj: any = w.toObject ? w.toObject() : w;
+            return (
+              waveObj.userId ||
+              waveObj.user_id ||
+              (Array.isArray(waveObj.user_id) ? waveObj.user_id[0] : null)
+            );
+          })
+          .filter(Boolean),
+      ),
+    ];
     const users = await User.find({ id: { $in: userIds } }).toArray();
     const UserInfos = this.waveModel.db.collection('userinfos');
-    const userInfos = await UserInfos.find({ user_id: { $in: userIds } }).toArray();
+    const userInfos = await UserInfos.find({
+      user_id: { $in: userIds },
+    }).toArray();
     const userInfosMap = new Map();
-    userInfos.forEach(ui => userInfosMap.set(ui.user_id, ui));
+    userInfos.forEach((ui) => userInfosMap.set(ui.user_id, ui));
     const userMap = new Map();
-    users.forEach(u => {
+    users.forEach((u) => {
       const userInfo = userInfosMap.get(u.id);
       userMap.set(u.id, {
         id: u.id,
@@ -110,12 +149,15 @@ export class WavesService {
         username: u.username,
         email: u.email,
         profile_picture: userInfo?.profile_picture || null,
-        is_verified: u.is_verified
+        is_verified: u.is_verified,
       });
     });
-    const mappedWaves = waves.map(wave => {
+    const mappedWaves = waves.map((wave) => {
       const waveObj: any = wave.toObject();
-      const actualUserId = waveObj.userId || waveObj.user_id || (Array.isArray(waveObj.user_id) ? waveObj.user_id[0] : null);
+      const actualUserId =
+        waveObj.userId ||
+        waveObj.user_id ||
+        (Array.isArray(waveObj.user_id) ? waveObj.user_id[0] : null);
       const userData = userMap.get(actualUserId);
       return {
         ...waveObj,
@@ -127,9 +169,7 @@ export class WavesService {
   }
 
   async findOne(id: number): Promise<Wave> {
-    const wave = await this.waveModel
-      .findOne({ id })
-      .exec();
+    const wave = await this.waveModel.findOne({ id }).exec();
 
     if (!wave) {
       throw new NotFoundException(`Wave #${id} not found`);
@@ -145,7 +185,9 @@ export class WavesService {
     const wave = await this.findOne(id);
 
     if (wave.userId !== userId) {
-      throw new BadRequestException('Vous ne pouvez supprimer que vos propres waves');
+      throw new BadRequestException(
+        'Vous ne pouvez supprimer que vos propres waves',
+      );
     }
 
     await this.waveModel.findOneAndDelete({ id });

@@ -14,18 +14,21 @@ export interface Wave extends Document {
   updatedAt: Date;
 }
 
-export const WaveSchema = new Schema({
-  id: {
-    type: Number,
-    required: true,
-    unique: true,
+export const WaveSchema = new Schema(
+  {
+    id: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    userId: { type: Number, required: true, ref: 'User' },
+    content: { type: String, required: true },
+    likeCount: { type: Number, default: 0 },
+    commentCount: { type: Number, default: 0 },
+    shareCount: { type: Number, default: 0 },
+    visibility: { type: Boolean, default: true },
   },
-  userId: { type: Number, required: true, ref: 'User' },
-  content: { type: String, required: true },
-  likeCount: { type: Number, default: 0 },
-  commentCount: { type: Number, default: 0 },
-  shareCount: { type: Number, default: 0 },
-  visibility: { type: Boolean, default: true },
-}, {
-  timestamps: true,
-});
+  {
+    timestamps: true,
+  },
+);
