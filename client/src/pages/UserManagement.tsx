@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEdit2, FiTrash2, FiToggleLeft, FiToggleRight, FiSearch, FiUsers, FiChevronLeft, FiChevronRight, FiPlus, FiUserX } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiToggleLeft, FiToggleRight, FiSearch, FiUsers, FiChevronLeft, FiChevronRight, FiUserX } from "react-icons/fi";
 import { adminService, User, UserListResponse, CreateUserData } from "../services/adminService";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import Alert from "../components/utils/Alert";
@@ -255,13 +255,6 @@ const UserManagement: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600 transition"
-                >
-                  <FiPlus className="h-4 w-4" />
-                  <span>Créer un utilisateur</span>
-                </button>
                 <button onClick={() => navigate("/admin")} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
                   Retour au panel
                 </button>
