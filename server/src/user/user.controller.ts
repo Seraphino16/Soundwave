@@ -277,6 +277,7 @@ export class UserController {
         throw new BadRequestException("Token d'authentification manquant");
       }
 
+
       let decoded: any;
       try {
         decoded = this.tokenService.verifyToken(token);
