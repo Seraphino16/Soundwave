@@ -17,12 +17,16 @@ export class AuthController {
     try {
       const loginResponse = await this.authService.login(loginDto);
 
-      res.clearCookie('token', { path: '/' });
+      res.clearCookie('token', {
+        path: '/',
+        sameSite: 'none',
+        secure: true,
+      });
 
       res.cookie('token', loginResponse.token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 60 * 60 * 24 * 7 * 1000,
         path: '/',
       });
@@ -31,6 +35,7 @@ export class AuthController {
       return res.status(200).json({
         success: true,
         message: 'Connexion réussie',
+        token: loginResponse.token,
       });
     } catch (error) {
       console.error('Erreur de connexion:', error);
@@ -63,8 +68,8 @@ export class AuthController {
 
       res.cookie('token', loginResponse.token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 60 * 60 * 24 * 7 * 1000,
         path: '/',
       });
@@ -80,8 +85,8 @@ export class AuthController {
     res.clearCookie('token', {
       path: '/',
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
     });
 
 
