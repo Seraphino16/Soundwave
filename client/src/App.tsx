@@ -17,6 +17,7 @@ import Events from './pages/Events';
 import Footer from "./components/footer/Footer";
 import Settings from "pages/Settings";
 import UserProfile from './pages/UserProfile';
+import LegalNotice from './pages/LegalNotice';
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/profile/:userId" element={<UserProfile />} />
+            <Route path="/legal" element={<LegalNotice />} />
           </Routes>
         </div>
         <Footer />

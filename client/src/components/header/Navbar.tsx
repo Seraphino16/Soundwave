@@ -45,22 +45,7 @@ const Navbar = () => {
     const isAuthRoute = location.pathname.startsWith("/auth");
     const isGuestPage = location.pathname === "/";
 
-    const mockUser = {
-        _id: "1",
-        id: 1,
-        pseudo: "Alex Martin",
-        username: "music_lover_2024",
-        email: "alex@example.com",
-        birthdate: "1990-01-01",
-        roles: ["user"],
-        is_verified: true,
-        is_active: true,
-        createdAt: "2023-03-15T10:00:00Z",
-        updatedAt: "2024-08-01T12:00:00Z",
-        verification_token: "",
-    };
-
-    const effectiveUser = user || mockUser;
+    const effectiveUser = user;
     const shouldShowUserInfo = !loading && effectiveUser;
 
     return (
@@ -100,9 +85,6 @@ const Navbar = () => {
                 )}
                 {!isAuthRoute && !isGuestPage && (
                     <div className="hidden lg:flex space-x-6 mx-2 items-center">
-                        <button className="hover:opacity-80 transition-opacity">
-                            <MessagesIcon />
-                        </button>
                         <Link to="/profile" className="hover:opacity-80 transition-opacity" title="Mon profil">
                             <ProfileIcon />
                         </Link>

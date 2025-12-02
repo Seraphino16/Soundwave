@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    FiMap, 
-    FiList, 
-    FiSearch, 
-    FiFilter, 
-    FiMapPin, 
-    FiRefreshCw,
-    FiAlertTriangle,
-    FiLoader
+import {
+    FiMap, FiList, FiSearch, FiFilter, FiMapPin,
+    FiRefreshCw, FiAlertTriangle, FiLoader
 } from 'react-icons/fi';
+
 import { eventsService, Event, EventFilters, Artist } from '../services/eventsService';
 import { calculateHaversineDistance } from '../utils/geoUtils';
 import GoogleEventMap from '../components/events/GoogleEventMap';
@@ -26,7 +21,7 @@ const Events: React.FC = () => {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [showEventModal, setShowEventModal] = useState(false);
     const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-    
+
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedArtist, setSelectedArtist] = useState('');
     const [radiusFilter, setRadiusFilter] = useState<number>(50);
@@ -34,96 +29,100 @@ const Events: React.FC = () => {
     const [dateToFilter, setDateToFilter] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
-    
-    const [alerts, setAlerts] = useState<Array<{
-        id: number;
-        title: string;
-        message: string;
-        type: 'success' | 'error' | 'info' | 'warning';
-    }>>([]);
+
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
+
+
+    const [alerts, setAlerts] = useState<
+        Array<{ id: number; title: string; message: string; type: 'success' | 'error' | 'info' | 'warning' }>
+    >([]);
 
     useEffect(() => {
-        loadInitialData();
-    }, []);
+        loadInitialData(page);
+    }, [page]);
 
     useEffect(() => {
-        if (events.length > 0 && (searchTerm || selectedArtist || dateFromFilter || dateToFilter || (typeFilter && typeFilter !== 'all') || userLocation)) {
+        if (
+            events.length > 0 &&
+            (searchTerm || selectedArtist || dateFromFilter || dateToFilter || (typeFilter && typeFilter !== 'all') || userLocation)
+        ) {
             applyFilters();
         } else if (events.length > 0) {
             setFilteredEvents(events);
         }
     }, [searchTerm, selectedArtist, radiusFilter, dateFromFilter, dateToFilter, typeFilter, userLocation, events]);
 
-    const loadInitialData = async () => {
+    /** 🔹 Chargement initial des événements + artistes */
+
+    const loadInitialData = async (currentPage = 1) => {
         try {
             setLoading(true);
-            
-            const [eventsResponse, artistsResponse] = await Promise.all([
-                eventsService.getEvents(),
-                eventsService.getArtists()
-            ]);
-            
-            setEvents(eventsResponse.events);
-            setFilteredEvents(eventsResponse.events);
-            setArtists(artistsResponse);
-            
-            showAlert('success', 'Événements chargés', `${eventsResponse.events.length} événements trouvés`);
+            const response = await eventsService.getEvents({ city: 'Paris' }, currentPage);
+            console.log('🎵 API Response:', response);
+
+            setEvents(response.events || []);
+
+            setFilteredEvents(response.events || []);
+            setTotalPages(response.totalPages || 1);
+
+            setArtists(response.artists || []);
+
+            setFilteredEvents(response.events || []);
+            setTotalPages(response.totalPages || 1);
         } catch (error) {
-            console.error('Error loading events:', error);
-            showAlert('error', 'Erreur', 'Impossible de charger les événements');
+            console.error('Erreur lors du chargement des événements :', error);
         } finally {
             setLoading(false);
         }
     };
 
+
+
+    /** 🔹 Géolocalisation */
     const getUserLocation = async () => {
         try {
             setLoadingLocation(true);
             const location = await eventsService.getUserLocation();
-            
+
             if (location) {
                 setUserLocation(location);
-                showAlert('success', 'Position trouvée', 'Votre position a été détectée');
+                showAlert('success', 'Position détectée', 'Votre position a été trouvée avec succès.');
             } else {
-                showAlert('warning', 'Position non disponible', 'Impossible de détecter votre position');
+                showAlert('warning', 'Position non disponible', 'Impossible de détecter votre position.');
             }
         } catch (error) {
-            console.error('Error getting user location:', error);
-            showAlert('error', 'Erreur', 'Erreur lors de la géolocalisation');
+            console.error('Erreur géolocalisation:', error);
+            showAlert('error', 'Erreur', 'Erreur lors de la géolocalisation.');
         } finally {
             setLoadingLocation(false);
         }
     };
 
+    /** 🔹 Application des filtres */
     const applyFilters = async () => {
         try {
             const currentFilters: EventFilters = {};
-            
-            if (searchTerm || selectedArtist) {
-                currentFilters.artist = searchTerm || selectedArtist;
-            }
+
+            if (searchTerm || selectedArtist) currentFilters.artist = searchTerm || selectedArtist;
             if (userLocation && radiusFilter) {
                 currentFilters.radius = radiusFilter;
                 currentFilters.location = userLocation;
             }
-            if (dateFromFilter) {
-                currentFilters.dateFrom = dateFromFilter;
-            }
-            if (dateToFilter) {
-                currentFilters.dateTo = dateToFilter;
-            }
-            if (typeFilter && typeFilter !== 'all') {
-                currentFilters.type = typeFilter;
-            }
+            if (dateFromFilter) currentFilters.dateFrom = dateFromFilter;
+            if (dateToFilter) currentFilters.dateTo = dateToFilter;
+            if (typeFilter && typeFilter !== 'all') currentFilters.type = typeFilter;
 
             const response = await eventsService.getEvents(currentFilters);
             setFilteredEvents(response.events);
         } catch (error) {
-            console.error('Error applying filters:', error);
-            showAlert('error', 'Erreur', 'Erreur lors du filtrage des événements');
+            console.error('Erreur filtrage événements:', error);
+            showAlert('error', 'Erreur', 'Erreur lors du filtrage des événements.');
         }
     };
 
+    /** 🔹 Réinitialisation des filtres */
     const resetFilters = () => {
         setSearchTerm('');
         setSelectedArtist('');
@@ -132,35 +131,27 @@ const Events: React.FC = () => {
         setDateToFilter('');
         setTypeFilter('all');
         setFilteredEvents(events);
-        showAlert('info', 'Filtres réinitialisés', 'Tous les filtres ont été supprimés');
+        showAlert('info', 'Filtres réinitialisés', 'Tous les filtres ont été supprimés.');
     };
 
+    /** 🔹 Gestion des alertes */
     const showAlert = (type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) => {
-        const newAlert = {
-            id: Date.now(),
-            title,
-            message,
-            type
-        };
-        setAlerts(prev => [...prev, newAlert]);
-        
-        setTimeout(() => {
-            setAlerts(prev => prev.filter(alert => alert.id !== newAlert.id));
-        }, 5000);
+        const newAlert = { id: Date.now(), title, message, type };
+        setAlerts((prev) => [...prev, newAlert]);
+        setTimeout(() => setAlerts((prev) => prev.filter((a) => a.id !== newAlert.id)), 5000);
     };
 
-    const removeAlert = (id: number) => {
-        setAlerts(prev => prev.filter(alert => alert.id !== id));
-    };
+    const removeAlert = (id: number) => setAlerts((prev) => prev.filter((a) => a.id !== id));
 
+    /** 🔹 Sélection d’un événement */
     const handleEventSelect = (event: Event) => {
         setSelectedEvent(event);
         setShowEventModal(true);
     };
 
+    /** 🔹 Calcul distance utilisateur */
     const calculateDistance = (event: Event): number | undefined => {
         if (!userLocation) return undefined;
-        
         return calculateHaversineDistance(
             userLocation.latitude,
             userLocation.longitude,
@@ -169,6 +160,7 @@ const Events: React.FC = () => {
         );
     };
 
+    /** 🔹 État de chargement */
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -180,9 +172,12 @@ const Events: React.FC = () => {
         );
     }
 
+    const hasMore = page < totalPages;
+
+
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
+            {/* ===== HEADER ===== */}
             <div className="bg-white shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -192,35 +187,30 @@ const Events: React.FC = () => {
                                 Découvrez {filteredEvents.length} événement(s) près de chez vous
                             </p>
                         </div>
-                        
+
                         <div className="mt-4 sm:mt-0 flex items-center space-x-3">
-                            {/* View mode toggle */}
+                            {/* Vue carte / liste */}
                             <div className="flex bg-gray-100 rounded-lg p-1">
-                                <button
-                                    onClick={() => setViewMode('map')}
-                                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition ${
-                                        viewMode === 'map' 
-                                            ? 'bg-white text-gray-900 shadow-sm' 
-                                            : 'text-gray-600 hover:text-gray-900'
-                                    }`}
-                                >
-                                    <FiMap className="h-4 w-4" />
-                                    <span>Carte</span>
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('list')}
-                                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition ${
-                                        viewMode === 'list' 
-                                            ? 'bg-white text-gray-900 shadow-sm' 
-                                            : 'text-gray-600 hover:text-gray-900'
-                                    }`}
-                                >
-                                    <FiList className="h-4 w-4" />
-                                    <span>Liste</span>
-                                </button>
+                                {[
+                                    { mode: 'map', icon: FiMap, label: 'Carte' },
+                                    { mode: 'list', icon: FiList, label: 'Liste' },
+                                ].map(({ mode, icon: Icon, label }) => (
+                                    <button
+                                        key={mode}
+                                        onClick={() => setViewMode(mode as 'map' | 'list')}
+                                        className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition ${
+                                            viewMode === mode
+                                                ? 'bg-white text-gray-900 shadow-sm'
+                                                : 'text-gray-600 hover:text-gray-900'
+                                        }`}
+                                    >
+                                        <Icon className="h-4 w-4" />
+                                        <span>{label}</span>
+                                    </button>
+                                ))}
                             </div>
-                            
-                            {/* Get location button */}
+
+                            {/* Géolocalisation */}
                             <button
                                 onClick={getUserLocation}
                                 disabled={loadingLocation}
@@ -238,25 +228,23 @@ const Events: React.FC = () => {
                 </div>
             </div>
 
-            {/* Filters */}
+            {/* ===== FILTRES ===== */}
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-                        {/* Search bar */}
-                        <div className="flex-1 max-w-lg">
-                            <div className="relative">
-                                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Rechercher un événement ou un artiste..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
-                                />
-                            </div>
+                        {/* Barre de recherche */}
+                        <div className="flex-1 max-w-lg relative">
+                            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Rechercher un événement ou un artiste..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
+                            />
                         </div>
 
-                        {/* Filter toggle and reset */}
+                        {/* Boutons filtre + reset */}
                         <div className="flex items-center space-x-3">
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
@@ -265,7 +253,7 @@ const Events: React.FC = () => {
                                 <FiFilter className="h-4 w-4" />
                                 <span>Filtres</span>
                             </button>
-                            
+
                             <button
                                 onClick={resetFilters}
                                 className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition"
@@ -276,21 +264,19 @@ const Events: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Extended filters */}
+                    {/* Filtres avancés */}
                     {showFilters && (
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-                            {/* Artist filter */}
+                            {/* Artiste */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Artiste
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Artiste</label>
                                 <select
                                     value={selectedArtist}
                                     onChange={(e) => setSelectedArtist(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
                                 >
                                     <option value="">Tous les artistes</option>
-                                    {artists.map(artist => (
+                                    {artists.map((artist) => (
                                         <option key={artist.id} value={artist.name}>
                                             {artist.name}
                                         </option>
@@ -298,7 +284,7 @@ const Events: React.FC = () => {
                                 </select>
                             </div>
 
-                            {/* Radius filter */}
+                            {/* Rayon */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Rayon ({radiusFilter} km)
@@ -314,13 +300,11 @@ const Events: React.FC = () => {
                                     className="w-full"
                                 />
                                 {!userLocation && (
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        Activez la géolocalisation
-                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">Activez la géolocalisation</p>
                                 )}
                             </div>
 
-                            {/* Date from */}
+                            {/* Date de début */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Date de début
@@ -333,7 +317,7 @@ const Events: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Event type */}
+                            {/* Type d'événement */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Type d'événement
@@ -355,7 +339,7 @@ const Events: React.FC = () => {
                 </div>
             </div>
 
-            {/* Main content */}
+            {/* ===== CONTENU PRINCIPAL ===== */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {viewMode === 'map' ? (
                     <GoogleEventMap
@@ -367,9 +351,8 @@ const Events: React.FC = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredEvents.length > 0 ? (
-                            filteredEvents.map(event => (
+                            filteredEvents.map((event) => (
                                 <EventCard
-                                    key={event.id}
                                     event={event}
                                     onClick={() => handleEventSelect(event)}
                                     showDistance={calculateDistance(event)}
@@ -378,9 +361,7 @@ const Events: React.FC = () => {
                         ) : (
                             <div className="col-span-full text-center py-12">
                                 <FiAlertTriangle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                    Aucun événement trouvé
-                                </h3>
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun événement trouvé</h3>
                                 <p className="text-gray-600 mb-4">
                                     Essayez de modifier vos critères de recherche ou vos filtres.
                                 </p>
@@ -395,12 +376,37 @@ const Events: React.FC = () => {
                     </div>
                 )}
             </div>
+            {/* ===== PAGINATION ===== */}
+            {viewMode === 'list' && filteredEvents.length > 0 && (
+                <div className="flex justify-center mt-8 space-x-3">
+                    <button
+                        onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={page === 1}
+                        className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-300 transition"
+                    >
+                        ← Précédent
+                    </button>
 
-            {/* Toast notifications */}
+                    <span className="px-4 py-2 text-gray-700">
+                      Page {page} / {totalPages}
+                    </span>
+
+                    <button
+                        onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={!hasMore}
+                        className="px-4 py-2 bg-primaryBlue text-white rounded-lg disabled:opacity-50 hover:bg-blue-600 transition"
+                    >
+                        Suivant →
+                    </button>
+                </div>
+            )}
+
+
+
+            {/* ===== ALERTES ===== */}
             <div className="fixed bottom-0 right-0 m-4 space-y-2 z-50">
-                {alerts.map(alert => (
+                {alerts.map((alert) => (
                     <Alert
-                        key={alert.id}
                         id={alert.id}
                         type={alert.type}
                         title={alert.title}
@@ -410,7 +416,7 @@ const Events: React.FC = () => {
                 ))}
             </div>
 
-            {/* Event Details Modal */}
+            {/* ===== MODALE ===== */}
             <EventDetailsModal
                 event={selectedEvent}
                 isOpen={showEventModal}
@@ -420,6 +426,7 @@ const Events: React.FC = () => {
                 }}
                 userLocation={userLocation}
             />
+
         </div>
     );
 };

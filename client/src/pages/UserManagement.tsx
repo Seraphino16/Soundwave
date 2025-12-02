@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEdit2, FiTrash2, FiToggleLeft, FiToggleRight, FiSearch, FiUsers, FiChevronLeft, FiChevronRight, FiPlus, FiUserX } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiToggleLeft, FiToggleRight, FiSearch, FiUsers, FiChevronLeft, FiChevronRight, FiUserX } from "react-icons/fi";
 import { adminService, User, UserListResponse, CreateUserData } from "../services/adminService";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import Alert from "../components/utils/Alert";
@@ -15,7 +15,7 @@ const UserManagement: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showRoleModal, setShowRoleModal] = useState(false);
@@ -97,11 +97,17 @@ const UserManagement: React.FC = () => {
     if (!selectedUser || !newRole) return;
 
     try {
-      await adminService.updateUserRole(selectedUser.id, newRole);
+      const user = await adminService.updateUserRole(selectedUser.id, newRole);
       setShowRoleModal(false);
       setSelectedUser(null);
       setNewRole("");
-      fetchUsers();
+      if (user) {
+        setUsers(prevUsers => prevUsers.map(
+            (prevUser) => prevUser.id === user.id ? user : prevUser
+        ));
+      } else {
+        throw new Error("User not received");
+      }
       showAlert("success", "Succès", "Rôle mis à jour avec succès");
     } catch (error) {
       console.error("Error updating role:", error);
@@ -111,8 +117,16 @@ const UserManagement: React.FC = () => {
 
   const handleToggleStatus = async (user: User) => {
     try {
-      await adminService.toggleUserStatus(user.id);
-      fetchUsers();
+      const newActiveStatus = !user.is_active;
+
+      const newUser = await adminService.toggleUserStatus(user.id, newActiveStatus);
+      if (user) {
+        setUsers(prevUsers => prevUsers.map(
+            (prevUser) => prevUser.id === newUser.id ? newUser : prevUser
+        ));
+      } else {
+        throw new Error("User not received");
+      }
       showAlert("success", "Succès", `Utilisateur ${user.is_active ? "désactivé" : "activé"} avec succès`);
     } catch (error) {
       console.error("Error toggling status:", error);
@@ -222,17 +236,6 @@ const UserManagement: React.FC = () => {
     return new Date(dateString).toLocaleDateString("fr-FR");
   };
 
-  if (userLoading || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryBlue mx-auto"></div>
-          <p className="mt-4 text-gray-600">{userLoading ? "Vérification des permissions..." : "Chargement des utilisateurs..."}</p>
-        </div>
-      </div>
-    );
-  }
-
   if (!isAdmin) {
     return null;
   }
@@ -252,13 +255,6 @@ const UserManagement: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-blue-600 transition"
-                >
-                  <FiPlus className="h-4 w-4" />
-                  <span>Créer un utilisateur</span>
-                </button>
                 <button onClick={() => navigate("/admin")} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
                   Retour au panel
                 </button>
@@ -283,7 +279,7 @@ const UserManagement: React.FC = () => {
                 onChange={(e) => setRoleFilter(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primaryBlue focus:border-transparent"
               >
-                <option value="all">Tous les rôles</option>
+                <option value="">Tous les rôles</option>
                 <option value="USER">Utilisateur</option>
                 <option value="ARTIST">Artiste</option>
                 <option value="ADMIN">Administrateur</option>
@@ -304,147 +300,152 @@ const UserManagement: React.FC = () => {
             </form>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inscription</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{user.pseudo}</div>
-                          <div className="text-sm text-gray-500">@{user.username}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{user.email}</div>
-                        <div className="text-sm text-gray-500">
-                          {user.is_verified ? (
-                            <span className="text-green-600">✓ Vérifié</span>
-                          ) : (
-                            <span className="text-orange-600">⚠ Non vérifié</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+          {(userLoading && loading) ? (
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryBlue mx-auto"></div>
+                <p className="mt-4 text-gray-600">{userLoading ? "Vérification des permissions..." : "Chargement des utilisateurs..."}</p>
+              </div>
+            </div>
+          ) : (
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inscription</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                    {users.map((user) => (
+                        <tr key={user.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{user.pseudo}</div>
+                              <div className="text-sm text-gray-500">@{user.username}</div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{user.email}</div>
+                            <div className="text-sm text-gray-500">
+                              {user.is_verified ? (
+                                  <span className="text-green-600">✓ Vérifié</span>
+                              ) : (
+                                  <span className="text-orange-600">⚠ Non vérifié</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.roles)}`}>
                           {user.roles.join(", ")}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          {user.is_active ? (
-                            <FiToggleRight className="text-green-500 text-xl mr-2" />
-                          ) : (
-                            <FiToggleLeft className="text-gray-400 text-xl mr-2" />
-                          )}
-                          <span className={`text-sm ${user.is_active ? "text-green-600" : "text-gray-500"}`}>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <button
+                                  onClick={() => handleToggleStatus(user)}
+                                  className={`${user.is_active ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}`}
+                                  title={user.is_active ? "Désactiver" : "Activer"}
+                              >
+                                {user.is_active ? <FiToggleRight className="text-green-500 text-xl mr-2"/> : <FiToggleLeft className="text-gray-400 text-xl mr-2" />}
+                              </button>
+                              <span className={`text-sm ${user.is_active ? "text-green-600" : "text-gray-500"}`}>
                             {user.is_active ? "Actif" : "Inactif"}
                           </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setNewRole(user.roles[0]);
-                              setShowRoleModal(true);
-                            }}
-                            className="text-primaryBlue hover:text-blue-600"
-                            title="Modifier le rôle"
-                          >
-                            <FiEdit2 />
-                          </button>
-                          <button
-                            onClick={() => handleToggleStatus(user)}
-                            className={`${user.is_active ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}`}
-                            title={user.is_active ? "Désactiver" : "Activer"}
-                          >
-                            {user.is_active ? <FiToggleLeft /> : <FiToggleRight />}
-                          </button>
-                          {!user.roles.includes("ADMIN") && (
-                            <>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(user.createdAt)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex space-x-2">
                               <button
-                                onClick={() => handleBanUser(user)}
-                                className="text-yellow-600 hover:text-yellow-700"
-                                title={user.is_active ? "Bannir" : "Débannir"}
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setNewRole(user.roles[0]);
+                                    setShowRoleModal(true);
+                                  }}
+                                  className="text-primaryBlue hover:text-blue-600"
+                                  title="Modifier le rôle"
                               >
-                                <FiUserX />
+                                <FiEdit2 />
                               </button>
-                              <button onClick={() => handleDeleteUser(user)} className="text-red-600 hover:text-red-700" title="Supprimer">
-                                <FiTrash2 />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {totalPages > 1 && (
-              <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
-                <div className="flex-1 flex justify-between sm:hidden">
-                  <button
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Précédent
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Suivant
-                  </button>
+                              {!user.roles.includes("ADMIN") && (
+                                  <>
+                                    <button
+                                        onClick={() => handleBanUser(user)}
+                                        className="text-yellow-600 hover:text-yellow-700"
+                                        title={user.is_active ? "Bannir" : "Débannir"}
+                                    >
+                                      <FiUserX />
+                                    </button>
+                                    <button onClick={() => handleDeleteUser(user)} className="text-red-600 hover:text-red-700" title="Supprimer">
+                                      <FiTrash2 />
+                                    </button>
+                                  </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                  </table>
                 </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Affichage de <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> à{" "}
-                      <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalUsers)}</span> sur{" "}
-                      <span className="font-medium">{totalUsers}</span> résultats
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="p-2 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <FiChevronLeft />
-                    </button>
-                    <span className="px-4 py-2 text-sm font-medium text-gray-700">
+
+                {totalPages > 1 && (
+                    <div className="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                      <div className="flex-1 flex justify-between sm:hidden">
+                        <button
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Précédent
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Suivant
+                        </button>
+                      </div>
+                      <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-sm text-gray-700">
+                            Affichage de <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> à{" "}
+                            <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalUsers)}</span> sur{" "}
+                            <span className="font-medium">{totalUsers}</span> résultats
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                              onClick={() => setCurrentPage(currentPage - 1)}
+                              disabled={currentPage === 1}
+                              className="p-2 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <FiChevronLeft />
+                          </button>
+                          <span className="px-4 py-2 text-sm font-medium text-gray-700">
                       Page {currentPage} sur {totalPages}
                     </span>
-                    <button
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="p-2 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <FiChevronRight />
-                    </button>
-                  </div>
-                </div>
+                          <button
+                              onClick={() => setCurrentPage(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                              className="p-2 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <FiChevronRight />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                )}
               </div>
-            )}
-          </div>
+          )}
+
         </div>
 
         {showRoleModal && selectedUser && (

@@ -22,6 +22,12 @@ import { UtilsModule } from './utils/utils.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { WavesModule } from './waves/waves.module';
+import { EventsModule } from './events/events.module';
+import { AdminController } from './admin/admin.controller';
+import { AdminService } from './admin/admin.service';
+import {UserSchema} from "./user/entities/user.entity";
+import {UserInfosSchema} from "./user/entities/user-infos.entity";
+import {UserSettingsSchema} from "./user/entities/user-settings.entity";
 
 @Module({
   imports: [
@@ -33,6 +39,7 @@ import { WavesModule } from './waves/waves.module';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     UserModule,
     TokenModule,
     MailerModule,
@@ -44,6 +51,7 @@ import { WavesModule } from './waves/waves.module';
     RatingsModule,
     ReviewsModule,
     WavesModule,
+    EventsModule,
   ],
   controllers: [
     AppController,
@@ -51,6 +59,7 @@ import { WavesModule } from './waves/waves.module';
     AuthController,
     UploadsController,
     GoogleController,
+    AdminController,
   ],
   providers: [
     AppService,
@@ -58,6 +67,7 @@ import { WavesModule } from './waves/waves.module';
     SpotifyService,
     UploadsService,
     GoogleService,
+    AdminService,
   ],
 })
 export class AppModule {}

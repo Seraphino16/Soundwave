@@ -33,9 +33,6 @@ const FeedWaves: React.FC = () => {
         }
     };
 
-    const handleComment = async (_waveId: number) => {
-    };
-
     const handleDelete = async (waveId: number) => {
         try {
             await feedWavesService.deleteWave(waveId);
@@ -87,7 +84,6 @@ const FeedWaves: React.FC = () => {
                         key={wave.id}
                         wave={wave}
                         onLike={handleLike}
-                        onComment={handleComment}
                         onDelete={handleDelete}
                     />
                 ))}

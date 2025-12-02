@@ -17,12 +17,16 @@ export class AuthController {
     try {
       const loginResponse = await this.authService.login(loginDto);
 
-      res.clearCookie('token', { path: '/' });
+      res.clearCookie('token', {
+        path: '/',
+        sameSite: 'none',
+        secure: true,
+      });
 
       res.cookie('token', loginResponse.token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 60 * 60 * 24 * 7 * 1000,
         path: '/',
       });
@@ -31,6 +35,7 @@ export class AuthController {
       return res.status(200).json({
         success: true,
         message: 'Connexion réussie',
+        token: loginResponse.token,
       });
     } catch (error) {
       console.error('Erreur de connexion:', error);
@@ -63,8 +68,8 @@ export class AuthController {
 
       res.cookie('token', loginResponse.token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 60 * 60 * 24 * 7 * 1000,
         path: '/',
       });
@@ -80,9 +85,10 @@ export class AuthController {
     res.clearCookie('token', {
       path: '/',
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
     });
+
 
     return res.status(200).json({
       success: true,
@@ -95,7 +101,8 @@ export class AuthController {
     const baseUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
     const params = new URLSearchParams({
       client_id: process.env.GOOGLE_CLIENT_ID!,
-      redirect_uri: 'http://localhost:5001/auth/google/callback',
+      redirect_uri:
+        process.env.REACT_APP_API_BASE_URL + '/auth/google/callback',
       response_type: 'code',
       scope: 'openid email profile',
       access_type: 'offline',

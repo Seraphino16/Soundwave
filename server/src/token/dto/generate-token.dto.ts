@@ -1,7 +1,6 @@
-import { IsEmail, IsString, IsNotEmpty, IsInt } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, IsInt, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 export class GenerateTokenDto {
-
   @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
@@ -16,4 +15,8 @@ export class GenerateTokenDto {
   @IsInt()
   @IsNotEmpty()
   id: number;
+
+  @ApiProperty()
+  @IsArray()
+  roles: string[];
 }

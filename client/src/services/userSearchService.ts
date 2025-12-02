@@ -60,7 +60,7 @@ class UserSearchService {
                 id: 11,
                 pseudo: 'stephe',
                 username: 'stephe',
-                profile_picture: 'http://localhost:5001/uploads/users/11/11_pfp.webp?v=1759241853990',
+                profile_picture: `${process.env.REACT_APP_API_BASE_URL}/uploads/users/11/11_pfp.webp?v=1759241853990`,
                 bio: 'salut c moi',
                 is_verified: true,
                 followers: 42
@@ -115,7 +115,7 @@ class UserSearchService {
                 id: 11,
                 pseudo: 'stephe',
                 username: 'stephe',
-                profile_picture: 'http://localhost:5001/uploads/users/11/11_pfp.webp?v=1759241853990',
+                profile_picture: `${process.env.REACT_APP_API_BASE_URL}/uploads/users/11/11_pfp.webp?v=1759241853990`,
                 bio: 'salut c moi',
                 is_verified: true,
                 followers: 42

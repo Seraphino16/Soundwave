@@ -43,6 +43,7 @@ const AdminDashboard: React.FC = () => {
         }
     }, [period, isAdmin, userLoading]);
 
+
     const fetchDashboardData = async () => {
         setLoading(true);
         try {

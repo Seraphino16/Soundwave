@@ -18,7 +18,7 @@ const Footer = () => {
                             <NavItem text="À PROPOS" href="#" />
                             <NavItem text="CONTACT" href="#" />
                             <NavItem text="AIDE" href="#" />
-                            <NavItem text="MENTIONS LÉGALES" href="#" />
+                            <NavItem text="MENTIONS LÉGALES" href="/legal" />
                         </div>
                     </div>
                     <div className="hidden lg:flex space-x-6">

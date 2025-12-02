@@ -6,7 +6,12 @@ const Sharp = require('sharp');
 @Injectable()
 export class UploadsService {
   private readonly uploadPath = path.join(process.cwd(), 'uploads');
-  private readonly allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  private readonly allowedMimeTypes = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+  ];
   private readonly maxFileSize = 5 * 1024 * 1024;
 
   constructor() {
@@ -34,11 +39,15 @@ export class UploadsService {
     }
 
     if (!this.allowedMimeTypes.includes(file.mimetype)) {
-      throw new BadRequestException('Format de fichier non supporté. Utilisez JPG, PNG ou WebP');
+      throw new BadRequestException(
+        'Format de fichier non supporté. Utilisez JPG, PNG ou WebP',
+      );
     }
 
     if (file.size > this.maxFileSize) {
-      throw new BadRequestException('Le fichier est trop volumineux. Taille maximale: 5MB');
+      throw new BadRequestException(
+        'Le fichier est trop volumineux. Taille maximale: 5MB',
+      );
     }
   }
 
@@ -50,7 +59,7 @@ export class UploadsService {
   }
 
   getFileUrl(filename: string, subdir?: string): string {
-    const base = 'http://localhost:5001/uploads';
+    const base = `${process.env.REACT_APP_API_BASE_URL}/uploads`;
     return subdir ? `${base}/${subdir}/${filename}` : `${base}/${filename}`;
   }
 
@@ -103,8 +112,8 @@ export class UploadsService {
 
     this.validateImageFile(file);
 
-  const suffix = type === 'profile' ? 'pfp' : 'banner';
-  const filename = `${userId}_${suffix}.webp`;
+    const suffix = type === 'profile' ? 'pfp' : 'banner';
+    const filename = `${userId}_${suffix}.webp`;
     const userDir = path.join(this.uploadPath, 'users', String(userId));
     this.ensureDir(userDir);
 
@@ -112,10 +121,10 @@ export class UploadsService {
 
     const destPath = path.join(userDir, filename);
 
-  await Sharp(file.buffer).webp({ quality: 85 }).toFile(destPath);
+    await Sharp(file.buffer).webp({ quality: 85 }).toFile(destPath);
 
-  const relativeSubdir = path.posix.join('users', String(userId));
-  const url = `${this.getFileUrl(filename, relativeSubdir)}?v=${Date.now()}`;
+    const relativeSubdir = path.posix.join('users', String(userId));
+    const url = `${this.getFileUrl(filename, relativeSubdir)}?v=${Date.now()}`;
 
     return { url, filePath: destPath, filename };
   }

@@ -43,46 +43,6 @@ const AdminPanel: React.FC = () => {
                 Accéder
               </button>
             </div>
-
-            <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center mb-4">
-                <span className="text-2xl mr-3">📊</span>
-                <h3 className="text-xl font-semibold text-gray-800">Tableau de Bord</h3>
-              </div>
-              <p className="text-gray-600 mb-4">Voir les statistiques et performances de la plateforme.</p>
-              <button
-                onClick={() => navigate("/admin/dashboard")}
-                className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold"
-              >
-                Accéder
-              </button>
-            </div>
-
-            <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center mb-4">
-                <span className="text-2xl mr-3">🔒</span>
-                <h3 className="text-xl font-semibold text-gray-800">Sécurité</h3>
-              </div>
-              <p className="text-gray-600 mb-4">Logs de sécurité et gestion des accès.</p>
-              <button className="px-4 py-2 bg-primaryBlue text-white rounded-lg hover:bg-[#B0C7E6] transition font-semibold">Accéder</button>
-            </div>
-          </div>
-          <div className="bg-gray-50 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Informations Système</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-gray-600">Utilisateurs actifs:</span>
-                <span className="ml-2 text-gray-800">1,234</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-600">Albums:</span>
-                <span className="ml-2 text-gray-800">5,678</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-600">Artistes:</span>
-                <span className="ml-2 text-gray-800">892</span>
-              </div>
-            </div>
           </div>
 
           <div className="mt-6 text-center">

@@ -6,11 +6,10 @@ import { useUserContext } from '../../context/UserContext';
 interface FeedWaveCardProps {
     wave: FeedWave;
     onLike?: (waveId: number) => void;
-    onComment?: (waveId: number) => void;
     onDelete?: (waveId: number) => void;
 }
 
-const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment, onDelete }) => {
+const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onDelete }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -72,12 +71,6 @@ const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment, on
         e.stopPropagation();
         setIsLiked(!isLiked);
         onLike?.(wave.id);
-    };
-
-    const handleComment = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onComment?.(wave.id);
     };
 
     const handleDelete = () => {
@@ -172,19 +165,6 @@ const FeedWaveCard: React.FC<FeedWaveCardProps> = ({ wave, onLike, onComment, on
                             </span>
                         </button>
 
-                        <button 
-                            onClick={handleComment}
-                            className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors group"
-                            title="Commenter"
-                        >
-                            <span className="text-lg">💬</span>
-                            <span className="text-sm font-medium">{wave.commentCount}</span>
-                        </button>
-
-                        <div className="flex items-center space-x-2 text-gray-400">
-                            <span className="text-lg">🔄</span>
-                            <span className="text-sm font-medium">{wave.shareCount}</span>
-                        </div>
                     </div>
                 </div>
             </div>

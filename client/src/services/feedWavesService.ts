@@ -109,7 +109,7 @@ class FeedWavesService {
 export const feedWavesService = new FeedWavesService();
 
 class ReviewsService {
-    private baseUrl = 'http://localhost:5001';
+    private baseUrl = process.env.REACT_APP_API_BASE_URL;
     async getFeedReviews(_page: number = 1, _limit: number = 10): Promise<{ reviews: FeedReview[], total: number }> {
         const mockReviews: FeedReview[] = [
             {

@@ -4,7 +4,7 @@
  */
 
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:5001',
+  BASE_URL: process.env.REACT_APP_API_BASE_URL,
   ENDPOINTS: {
     USERS: {
       ME: '/users/me',
@@ -21,6 +21,11 @@ export const API_CONFIG = {
       PROFILE_PICTURE: (userId: number) => `/uploads/profile-picture/${userId}`,
       BANNER_PICTURE: (userId: number) => `/uploads/banner-picture/${userId}`,
     },
+      EVENTS: {
+          LIST: '/events',
+          DETAILS: (id: number) => `/events/${id}`,
+          ARTISTS: '/artists',
+      },
   },
 } as const;
 

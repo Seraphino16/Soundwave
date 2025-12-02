@@ -13,13 +13,21 @@ export class SpotifyService {
   constructor(private configService: ConfigService) {
     this.spotifyApiUrl = this.configService.get<string>('SPOTIFY_API_URL')!;
     this.clientId = this.configService.get<string>('SPOTIFY_CLIENT_ID')!;
-    this.clientSecret = this.configService.get<string>('SPOTIFY_CLIENT_SECRET')!;
-    this.redirectUriRegister = this.configService.get<string>('SPOTIFY_REDIRECT_URI_REGISTER')!;
-    this.redirectUriLogin = this.configService.get<string>('SPOTIFY_REDIRECT_URI_LOGIN')!;
+    this.clientSecret = this.configService.get<string>(
+      'SPOTIFY_CLIENT_SECRET',
+    )!;
+    this.redirectUriRegister = this.configService.get<string>(
+      'SPOTIFY_REDIRECT_URI_REGISTER',
+    )!;
+    this.redirectUriLogin = this.configService.get<string>(
+      'SPOTIFY_REDIRECT_URI_LOGIN',
+    )!;
   }
 
   generateSpotifyAuthUrl(isLogin: boolean = false): string {
-    const redirectUri = isLogin ? this.redirectUriLogin : this.redirectUriRegister;
+    const redirectUri = isLogin
+      ? this.redirectUriLogin
+      : this.redirectUriRegister;
 
     return (
       `https://accounts.spotify.com/authorize?` +
@@ -30,8 +38,13 @@ export class SpotifyService {
     );
   }
 
-  async getAccessTokenFromCode(code: string, isLogin: boolean = false): Promise<string> {
-    const redirectUri = isLogin ? this.redirectUriLogin : this.redirectUriRegister;
+  async getAccessTokenFromCode(
+    code: string,
+    isLogin: boolean = false,
+  ): Promise<string> {
+    const redirectUri = isLogin
+      ? this.redirectUriLogin
+      : this.redirectUriRegister;
 
     const response = await axios.post(
       'https://accounts.spotify.com/api/token',
@@ -78,16 +91,23 @@ export class SpotifyService {
   async getAllNewReleases() {
     try {
       const accessToken = await this.getAccessToken();
-      let allAlbums: { id: string; title: string; coverImage: string | null }[] = [];
+      let allAlbums: {
+        id: string;
+        title: string;
+        coverImage: string | null;
+      }[] = [];
       const limit = 50;
       let offset = 0;
       let hasMore = true;
 
       while (hasMore) {
-        const response = await axios.get(`${this.spotifyApiUrl}/browse/new-releases`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          params: { limit, offset },
-        });
+        const response = await axios.get(
+          `${this.spotifyApiUrl}/browse/new-releases`,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            params: { limit, offset },
+          },
+        );
 
         const albums = response.data.albums.items.map((album: any) => ({
           id: album.id,
@@ -161,10 +181,13 @@ export class SpotifyService {
       let hasMore = true;
 
       while (hasMore) {
-        const response = await axios.get(`${this.spotifyApiUrl}/browse/new-releases`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          params: { limit, offset },
-        });
+        const response = await axios.get(
+          `${this.spotifyApiUrl}/browse/new-releases`,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            params: { limit, offset },
+          },
+        );
 
         const artists = response.data.albums.items
           .flatMap((album: any) =>
@@ -174,7 +197,10 @@ export class SpotifyService {
               image: album.images.length > 0 ? album.images[0].url : null,
             })),
           )
-          .filter((artist, index, self) => index === self.findIndex((a) => a.id === artist.id));
+          .filter(
+            (artist, index, self) =>
+              index === self.findIndex((a) => a.id === artist.id),
+          );
 
         allArtists = [...allArtists, ...artists];
 
@@ -219,14 +245,17 @@ export class SpotifyService {
     try {
       const accessToken = await this.getAccessToken();
 
-      const response = await axios.get(`${this.spotifyApiUrl}/artists/${artistId}/albums`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        params: {
-          include_groups: 'album',
-          market: 'FR',
-          limit: 50,
+      const response = await axios.get(
+        `${this.spotifyApiUrl}/artists/${artistId}/albums`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          params: {
+            include_groups: 'album',
+            market: 'FR',
+            limit: 50,
+          },
         },
-      });
+      );
 
       const albums = response.data.items.map((album: any) => ({
         id: album.id,
@@ -236,7 +265,10 @@ export class SpotifyService {
 
       return { albums };
     } catch (error) {
-      console.error("Erreur lors de la récupération des albums de l'artiste:", error);
+      console.error(
+        "Erreur lors de la récupération des albums de l'artiste:",
+        error,
+      );
       throw new Error("Impossible de récupérer les albums de l'artiste");
     }
   }
@@ -245,18 +277,24 @@ export class SpotifyService {
     try {
       const accessToken = await this.getAccessToken();
 
-      const response = await axios.get(`${this.spotifyApiUrl}/artists/${artistId}/albums`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        params: { include_groups: 'album', market: 'FR', limit: 50 },
-      });
+      const response = await axios.get(
+        `${this.spotifyApiUrl}/artists/${artistId}/albums`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          params: { include_groups: 'album', market: 'FR', limit: 50 },
+        },
+      );
 
       const albums = response.data.items;
 
       const albumsWithTracks = await Promise.all(
         albums.map(async (album: any) => {
-          const albumDetails = await axios.get(`${this.spotifyApiUrl}/albums/${album.id}`, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
+          const albumDetails = await axios.get(
+            `${this.spotifyApiUrl}/albums/${album.id}`,
+            {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            },
+          );
 
           return {
             id: album.id,
@@ -270,17 +308,23 @@ export class SpotifyService {
               spotifyUrl: track.external_urls?.spotify || null,
             })),
           };
-        })
+        }),
       );
 
       return { albums: albumsWithTracks };
     } catch (error) {
-      console.error('Erreur lors de la récupération des albums avec pistes:', error);
-      throw new Error("Impossible de récupérer les albums avec les pistes");
+      console.error(
+        'Erreur lors de la récupération des albums avec pistes:',
+        error,
+      );
+      throw new Error('Impossible de récupérer les albums avec les pistes');
     }
   }
 
-  private async searchSpotify(type: 'album' | 'artist', filters: Record<string, string>): Promise<any> {
+  private async searchSpotify(
+    type: 'album' | 'artist',
+    filters: Record<string, string>,
+  ): Promise<any> {
     const accessToken = await this.getAccessToken();
     const queryParts: string[] = [];
 
@@ -341,7 +385,9 @@ export class SpotifyService {
 
       if (name) {
         const lowerName = name.toLowerCase();
-        artists = artists.filter((a) => a.name.toLowerCase().includes(lowerName));
+        artists = artists.filter((a) =>
+          a.name.toLowerCase().includes(lowerName),
+        );
       }
 
       return { artists };
